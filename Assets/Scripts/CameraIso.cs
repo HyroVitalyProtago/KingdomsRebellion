@@ -15,7 +15,7 @@ public class CameraIso : MonoBehaviour {
 	public static float RotateAmount { get { return 10f; } }
 	public static float RotateSpeed { get { return 100f; } }
 	public static float MinCameraZoom { get { return 3f; } }
-	public static float MaxCameraZoom { get { return 20f; } }
+	public static float MaxCameraZoom { get { return 100f; } }
 
 	void Update() {
 		Move();
