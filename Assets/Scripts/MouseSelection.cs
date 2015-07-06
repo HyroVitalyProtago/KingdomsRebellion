@@ -7,7 +7,7 @@ public class MouseSelection : MonoBehaviour {
 
     private Ray ray;
     private RaycastHit hit;
-    public IList<GameObject> selectedObjects;
+    public static IList<GameObject> selectedObjects;
     private GameObject target;
     private Vector3 hitpoint;
     private Vector3 mousePosition;
@@ -18,49 +18,56 @@ public class MouseSelection : MonoBehaviour {
     void Start() {
         selectedObjects = new List<GameObject>();
         target = GameObject.Find("Transform");
-        timeLeftBeforeDragging = .2f;
+        timeLeftBeforeDragging = .15f;
         isDragging = false;
     }
 
     // Update is called once per frame
     void Update() {
         ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        
+
         if (Physics.Raycast(ray.origin, ray.direction, out hit)) {
-            if (hit.collider.CompareTag("Unit") && hit.collider.gameObject.GetComponent<Unit>().color == playerColor) {
-                if (Input.GetMouseButtonDown(0)) {
-                    if (!Input.GetKey(KeyCode.LeftControl)) {
-                        selectedObjects.Clear();
-                    }
-                    selectedObjects.Add(hit.collider.gameObject);
-                }
-            }
             if (Input.GetMouseButtonDown(0)) {
-                Physics.Raycast(ray.origin, ray.direction, out hit);
                 hitpoint = hit.point;
-                mousePosition = Input.mousePosition;
-            }
-            if (Input.GetMouseButton(0)) {
+                mousePosition = Input.mousePosition; 
+                if (!Input.GetKey(KeyCode.LeftControl)) {
+                    DeselectUnits();
+                }
+                if (hit.collider.CompareTag("Unit")) {
+                    
+                    selectedObjects.Add(hit.collider.gameObject);
+                    hit.collider.gameObject.GetComponent<Unit>().selected = true;
+                }
+
+            } else if (Input.GetMouseButton(0)) {
                 if (!isDragging) {
                     timeLeftBeforeDragging -= Time.deltaTime;
                 }
                 if (timeLeftBeforeDragging <= 0f) {
                     isDragging = true;
-                    Debug.Log("Dragging");
                 }
-            }
-            if (Input.GetMouseButtonUp(0)) {
-                if (Physics.Raycast(ray.origin, ray.direction, out hit)) {
+            } else if (Input.GetMouseButtonUp(0)) {
+                if (isDragging) {
+                    SelectUnits();
                 }
-                    if (isDragging) {
-                        SelectUnits();
-                    }
                 isDragging = false;
-                timeLeftBeforeDragging = .2f;
+                timeLeftBeforeDragging = .15f;
             }
+            
+            
             if (Input.GetMouseButtonUp(1)) {
                 target.transform.position = hit.point; 
                 MoveUnits(target.transform);
+                if (hit.collider.CompareTag("Unit")) {
+                    var unit = hit.collider.GetComponent<Unit>();
+                    if ( unit.color != playerColor) {
+                        foreach (var ally in selectedObjects) {
+                            var allyUnit = ally.GetComponent<Unit>();
+                            allyUnit.ennemyTargeted = unit;
+                            allyUnit.attacking = true;
+                        }
+                    }
+                }
             }
         }
     }
@@ -68,8 +75,11 @@ public class MouseSelection : MonoBehaviour {
 
     void MoveUnits(Transform newtrans) {
         foreach (var unit in selectedObjects) {
-            AICharacterControl aichar = unit.GetComponent<AICharacterControl>();
-            aichar.SetTarget(newtrans);
+            if (unit.GetComponent<Unit>().color == playerColor) {
+                AICharacterControl aichar = unit.GetComponent<AICharacterControl>();
+                Debug.Log("move");
+                aichar.SetTarget(newtrans);
+            }
         }
     }
 
@@ -77,28 +87,39 @@ public class MouseSelection : MonoBehaviour {
         if(isDragging) {
             Vector2 pos = new Vector2(mousePosition.x, Screen.height - mousePosition.y);
             Vector2 size = new Vector2(Input.mousePosition.x - mousePosition.x, mousePosition.y - Input.mousePosition.y);
-            GUI.Box(new Rect(pos, size), GUIContent.none);
+            Rect rect = new Rect(pos, size);
+            BoxTools.DrawRect(rect, new Color(0.8f,0.8f,0.8f,0.25f));
+            BoxTools.DrawRectBorder(rect, 1f, Color.blue);
         }
     }
 
     void SelectUnits() {
         GameObject[] units = GameObject.FindGameObjectsWithTag("Unit");
         foreach (var unit in units) {
-
-            if (unit.GetComponent<Unit>().color == playerColor && IsInRect(unit.transform.position)) {
+            if (unit.GetComponent<Unit>().color == playerColor && IsInRect(unit)) {
                 selectedObjects.Add(unit);
+                unit.GetComponent<Unit>().selected = true;
             }
         }
     }
 
-    bool IsInRect(Vector3 pos) {
-        float xMin = (hitpoint.x < hit.point.x) ? hitpoint.x : hit.point.x;
-        float zMin = (hitpoint.z < hit.point.z) ? hitpoint.z : hit.point.z;
-        float xMax = (hitpoint.x < hit.point.x) ? hit.point.x : hitpoint.x;
-        float zMax = (hitpoint.z < hit.point.z) ? hit.point.z : hitpoint.z;
-        if (pos.x < xMin || pos.x > xMax || pos.z < zMin || pos.z > zMax) {
-            return false;
+    void DeselectUnits() {
+        foreach (var unit in selectedObjects) {
+                unit.GetComponent<Unit>().selected = false;
         }
-        return true;
+        selectedObjects.Clear();
+        Debug.Log("clear");
     }
+
+    bool IsInRect(GameObject gameObject) {
+        if (!isDragging)
+            return false;
+
+        var camera = Camera.main;
+        var viewportBounds = BoxTools.GetViewportBounds(camera, mousePosition, Input.mousePosition);
+
+        return viewportBounds.Contains(camera.WorldToViewportPoint(gameObject.transform.position));
+    }
+
+    
 }
