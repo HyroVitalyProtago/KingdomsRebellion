@@ -4,11 +4,15 @@ using System.Collections.Generic;
 
 
 //TODO Divide preSelected in 2 lists: one for playerColor, one for others.
-public class MouseSelection : GenericMouseSelection {
+public class Selection : GenericSelection {
 
     protected Color playerColor;
     IList<GameObject> playerPreSelected;
     IList<GameObject> ennemyPreSelected;
+
+    public delegate void ESelection(IList<GameObject> listObjects);
+
+    public static event ESelection OnSelection;
 
     protected override void OnEnable() {
         base.OnEnable();
@@ -94,21 +98,21 @@ public class MouseSelection : GenericMouseSelection {
                 unit.GetComponent<HealthBar>().ShowHealthBar();
             }
         }
-        print (selectedObjects.Count);
         ApplySelection();
     }
 
     protected override void ApplySelection() {
-        foreach (var go in selectedObjects) {
+        /*foreach (var go in selectedObjects) {
             var unit = go.GetComponent<Unit>();
             unit.ApplySelection();
-        }
+        }*/
+        OnSelection(selectedObjects);
     }
 
     protected override void ApplyDeselection() {
         foreach (var go in selectedObjects) {
-            var unit = go.GetComponent<Unit>();
-            unit.ApplyDeselection();
+            var unit = go.GetComponent<HealthBar>();
+            unit.HideHealthBar();
         }
     }
 

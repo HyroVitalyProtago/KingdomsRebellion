@@ -3,28 +3,28 @@ using System.Collections.Generic;
 
 //TODO: Make this class more generic.
 //This class Select all selectable unit
-public class GenericMouseSelection : MonoBehaviour {
+public class GenericSelection : MonoBehaviour {
 
-    private Ray ray;
+    Ray ray;
     private RaycastHit hit;
     protected IList<GameObject> selectedObjects;
     //Don't forget to notify (SendMessage) when new Selectable object is created.
     protected IList<GameObject> selectableObjects;
     protected Vector3 originWorldMousePoint;
-    private Camera originCamera;
+    Camera originCamera;
     protected bool isDragging;
     protected float timeLeftBeforeDragging;
 
     protected virtual void OnEnable() {
-        MouseInput.OnUpdateDrag += OnUpdateDrag;
-        MouseInput.OnLeftClick += OnLeftClick;
-        MouseInput.OnDrag += OnDrag;
+        Mouse.OnUpdateDrag += OnUpdateDrag;
+        Mouse.OnLeftClick += OnLeftClick;
+        Mouse.OnDrag += OnDrag;
     }
 
     protected virtual void OnDisable() {
-        MouseInput.OnUpdateDrag -= OnUpdateDrag;
-        MouseInput.OnLeftClick -= OnLeftClick;
-        MouseInput.OnDrag -= OnDrag;
+        Mouse.OnUpdateDrag -= OnUpdateDrag;
+        Mouse.OnLeftClick -= OnLeftClick;
+        Mouse.OnDrag -= OnDrag;
     }
 
     protected virtual void Start() {
@@ -77,7 +77,7 @@ public class GenericMouseSelection : MonoBehaviour {
 
     void OnLeftClick(int playerId, Camera camera, Vector3 mousePosition) {
         ray = camera.ScreenPointToRay(mousePosition);
-        if (playerId == MouseInput.PlayerId) {
+        if (playerId == Mouse.PlayerId) {
             this.originWorldMousePoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         }
         if (Physics.Raycast(ray.origin, ray.direction, out hit)) {

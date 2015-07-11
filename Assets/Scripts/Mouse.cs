@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MouseInput : MonoBehaviour {
+public class Mouse : MonoBehaviour {
 
     public delegate void EClickAction(int playerId, Camera camera, Vector3 mousePosition);
     public delegate void EDragAction(int playerId, Vector3 originWorldPoint, Camera currentCamera, Vector3 currentMousePousition);
@@ -17,13 +17,13 @@ public class MouseInput : MonoBehaviour {
 	void Update () {
         if (Input.GetMouseButtonDown(0)) {
             originWorldPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            OnLeftClick(MouseInput.PlayerId, Camera.main, Input.mousePosition);
+            OnLeftClick(Mouse.PlayerId, Camera.main, Input.mousePosition);
         } else if (Input.GetMouseButton(0)) {
-            OnUpdateDrag(MouseInput.PlayerId, originWorldPoint, Camera.main, Input.mousePosition);
+            OnUpdateDrag(Mouse.PlayerId, originWorldPoint, Camera.main, Input.mousePosition);
         } else if (Input.GetMouseButtonUp(0)) {
-            OnDrag(MouseInput.PlayerId, originWorldPoint, Camera.main, Input.mousePosition);
+            OnDrag(Mouse.PlayerId, originWorldPoint, Camera.main, Input.mousePosition);
         } else if (Input.GetMouseButtonDown(1)) {
-            OnRightClick(MouseInput.PlayerId, Camera.main, Input.mousePosition);
+            OnRightClick(Mouse.PlayerId, Camera.main, Input.mousePosition);
         }
 	}
 

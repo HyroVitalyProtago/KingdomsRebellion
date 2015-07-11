@@ -8,7 +8,7 @@ public class Unit : MonoBehaviour {
     public Color color;
     public int playerId;
     public string type { get; private set; }
-    public bool selected;
+   // public bool selected;
     public int life;
     public int lifeMax;
     public bool attacking;
@@ -25,7 +25,7 @@ public class Unit : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        selected = false;
+     //   selected = false;
         lifeMax = 30;
         life = 30;
         attacking = false;
@@ -45,10 +45,10 @@ public class Unit : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         if (attacking && !attacklaunched) {
-            StartCoroutine(Attack(this, ennemyTargeted));
+            StartCoroutine(Attack(ennemyTargeted));
             attacklaunched = true;
         } else if(!attacking && attacklaunched){
-            StopCoroutine(Attack(this, ennemyTargeted));
+            StopCoroutine(Attack(ennemyTargeted));
             attacklaunched = false;
         }
 
@@ -57,15 +57,11 @@ public class Unit : MonoBehaviour {
         }
 	}
 
-    public IEnumerator Attack(Unit selectedUnit, Unit ennemy) {
-        if (selectedUnit.color == ennemy.color) {
-            attacking = false;
-            yield return null;
-        }
+    public IEnumerator Attack(Unit ennemy) {
         while (attacking && ennemy != null) {
-            if ((ennemy.transform.position - selectedUnit.transform.position).magnitude <= 1.1f) {
+            if ((ennemy.transform.position - transform.position).magnitude <= 1.1f) {
                 spot.SetActive(true);
-                ennemy.life -= selectedUnit.strength - ennemy.defense;
+                ennemy.life -= strength - ennemy.defense;
             }
             if (ennemy.life <= 0) {
                 attacking = false;
@@ -76,19 +72,8 @@ public class Unit : MonoBehaviour {
         }
         yield return null;
     }
+
     void OnDestroy() {
-        if (selected) {
-            //selectedObjects.Remove(this.gameObject);
             OnDeath(gameObject);
-        }
-    }
-
-    public void ApplySelection() {
-        selected = true;
-    }
-
-    public void ApplyDeselection() {
-        GetComponent<HealthBar>().HideHealthBar();
-        selected = false;
     }
 }
