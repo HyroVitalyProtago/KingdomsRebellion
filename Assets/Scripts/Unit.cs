@@ -1,9 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+//TODO: All attributes HAVE TO be private.
+//Create events to modify attributes when needed.
 public class Unit : MonoBehaviour {
 
     public Color color;
+    public int playerId;
     public string type { get; private set; }
     public bool selected;
     public int life;
@@ -13,7 +16,13 @@ public class Unit : MonoBehaviour {
     public int strength;
     public int defense;
     public Unit ennemyTargeted;
-    private GameObject light;
+    private GameObject spot;
+
+    //Events : 
+    public delegate void EOnDeath(GameObject go);
+
+    public static event EOnDeath OnDeath;
+
 	// Use this for initialization
 	void Start () {
         selected = false;
@@ -23,9 +32,14 @@ public class Unit : MonoBehaviour {
         attacklaunched = false;
         strength = 14;
         defense = 10;
-        light = gameObject.GetComponentInChildren<Light>().gameObject;
-        light.GetComponent<Light>().color = color;
-        light.SetActive(false);
+        spot = gameObject.GetComponentInChildren<Light>().gameObject;
+        spot.GetComponent<Light>().color = color;
+        spot.SetActive(false);
+        if (color == Color.blue) {
+            playerId = 0;
+        } else {
+            playerId = 1;
+        }
 	}
 	
 	// Update is called once per frame
@@ -50,21 +64,31 @@ public class Unit : MonoBehaviour {
         }
         while (attacking && ennemy != null) {
             if ((ennemy.transform.position - selectedUnit.transform.position).magnitude <= 1.1f) {
-                light.SetActive(true);
+                spot.SetActive(true);
                 ennemy.life -= selectedUnit.strength - ennemy.defense;
             }
             if (ennemy.life <= 0) {
                 attacking = false;
             }
             yield return new WaitForSeconds(0.2f);
-            light.SetActive(false);
+            spot.SetActive(false);
             yield return new WaitForSeconds(1.8f);
         }
         yield return null;
     }
     void OnDestroy() {
         if (selected) {
-            MouseSelection.selectedObjects.Remove(this.gameObject);
+            //selectedObjects.Remove(this.gameObject);
+            OnDeath(gameObject);
         }
+    }
+
+    public void ApplySelection() {
+        selected = true;
+    }
+
+    public void ApplyDeselection() {
+        GetComponent<HealthBar>().HideHealthBar();
+        selected = false;
     }
 }

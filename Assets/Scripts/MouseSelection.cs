@@ -1,125 +1,122 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using UnityStandardAssets.Characters.ThirdPerson;
 
-public class MouseSelection : MonoBehaviour {
 
-    private Ray ray;
-    private RaycastHit hit;
-    public static IList<GameObject> selectedObjects;
-    private GameObject target;
-    private Vector3 hitpoint;
-    private Vector3 mousePosition;
-    private bool isDragging;
-    private float timeLeftBeforeDragging;
-    public Color playerColor;
+//TODO Divide preSelected in 2 lists: one for playerColor, one for others.
+public class MouseSelection : GenericMouseSelection {
 
-    void Start() {
+    protected Color playerColor;
+    IList<GameObject> playerPreSelected;
+    IList<GameObject> ennemyPreSelected;
+
+    protected override void OnEnable() {
+        base.OnEnable();
+        Unit.OnDeath += OnSelectableDestroy;
+    } 
+
+    void PreSelected(GameObject go) {
+        var unit = go.GetComponent<Unit>();
+        if (unit == null) return;
+
+        if (unit.color == playerColor) {
+            if (!playerPreSelected.Contains(go)) {
+                playerPreSelected.Add(go);
+            }
+        } else{
+            if (!ennemyPreSelected.Contains(go) && playerPreSelected.Count == 0) {
+                ennemyPreSelected.Add(go);
+            }
+        }
+    }
+
+    protected override void OnUpdateDrag(int playerId, Vector3 originWorldPoint, Camera currentCamera, Vector3 currentMousePousition) {
+        if (!isDragging) {
+            timeLeftBeforeDragging -= Time.deltaTime;
+        } else {
+            for (int i = 0; i < selectableObjects.Count; ++i) {
+                if (IsInRect(selectableObjects[i], originWorldPoint)) {
+                    PreSelected(selectableObjects[i]);
+                } else if (playerPreSelected.Remove(selectableObjects[i])) {
+                    selectableObjects[i].GetComponent<HealthBar>().HideHealthBar();
+                } else if (ennemyPreSelected.Remove(selectableObjects[i])) {
+                    selectableObjects[i].GetComponent<HealthBar>().HideHealthBar();
+                }
+            }
+            if (playerPreSelected.Count > 0) {
+                foreach (var unit in playerPreSelected) {
+                    var healthBar = unit.GetComponent<HealthBar>();
+                    healthBar.ShowHealthBar();
+                }
+                foreach (var unit in ennemyPreSelected) {
+                    var healthBar = unit.GetComponent<HealthBar>();
+                    healthBar.HideHealthBar();
+                }
+                ennemyPreSelected.Clear();
+            } else if (ennemyPreSelected.Count > 0) {
+                foreach (var unit in ennemyPreSelected) {
+                    var healthBar = unit.GetComponent<HealthBar>();
+                    healthBar.ShowHealthBar();
+                }
+                foreach (var unit in playerPreSelected) {
+                    var healthBar = unit.GetComponent<HealthBar>();
+                    healthBar.HideHealthBar();
+                }
+                playerPreSelected.Clear();
+            }
+        }
+        if (timeLeftBeforeDragging <= 0f) {
+            isDragging = true;
+        }
+    }
+
+    protected override void Start() {
         selectedObjects = new List<GameObject>();
-        target = GameObject.Find("Transform");
+        selectableObjects = new List<GameObject>();
+        foreach (Transform child in transform) {
+            selectableObjects.Add(child.gameObject);
+        }
         timeLeftBeforeDragging = .15f;
         isDragging = false;
+        playerColor = Color.blue;
+        playerPreSelected = new List<GameObject>();
+        ennemyPreSelected = new List<GameObject>();
     }
 
-    // Update is called once per frame
-    void Update() {
-        ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-        if (Physics.Raycast(ray.origin, ray.direction, out hit)) {
-            if (Input.GetMouseButtonDown(0)) {
-                hitpoint = hit.point;
-                mousePosition = Input.mousePosition; 
-                if (!Input.GetKey(KeyCode.LeftControl)) {
-                    DeselectUnits();
-                }
-                if (hit.collider.CompareTag("Unit")) {
-                    
-                    selectedObjects.Add(hit.collider.gameObject);
-                    hit.collider.gameObject.GetComponent<Unit>().selected = true;
-                }
-
-            } else if (Input.GetMouseButton(0)) {
-                if (!isDragging) {
-                    timeLeftBeforeDragging -= Time.deltaTime;
-                }
-                if (timeLeftBeforeDragging <= 0f) {
-                    isDragging = true;
-                }
-            } else if (Input.GetMouseButtonUp(0)) {
-                if (isDragging) {
-                    SelectUnits();
-                }
-                isDragging = false;
-                timeLeftBeforeDragging = .15f;
-            }
-            
-            
-            if (Input.GetMouseButtonUp(1)) {
-                target.transform.position = hit.point; 
-                MoveUnits(target.transform);
-                if (hit.collider.CompareTag("Unit")) {
-                    var unit = hit.collider.GetComponent<Unit>();
-                    if ( unit.color != playerColor) {
-                        foreach (var ally in selectedObjects) {
-                            var allyUnit = ally.GetComponent<Unit>();
-                            allyUnit.ennemyTargeted = unit;
-                            allyUnit.attacking = true;
-                        }
-                    }
-                }
+    protected override void SelectUnits(Vector3 originWorldPoint) {
+        if (playerPreSelected.Count > 0) {
+            selectedObjects = playerPreSelected;
+        } else if (ennemyPreSelected.Count > 0) {
+            selectedObjects = ennemyPreSelected;
+        }
+        if (!isDragging) {
+            foreach (var unit in selectedObjects) {
+                unit.GetComponent<HealthBar>().ShowHealthBar();
             }
         }
+        print (selectedObjects.Count);
+        ApplySelection();
     }
 
-
-    void MoveUnits(Transform newtrans) {
-        foreach (var unit in selectedObjects) {
-            if (unit.GetComponent<Unit>().color == playerColor) {
-                AICharacterControl aichar = unit.GetComponent<AICharacterControl>();
-                Debug.Log("move");
-                aichar.SetTarget(newtrans);
-            }
+    protected override void ApplySelection() {
+        foreach (var go in selectedObjects) {
+            var unit = go.GetComponent<Unit>();
+            unit.ApplySelection();
         }
     }
 
-    void OnGUI() {
-        if(isDragging) {
-            Vector2 pos = new Vector2(mousePosition.x, Screen.height - mousePosition.y);
-            Vector2 size = new Vector2(Input.mousePosition.x - mousePosition.x, mousePosition.y - Input.mousePosition.y);
-            Rect rect = new Rect(pos, size);
-            BoxTools.DrawRect(rect, new Color(0.8f,0.8f,0.8f,0.25f));
-            BoxTools.DrawRectBorder(rect, 1f, Color.blue);
+    protected override void ApplyDeselection() {
+        foreach (var go in selectedObjects) {
+            var unit = go.GetComponent<Unit>();
+            unit.ApplyDeselection();
         }
     }
 
-    void SelectUnits() {
-        GameObject[] units = GameObject.FindGameObjectsWithTag("Unit");
-        foreach (var unit in units) {
-            if (unit.GetComponent<Unit>().color == playerColor && IsInRect(unit)) {
-                selectedObjects.Add(unit);
-                unit.GetComponent<Unit>().selected = true;
-            }
+    void OnSelectableDestroy(GameObject go) {
+        selectableObjects.Remove(go);
+        selectedObjects.Remove(go);
+        if(!playerPreSelected.Remove(go)) {
+            ennemyPreSelected.Remove(go);
         }
     }
-
-    void DeselectUnits() {
-        foreach (var unit in selectedObjects) {
-                unit.GetComponent<Unit>().selected = false;
-        }
-        selectedObjects.Clear();
-        Debug.Log("clear");
-    }
-
-    bool IsInRect(GameObject gameObject) {
-        if (!isDragging)
-            return false;
-
-        var camera = Camera.main;
-        var viewportBounds = BoxTools.GetViewportBounds(camera, mousePosition, Input.mousePosition);
-
-        return viewportBounds.Contains(camera.WorldToViewportPoint(gameObject.transform.position));
-    }
-
-    
 }
