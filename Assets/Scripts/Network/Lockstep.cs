@@ -227,7 +227,7 @@ public class Lockstep : MonoBehaviour {
 			SetAction(); // set wantedActions[1]
 
 			if (lockStepTurnID >= firstLockStepTurnID + 3) {
-				// ProcessActions();
+				ProcessActions();
 				NetworkUI.Inc(); // TEST NetworUI inc frame number
 			}
 
@@ -242,6 +242,12 @@ public class Lockstep : MonoBehaviour {
 		}
 
 		return false;
+	}
+
+	void ProcessActions() {
+		for (int i = 0; i < actions[0].Length; ++i) {
+			actions[0][i].Process();
+		}
 	}
 
 	void SendActionToAll() {

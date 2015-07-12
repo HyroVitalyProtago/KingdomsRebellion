@@ -41,30 +41,24 @@ public class Selection : GenericSelection {
             for (int i = 0; i < selectableObjects.Count; ++i) {
                 if (IsInRect(selectableObjects[i], originWorldPoint)) {
                     PreSelected(selectableObjects[i]);
-                } else if (playerPreSelected.Remove(selectableObjects[i])) {
-                    selectableObjects[i].GetComponent<HealthBar>().HideHealthBar();
-                } else if (ennemyPreSelected.Remove(selectableObjects[i])) {
+				} else if (playerPreSelected.Remove(selectableObjects[i]) || ennemyPreSelected.Remove(selectableObjects[i])) {
                     selectableObjects[i].GetComponent<HealthBar>().HideHealthBar();
                 }
             }
             if (playerPreSelected.Count > 0) {
                 foreach (var unit in playerPreSelected) {
-                    var healthBar = unit.GetComponent<HealthBar>();
-                    healthBar.ShowHealthBar();
+					unit.GetComponent<HealthBar>().ShowHealthBar();
                 }
                 foreach (var unit in ennemyPreSelected) {
-                    var healthBar = unit.GetComponent<HealthBar>();
-                    healthBar.HideHealthBar();
+					unit.GetComponent<HealthBar>().HideHealthBar();
                 }
                 ennemyPreSelected.Clear();
             } else if (ennemyPreSelected.Count > 0) {
                 foreach (var unit in ennemyPreSelected) {
-                    var healthBar = unit.GetComponent<HealthBar>();
-                    healthBar.ShowHealthBar();
+					unit.GetComponent<HealthBar>().ShowHealthBar();
                 }
                 foreach (var unit in playerPreSelected) {
-                    var healthBar = unit.GetComponent<HealthBar>();
-                    healthBar.HideHealthBar();
+					unit.GetComponent<HealthBar>().HideHealthBar();
                 }
                 playerPreSelected.Clear();
             }
@@ -102,17 +96,12 @@ public class Selection : GenericSelection {
     }
 
     protected override void ApplySelection() {
-        /*foreach (var go in selectedObjects) {
-            var unit = go.GetComponent<Unit>();
-            unit.ApplySelection();
-        }*/
-        OnSelection(selectedObjects);
+        if (OnSelection != null) OnSelection(selectedObjects);
     }
 
     protected override void ApplyDeselection() {
         foreach (var go in selectedObjects) {
-            var unit = go.GetComponent<HealthBar>();
-            unit.HideHealthBar();
+			go.GetComponent<HealthBar>().HideHealthBar();
         }
     }
 
