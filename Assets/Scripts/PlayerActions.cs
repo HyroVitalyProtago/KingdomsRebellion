@@ -5,30 +5,29 @@ using UnityStandardAssets.Characters.ThirdPerson;
 
 public class PlayerActions : MonoBehaviour {
 
-    IList<GameObject> selectedObjects;
+	IList<GameObject> selectedObjects;
 
-    void OnEnable() {
-        Mouse.OnRightClick += OnMove;
-        Selection.OnSelection += OnSelection;
-    }
-
-    void OnDisable() {
-        Mouse.OnRightClick -= OnMove;
-        Selection.OnSelection -= OnSelection;
-    }
-
-	void Start () {
-        selectedObjects = new List<GameObject>();
+	void OnEnable() {
+		Mouse.OnRightClick += OnMove;
+		Selection.OnSelection += OnSelection;
 	}
 
-    void OnSelection(IList<GameObject> selectedObjects) {
-        this.selectedObjects = selectedObjects;
-    }
+	void OnDisable() {
+		Mouse.OnRightClick -= OnMove;
+		Selection.OnSelection -= OnSelection;
+	}
 
+	void Start() {
+		selectedObjects = new List<GameObject>();
+	}
 
-    void OnMove(int playerId, Camera camera, Vector3 mousePosition) {
-        for (int i = 0; i < selectedObjects.Count; ++i) {
-            selectedObjects[i].GetComponent<Movement>().Move(playerId, camera, mousePosition);
-        }
-    }
+	void OnSelection(IList<GameObject> selectedObjects) {
+		this.selectedObjects = selectedObjects;
+	}
+
+	void OnMove(int playerId, Camera camera, Vector3 mousePosition) {
+		for (int i = 0; i < selectedObjects.Count; ++i) {
+			selectedObjects[i].GetComponent<Movement>().Move(playerId, camera, mousePosition);
+		}
+	}
 }

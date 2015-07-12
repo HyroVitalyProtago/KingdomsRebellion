@@ -18,11 +18,11 @@ public class Mouse : MonoBehaviour {
             originWorldPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 			if (OnLeftClick != null) OnLeftClick(NetworkAPI.PlayerId, Camera.main, Input.mousePosition);
         } else if (Input.GetMouseButton(0)) {
-			if (OnUpdateDrag != null) OnUpdateDrag(NetworkAPI.PlayerId, originWorldPoint, Camera.main, Input.mousePosition);
+//			if (OnUpdateDrag != null) OnUpdateDrag(NetworkAPI.PlayerId, originWorldPoint, Camera.main, Input.mousePosition);
         } else if (Input.GetMouseButtonUp(0)) {
-			if (OnDrag != null) OnDrag(NetworkAPI.PlayerId, originWorldPoint, Camera.main, Input.mousePosition);
+//			if (OnDrag != null) OnDrag(NetworkAPI.PlayerId, originWorldPoint, Camera.main, Input.mousePosition);
         } else if (Input.GetMouseButtonDown(1)) {
-			if (OnRightClick != null) OnRightClick(NetworkAPI.PlayerId, Camera.main, Input.mousePosition);
+//			if (OnRightClick != null) OnRightClick(NetworkAPI.PlayerId, Camera.main, Input.mousePosition);
         }
 	}
 

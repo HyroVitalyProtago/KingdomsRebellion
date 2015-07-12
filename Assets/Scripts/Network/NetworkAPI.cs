@@ -79,6 +79,11 @@ public class NetworkAPI : MonoBehaviour {
 	
 	public static void SetupClient(string ip, string port) {
 		PlayerId = 1; // TEST set player id to 1 for client
+
+		GameObject realMainCamera = GameObject.Find("Cameras/Camera ("+PlayerId+")") as GameObject;
+		realMainCamera.GetComponent<Camera>().enabled = true;
+		Camera.main.enabled = false; // Camera.main is now equal to realMainCamera.GetComponent<Camera>()
+
 		connectionId = NetworkTransport.Connect(hostId, ip, Convert.ToInt32(port), 0, out error);
 	}
 	

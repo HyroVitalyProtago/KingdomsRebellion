@@ -17,13 +17,13 @@ public class GenericSelection : MonoBehaviour {
 
 	protected virtual void OnEnable() {
 		Mouse.OnUpdateDrag += OnUpdateDrag;
-		Mouse.OnLeftClick += OnLeftClick;
+		SelectAction.OnSelect += OnSelect;
 		Mouse.OnDrag += OnDrag;
 	}
 
 	protected virtual void OnDisable() {
 		Mouse.OnUpdateDrag -= OnUpdateDrag;
-		Mouse.OnLeftClick -= OnLeftClick;
+		SelectAction.OnSelect -= OnSelect;
 		Mouse.OnDrag -= OnDrag;
 	}
 
@@ -77,7 +77,7 @@ public class GenericSelection : MonoBehaviour {
 	protected virtual void ApplyDeselection() {
 	}
 
-	void OnLeftClick(int playerId, Camera camera, Vector3 mousePosition) {
+	void OnSelect(int playerId, Camera camera, Vector3 mousePosition) {
 		ray = camera.ScreenPointToRay(mousePosition);
 		if (playerId == NetworkAPI.PlayerId) {
 			this.originWorldMousePoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -90,7 +90,7 @@ public class GenericSelection : MonoBehaviour {
 		}
 		if (hit.collider != null) {
 			var colliderGameObject = hit.collider.gameObject;
-			//TODO Resolve problem when holding LeftControl to forbid to select unit of different color.
+			// FIXME Resolve problem when holding LeftControl to forbid to select unit of different color.
 			if (selectableObjects.Contains(colliderGameObject)) {
 				if (!selectedObjects.Contains(colliderGameObject)) {
 					selectedObjects.Add(colliderGameObject);
