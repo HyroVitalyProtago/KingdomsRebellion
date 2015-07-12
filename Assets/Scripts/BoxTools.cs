@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class BoxTools : MonoBehaviour {
+/*
+ * Static class that can be used to create Rect (with Border).
+ */
+public static class BoxTools {
 
     private static Texture2D _whiteTexture;
     public static Texture2D whiteTexture {
@@ -33,13 +36,13 @@ public class BoxTools : MonoBehaviour {
         DrawRect(new Rect(rect.xMin, rect.yMax - thickness, rect.width, thickness), color);
     }
 
-    public static Bounds GetViewportBounds(Camera camera, Vector3 screenPosition1, Vector3 screenPosition2) {
-        var v1 = Camera.main.ScreenToViewportPoint(screenPosition1);
-        var v2 = Camera.main.ScreenToViewportPoint(screenPosition2);
+    public static Bounds GetViewportBounds(Vector3 originViewportPoint, Camera currentCamera, Vector3 currentScreenPosition) {
+        var v1 = originViewportPoint;
+        var v2 = currentCamera.ScreenToViewportPoint(currentScreenPosition);
         var min = Vector3.Min(v1, v2);
         var max = Vector3.Max(v1, v2);
-        min.z = camera.nearClipPlane;
-        max.z = camera.farClipPlane;
+        min.z = currentCamera.nearClipPlane;
+        max.z = currentCamera.farClipPlane;
 
         var bounds = new Bounds();
         bounds.SetMinMax(min, max);
