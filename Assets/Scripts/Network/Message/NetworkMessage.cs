@@ -3,7 +3,7 @@ using System.IO;
 
 public abstract class NetworkMessage {
 
-	public int LockStepTurn { get; private set; }
+	public int LockStepTurn { get; set; }
 
 	protected NetworkMessage(int lockStepTurn) {
 		LockStepTurn = lockStepTurn;
