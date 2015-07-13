@@ -1,21 +1,19 @@
-﻿using UnityEngine;
-using System;
-using System.Collections;
+﻿using System;
 
 public static class GameActionFactory {
-	public static GameAction GetGameAction(byte[] data, int size) {
+	public static GameAction Get(byte[] data) {
 		byte b = data[0];
 
 		if (b == (byte) GameActionEnum.NoAction) {
-			return GameAction.FromBytes(data, size);
+			return NoAction.FromBytes(data);
 		} else if (b == (byte) GameActionEnum.SelectAction) {
-			return SelectAction.FromBytes(data, size);
+			return SelectAction.FromBytes(data);
 		} else if (b == (byte) GameActionEnum.DragAction) {
 //			return DragAction.FromBytes(data, size);
 		} else if (b == (byte) GameActionEnum.MoveAction) {
 //			return MoveAction.FromBytes(data, size);
 		}
 
-		throw new ArgumentException("data type don't correspond a known GameAction");
+		throw new ArgumentException("GameActionFactory :: Get : data type don't correspond a known GameAction");
 	}
 }

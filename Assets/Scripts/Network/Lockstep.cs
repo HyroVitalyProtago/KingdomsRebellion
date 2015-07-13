@@ -281,16 +281,17 @@ public class Lockstep : MonoBehaviour {
 
 	void SetAction() {
 		if (actions[2][NetworkAPI.PlayerId] == null) {
-			GameAction action;
 			if (actionQueue.Count > 0) {
-				actionQueue.Dequeue();
+				actions[2][NetworkAPI.PlayerId] = actionQueue.Dequeue();
 			} else {
-				actions[2][NetworkAPI.PlayerId] = new GameAction(lockStepTurnID + 2);
+				actions[2][NetworkAPI.PlayerId] = new NoAction(lockStepTurnID + 2);
 			}
 			NetworkUI.Log("SetAction " + actions[2][NetworkAPI.PlayerId]);
 		} else {
-			actionQueue.Dequeue(); // TEST for keep only action for the turn
-			// TODO maybe clear it...
+			if (actionQueue.Count > 0) {
+				actionQueue.Dequeue(); // TEST for keep only action for the turn
+				// TODO maybe clear it...
+			}
 		}
 
 		++numberOfPlayerWhoSendAction[2];

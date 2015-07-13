@@ -1,32 +1,28 @@
-﻿using UnityEngine;
-using System.Collections;
-using System;
+﻿using System.IO;
 
-public class GameConfirmation : NetworkMessage {
+public sealed class GameConfirmation : NetworkMessage {
 
 	public bool Wait { get; private set; }
 
-	public static GameConfirmation FromBytes(byte[] data, int size) {
-		return new GameConfirmation(BitConverter.ToInt32(data, 0), Convert.ToBoolean(data[4]));
+	public static GameConfirmation FromBytes(byte[] data) {
+		return new GameConfirmation().GetFromBytes(data) as GameConfirmation;
 	}
 
 	public GameConfirmation(int lockStepTurn, bool wait) : base(lockStepTurn) {
 		Wait = wait;
 	}
 
-	public override byte[] ToBytes() {
-		byte[] data = new byte[NetworkAPI.bufferSize];
-
-		int i = 0;
-
-		byte[] lockStepTurn = BitConverter.GetBytes(LockStepTurn);
-		for (; i < lockStepTurn.Length; ++i) {
-			data[i] = lockStepTurn[i];
-		}
-
-		byte wait = Convert.ToByte(Wait);
-		data[++i] = wait;
-
-		return data;
+	private GameConfirmation() {
 	}
+
+	protected sealed override void Serialize(BinaryWriter writer) {
+		base.Serialize(writer);
+		writer.Write(Wait);
+	}
+
+	protected sealed override void Deserialize(BinaryReader reader) {
+		base.Deserialize(reader);
+		Wait = reader.ReadBoolean();
+	}
+
 }

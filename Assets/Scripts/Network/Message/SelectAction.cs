@@ -1,13 +1,10 @@
 using UnityEngine;
 using System;
-using System.Collections;
+using System.IO;
 
-// Camera (Vector3 position, Vector3 rotation, int size)
-// MousePosition (Vector3)
 public class SelectAction : GameAction {
 
 	public delegate void ESelectAction(int playerId,Camera camera,Vector3 mousePosition);
-
 	public static event ESelectAction OnSelect;
 
 	Vector3 cameraPosition;
@@ -15,14 +12,8 @@ public class SelectAction : GameAction {
 	float cameraOrthographicSize;
 	Vector3 mousePosition;
 
-	public static new SelectAction FromBytes(byte[] data, int size) {
-		return new SelectAction(
-			BitConverter.ToInt32(data, 1),
-			NetworkMessage.Vector3FromBytes(data, 5),
-			NetworkMessage.Vector3FromBytes(data, 37),
-			BitConverter.ToSingle(data, 41),
-			NetworkMessage.Vector3FromBytes(data, 45)
-		);
+	public static SelectAction FromBytes(byte[] data) {
+		return new SelectAction().GetFromBytes(data) as SelectAction;
 	}
 	
 	public SelectAction(int lockStepTurn, Vector3 cameraPosition, Vector3 cameraRotation, float cameraOrthographicSize, Vector3 mousePosition) : base(lockStepTurn) {
@@ -30,6 +21,9 @@ public class SelectAction : GameAction {
 		this.cameraRotation = cameraRotation;
 		this.cameraOrthographicSize = cameraOrthographicSize;
 		this.mousePosition = mousePosition;
+	}
+
+	protected SelectAction() : base() {
 	}
 
 	public override void Process(int playerID) {
@@ -44,19 +38,25 @@ public class SelectAction : GameAction {
 			OnSelect(playerID, camera, mousePosition);
 		}
 	}
-	
-	public override byte[] ToBytes() {
-		byte[] data = new byte[NetworkAPI.bufferSize];
-		int offset = 0;
-		
-		data[offset] = (byte)GameActionEnum.SelectAction;
-		offset = AddInt(data, LockStepTurn, ++offset);
-		offset = AddVector3(data, cameraPosition, offset);
-		offset = AddVector3(data, cameraRotation, offset);
-		offset = AddFloat(data, cameraOrthographicSize, offset);
-		offset = AddVector3(data, mousePosition, offset);
 
-		return data;
+	public override byte ActionType() {
+		return (byte) GameActionEnum.SelectAction;
+	}
+
+	protected override void Serialize(BinaryWriter writer) {
+		base.Serialize(writer);
+		SerializeVector3(cameraPosition, writer);
+		SerializeVector3(cameraRotation, writer);
+		writer.Write(cameraOrthographicSize);
+		SerializeVector3(mousePosition, writer);
+	}
+	
+	protected override void Deserialize(BinaryReader reader) {
+		base.Deserialize(reader);
+		cameraPosition = DeserializeVector3(reader);
+		cameraRotation = DeserializeVector3(reader);
+		cameraOrthographicSize = reader.ReadSingle();
+		mousePosition = DeserializeVector3(reader);
 	}
 
 }

@@ -104,9 +104,9 @@ public class NetworkAPI : MonoBehaviour {
 			}
 		} else if (eventType == NetworkEventType.DataEvent) {
 			if (channelId == channelActionId && ReceiveAction != null) {
-				ReceiveAction(PlayerId == 0 ? 1 : 0, GameAction.FromBytes(buffer, dataSize));
+				ReceiveAction(PlayerId == 0 ? 1 : 0, GameActionFactory.Get(buffer));
 			} else if (channelId == channelConfirmationId && ReceiveConfirmation != null) {
-				ReceiveConfirmation(PlayerId == 0 ? 1 : 0, GameConfirmation.FromBytes(buffer, dataSize));
+				ReceiveConfirmation(PlayerId == 0 ? 1 : 0, GameConfirmation.FromBytes(buffer));
 			}
 		}
 	}

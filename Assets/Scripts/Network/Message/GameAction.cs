@@ -1,30 +1,33 @@
-﻿using UnityEngine;
-using System.Collections;
-using System;
+﻿using System;
+using System.IO;
 
-public class GameAction : NetworkMessage {
+public abstract class GameAction : NetworkMessage {
 
-	public static GameAction FromBytes(byte[] data, int size) {
-		return new GameAction(BitConverter.ToInt32(data, 1));
-	}
+//	Template for GameAction static builder
+//	public static GameAction FromBytes(byte[] data) {
+//		return new GameAction().GetFromBytes(data) as GameAction;
+//	}
 
 	public GameAction(int lockStepTurn) : base(lockStepTurn) {
 	}
 
-	public virtual void Process(int playerID) {}
+	protected GameAction() : base() {
+	}
 
-	public override byte[] ToBytes() {
-		byte[] data = new byte[NetworkAPI.bufferSize];
+	public virtual void Process(int playerID) {
+	}
 
-		int i = 0;
+	public abstract byte ActionType();
 
-		data[i] = (byte) GameActionEnum.NoAction;
+	protected override void Serialize(BinaryWriter writer) {
+		writer.Write(ActionType());
+		base.Serialize(writer);
+	}
 
-		byte[] lockStepTurn = BitConverter.GetBytes(LockStepTurn);
-		for (++i ; i < lockStepTurn.Length; ++i) {
-			data[i] = lockStepTurn[i];
+	protected override void Deserialize(BinaryReader reader) {
+		if (reader.ReadByte() != ActionType()) {
+			throw new ArgumentException("GameAction :: Deserialize => Bad ActionType for deserialization : " + ActionType().ToString() + " != " + ((byte) ActionType()));
 		}
-
-		return data;
+		base.Deserialize(reader);
 	}
 }
