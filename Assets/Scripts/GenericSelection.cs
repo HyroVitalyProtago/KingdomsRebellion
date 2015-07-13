@@ -94,6 +94,7 @@ public class GenericSelection : MonoBehaviour {
 			if (selectableObjects.Contains(colliderGameObject)) {
 				if (!selectedObjects.Contains(colliderGameObject)) {
 					selectedObjects.Add(colliderGameObject);
+					ApplySelection(); // TEST network
 				} else {
 					ApplyDeselection();
 					selectedObjects.Remove(colliderGameObject);

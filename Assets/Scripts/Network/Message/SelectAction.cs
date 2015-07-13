@@ -4,7 +4,7 @@ using System.IO;
 
 public class SelectAction : GameAction {
 
-	public delegate void ESelectAction(int playerId,Camera camera,Vector3 mousePosition);
+	public delegate void ESelectAction(int playerId, Camera camera, Vector3 mousePosition);
 	public static event ESelectAction OnSelect;
 
 	Vector3 cameraPosition;

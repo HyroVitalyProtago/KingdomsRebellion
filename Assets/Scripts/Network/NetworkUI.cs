@@ -55,6 +55,8 @@ public class NetworkUI : MonoBehaviour {
 	}
 
 	void OnGUI() {
+		GUILayout.BeginVertical("box");
+
 		ip = GUILayout.TextField(ip, 32);
 		port = GUILayout.TextField(port, 4);
 //		messageToSend = GUILayout.TextField(messageToSend, 64);
@@ -87,5 +89,7 @@ public class NetworkUI : MonoBehaviour {
 		// =====================
 
 		GUILayout.Label(Console);
+
+		GUILayout.EndVertical();
 	}
 }

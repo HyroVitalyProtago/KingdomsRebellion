@@ -13,11 +13,7 @@ public class Lockstep : MonoBehaviour {
 	int lockStepTurnID;
 	int numberOfPlayers;
 
-	//
 	Queue<GameAction> actionQueue;
-	//
-	int[] waitingForOthers;
-	//
 
 	GameAction[][] actions; // [turn, player]
 	int[] numberOfPlayerWhoSendAction; // [turn]
@@ -39,38 +35,20 @@ public class Lockstep : MonoBehaviour {
 		numberOfPlayers = 2;
 
 		actionQueue = new Queue<GameAction>();
-		// --------------------------------------
-		waitingForOthers = new int[32];
-		for (int i = 0; i < waitingForOthers.Length; ++i) {
-			waitingForOthers[i] = -1;
-		}
-		// --------------------------------------
 
-		actions = new GameAction[6][];
+		actions = new GameAction[3][];
 		for (int i = 0; i < actions.Length; ++i) {
-			actions[i] = new GameAction[numberOfPlayers];
-			for (int j = 0; j < numberOfPlayers; ++j) {
-				actions[i][j] = null;
-			}
+			actions[i] = new GameAction[numberOfPlayers]; // allready set to null
 		}
 
-		numberOfPlayerWhoSendAction = new int[6];
-		for (int i = 0; i < numberOfPlayerWhoSendAction.Length; ++i) {
-			numberOfPlayerWhoSendAction[i] = 0;
-		}
+		numberOfPlayerWhoSendAction = new int[3]; // allready set to 0
 
-		playerHaveConfirmedMyAction = new bool[6][];
+		playerHaveConfirmedMyAction = new bool[3][];
 		for (int i = 0; i < playerHaveConfirmedMyAction.Length; ++i) {
-			playerHaveConfirmedMyAction[i] = new bool[numberOfPlayers];
-			for (int j = 0; j < numberOfPlayers; ++j) {
-				playerHaveConfirmedMyAction[i][j] = false;
-			}
+			playerHaveConfirmedMyAction[i] = new bool[numberOfPlayers]; // allready set to false
 		}
 		
-		numberOfPlayerWhoConfirmedMyAction = new int[6];
-		for (int i = 0; i < numberOfPlayerWhoConfirmedMyAction.Length; ++i) {
-			numberOfPlayerWhoConfirmedMyAction[i] = 0;
-		}
+		numberOfPlayerWhoConfirmedMyAction = new int[3]; // allready set to 0
 	}
 
 	void OnEnable() {
@@ -90,8 +68,8 @@ public class Lockstep : MonoBehaviour {
 	void OnAction(int playerID, GameAction action) {
 		int turn = action.LockStepTurn - lockStepTurnID;
 
-		if (turn < 0 || turn > 4) {
-			Debug.LogError("Confirmation from player " + playerID + " on impossible turn [0;4] : " + turn);
+		if (turn < 0 || turn > 2) {
+			Debug.LogError("Lockstep : Confirmation from player " + playerID + " on impossible turn [0;4] : " + turn);
 			return;
 		}
 
@@ -112,7 +90,7 @@ public class Lockstep : MonoBehaviour {
 		int turn = confirmation.LockStepTurn - lockStepTurnID;
 
 		if (turn < 0 || turn > 2) {
-			Debug.LogError("Confirmation from player " + playerID + " on impossible turn [0;2] : " + turn);
+			Debug.LogError("Lockstep : Confirmation from player " + playerID + " on impossible turn [0;2] : " + turn);
 			return;
 		}
 
@@ -120,19 +98,12 @@ public class Lockstep : MonoBehaviour {
 
 		if (!playerHaveConfirmedMyAction[turn][playerID]) {
 			playerHaveConfirmedMyAction[turn][playerID] = true;
-			if (confirmation.Wait) { // need to wait the other player for a better sync
-				waitingForOthers[turn * 4 + 16] = turn;
-			} else {
-				++numberOfPlayerWhoConfirmedMyAction[turn];
-			}
+			++numberOfPlayerWhoConfirmedMyAction[turn];
 		} else {
 			NetworkUI.Log("Confirmation allready received for LockstepTurn " + confirmation.LockStepTurn);
 		}
 	}
 
-	/*
-	 * Launch GameFrameTurn every (<gameFrameTurnLength> * 1000) miliseconds, in this case, every 50ms
-	 */
 	void Update() {
 		accumulatedTime = accumulatedTime + Convert.ToInt32((Time.deltaTime * 1000));
 
@@ -142,19 +113,9 @@ public class Lockstep : MonoBehaviour {
 		}
 	}
 
-	/*
-	 * Check for LockStepTurn on first gameFrame
-	 * When LockStepTurn is ok, go to the next frame
-	 * Update Game on the other frames
-	 */
 	void GameFrameTurn() {
 		NetworkUI.ClearLog(); // TEST network ui clear log on game frame turn
 		NetworkUI.Log("LockstepTurn : " + lockStepTurnID + " ; gameFrame : " + gameFrame);
-
-		// Wait others if there is confirmation(s) with waiting
-		if (waitingForOthers[0] != -1) {
-			++numberOfPlayerWhoConfirmedMyAction[waitingForOthers[0]];
-		}
 
 		if (gameFrame == 0) {
 			if (LockStepTurn()) {
@@ -177,12 +138,6 @@ public class Lockstep : MonoBehaviour {
 	void NextTurn() {
 		++lockStepTurnID;
 
-		for (int i = 0; i < waitingForOthers.Length-1; ++i) {
-			waitingForOthers[i] = waitingForOthers[i + 1];
-		}
-		waitingForOthers[waitingForOthers.Length - 1] = -1;
-
-
 		// Shift left actions
 		for (int i = 0; i < actions.Length-1; ++i) {
 			actions[i] = actions[i + 1];
@@ -190,10 +145,10 @@ public class Lockstep : MonoBehaviour {
 			NetworkUI.Log("actions[" + (i + 1) + "][NetworkAPI.PlayerId] = " + actions[i + 1][NetworkAPI.PlayerId]);
 		}
 		// Last reset
-		actions[actions.Length - 1] = new GameAction[numberOfPlayers];
-		for (int j = 0; j < numberOfPlayers; ++j) {
-			actions[actions.Length - 1][j] = null;
-		}
+		actions[actions.Length - 1] = new GameAction[numberOfPlayers]; // allready set to null
+//		for (int j = 0; j < numberOfPlayers; ++j) {
+//			actions[actions.Length - 1][j] = null;
+//		}
 		
 		// Shift left numberOfPlayerWhoSendAction
 		for (int i = 0; i < numberOfPlayerWhoSendAction.Length-1; ++i) {
@@ -207,10 +162,10 @@ public class Lockstep : MonoBehaviour {
 			playerHaveConfirmedMyAction[i] = playerHaveConfirmedMyAction[i + 1];
 		}
 		// Last reset
-		playerHaveConfirmedMyAction[playerHaveConfirmedMyAction.Length - 1] = new bool[numberOfPlayers];
-		for (int j = 0; j < numberOfPlayers; ++j) {
-			playerHaveConfirmedMyAction[playerHaveConfirmedMyAction.Length - 1][j] = false;
-		}
+		playerHaveConfirmedMyAction[playerHaveConfirmedMyAction.Length - 1] = new bool[numberOfPlayers]; // allready set to false
+//		for (int j = 0; j < numberOfPlayers; ++j) {
+//			playerHaveConfirmedMyAction[playerHaveConfirmedMyAction.Length - 1][j] = false;
+//		}
 
 		// Shift left numberOfPlayerWhoConfirmedMyAction
 		for (int i = 0; i < numberOfPlayerWhoConfirmedMyAction.Length-1; ++i) {
@@ -282,7 +237,9 @@ public class Lockstep : MonoBehaviour {
 	void SetAction() {
 		if (actions[2][NetworkAPI.PlayerId] == null) {
 			if (actionQueue.Count > 0) {
-				actions[2][NetworkAPI.PlayerId] = actionQueue.Dequeue();
+				GameAction action = actionQueue.Dequeue();
+				action.LockStepTurn = lockStepTurnID + 2;
+				actions[2][NetworkAPI.PlayerId] = action;
 			} else {
 				actions[2][NetworkAPI.PlayerId] = new NoAction(lockStepTurnID + 2);
 			}
@@ -306,7 +263,7 @@ public class Lockstep : MonoBehaviour {
 
 	void OnLeftClick(int playerId, Camera camera, Vector3 mousePosition) {
 		actionQueue.Enqueue(new SelectAction(
-			lockStepTurnID,
+			lockStepTurnID, // bad lockStepTurnID for create action...
 			camera.transform.localPosition,
 			camera.transform.localEulerAngles,
 			camera.orthographicSize,

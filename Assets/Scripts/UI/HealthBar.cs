@@ -16,6 +16,14 @@ public class HealthBar : MonoBehaviour {
 	private RectTransform rectTransform;
 	private Image image;
 
+	void OnEnable() {
+		NetworkAPI.MainCameraChange += OnMainCameraChange;
+	}
+
+	void OnMainCameraChange() {
+		healthContainer.GetComponentInParent<Canvas>().worldCamera = Camera.main;
+	}
+
 	void Start() {
 		healthContainer = this.GetComponentInChildren<Image>().gameObject;
 		healthContainer.GetComponentInParent<Canvas>().worldCamera = Camera.main;

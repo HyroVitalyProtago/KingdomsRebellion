@@ -13,23 +13,22 @@ using System;
  */
 public class NetworkAPI : MonoBehaviour {
 
+	public delegate void MainCameraChangeEvent();
+	public static event MainCameraChangeEvent MainCameraChange;
+
 	// Event throw when a new player is connected
 	public delegate void ConnectionEvent();
-
 	public static event ConnectionEvent Connection;
 
 	// Event throw when action is received
 	public delegate void ActionEvent(int playerID,GameAction action);
-
 	public static event ActionEvent ReceiveAction;
 
 	// Event throw when confirmation is received
 	public delegate void ConfirmationEvent(int playerID,GameConfirmation confirmation);
-
 	public static event ConfirmationEvent ReceiveConfirmation;
 
 	public static int[] Players;
-
 	public static int PlayerId { get; /*private*/ set; } // TODO player id set to private
 //	public static int NumberOfPlayers { get; private set; };
 
@@ -83,6 +82,8 @@ public class NetworkAPI : MonoBehaviour {
 		GameObject realMainCamera = GameObject.Find("Cameras/Camera ("+PlayerId+")") as GameObject;
 		realMainCamera.GetComponent<Camera>().enabled = true;
 		Camera.main.enabled = false; // Camera.main is now equal to realMainCamera.GetComponent<Camera>()
+
+		if (MainCameraChange != null) MainCameraChange();
 
 		connectionId = NetworkTransport.Connect(hostId, ip, Convert.ToInt32(port), 0, out error);
 	}
