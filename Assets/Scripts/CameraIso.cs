@@ -5,94 +5,115 @@ using System.Collections;
  * Navigation system for RTS
  * @advice Attach on camera
  */
+
+// TODO: Block player in the map and zoom on the cursor position
 public class CameraIso : MonoBehaviour {
 
-	public static float ScrollWidth { get { return Screen.width * .1f; } }
-	public static float ScrollHeight { get { return Screen.height * .2f; } }
-	public static float ScrollFactor { get { return .4f; } }
-	public static float ScrollSpeed { get { return 2f; } }
-	public static float ScrollMaxSpeed { get { return 10f; } }
-	public static float RotateAmount { get { return 10f; } }
-	public static float RotateSpeed { get { return 100f; } }
-	public static float MinCameraZoom { get { return 3f; } }
-	public static float MaxCameraZoom { get { return 100f; } }
+    public static float ScrollWidth { get { return 1f; } }
+    public static float ScrollHeight { get { return 1f; } }
+    public static float ScrollFactor { get { return .4f; } }
+    public static float ScrollSpeed { get { return 4f; } }
+    public static float ScrollMaxSpeed { get { return 10f; } }
+    public static float RotateAmount { get { return 10f; } }
+    public static float RotateSpeed { get { return 100f; } }
+    public static float MinCameraZoom { get { return 3f; } }
+    public static float MaxCameraZoom { get { return 80f; } }
+    public static float MapWidth { get { return 100f; } }
+    public static float MapHeigth { get { return 100f; } }
+    private Vector3 mousePosition;
 
-	void Update() {
-		Move();
-		Scroll();
-		Rotate();
-	}
+    void Start() {
+        Cursor.lockState = CursorLockMode.Confined;
+        mousePosition = new Vector3();
+    }
 
-	float Speed(float pos, float scrollSize, float screenSize, KeyCode key1, KeyCode key2) {
-		float speed = 0;
+    void Update() {
+        Move();
+        Scroll();
+        Rotate();
+    }
 
-		if (pos < scrollSize && pos >= 0) {
-			speed = (pos / scrollSize) - 1;
-		} else if (pos > screenSize - scrollSize && pos <= screenSize) {
-			speed = 1 + ((pos - screenSize) / scrollSize);
-		} else if (Input.GetKey(key1)) {
-			speed = -ScrollSpeed;
-		} else if (Input.GetKey(key2)) {
-			speed = ScrollSpeed;
-		}
 
-		if (speed != 0) {
-			speed = ScrollSpeed * Mathf.Sign(speed) * ((speed * speed) * ScrollFactor);
-		}
+    float Speed(float pos, float scrollSize, float screenSize, KeyCode key1, KeyCode key2) {
+        float speed = 0;
+#if !UNITY_EDITOR
+		    if (pos < 7 && pos >= 0) {
+			    speed = 1 - (ScrollSpeed / scrollSize);
+		    } else if (pos > screenSize - scrollSize - 7 && pos <= screenSize) {
+			    speed = - 1 - ((ScrollSpeed - screenSize) / scrollSize);
+		    }
+#endif
 
-		return speed;
-	}
+        if (Input.GetKey(key1)) {
+            speed = -ScrollSpeed;
+        }
+        if (Input.GetKey(key2)) {
+            speed = ScrollSpeed;
+        }
 
-	void Move() {
-		float xpos = Input.mousePosition.x;
-		float ypos = Input.mousePosition.y;
-		Vector3 movement = new Vector3(0,0,0);
+        if (speed != 0) {
+            speed = ScrollSpeed * Mathf.Sign(speed) * ((speed * speed) * ScrollFactor);
+        }
+        return speed;
+    }
 
-		// horizontal camera movement
-		movement.x += Speed(xpos, ScrollWidth, Screen.width, KeyCode.A, KeyCode.D);
+    void Move() {
+        float xpos = Input.mousePosition.x;
+        float ypos = Input.mousePosition.y;
+        Vector3 movement = new Vector3(0, 0, 0);
 
-		// vertical camera movement
-		movement.z += Speed(ypos, ScrollHeight, Screen.height, KeyCode.S, KeyCode.W);
+        // horizontal camera movement
+        movement.x = Speed(xpos, ScrollWidth, Screen.width, KeyCode.A, KeyCode.D);
 
-		// make sure movement is in the direction the camera is pointing
-		// but ignore the vertical tilt of the camera to get sensible scrolling
-		movement = Camera.main.transform.TransformDirection(movement);
-		movement.y = 0;
+        // vertical camera movement
+        movement.z = Speed(ypos, ScrollHeight, Screen.height, KeyCode.S, KeyCode.W);
 
-		// calculate desired camera position based on received input
-		Vector3 origin = Camera.main.transform.position;
-		Vector3 destination = origin + movement;
+        // make sure movement is in the direction the camera is pointing
+        // but ignore the vertical tilt of the camera to get sensible scrolling
+        movement = Camera.main.transform.TransformDirection(movement);
+        movement.y = 0;
 
-		if (destination != origin) {
-		    Camera.main.transform.position = Vector3.MoveTowards(origin, destination, Time.deltaTime * ScrollMaxSpeed);
-		}
-	}
+        // calculate desired camera position based on received input
+        Vector3 origin = Camera.main.transform.position;
+        Vector3 destination = new Vector3(Mathf.Clamp(origin.x + movement.x, -MapWidth / 2, MapWidth / 2), origin.y, Mathf.Clamp(origin.z + movement.z, -MapWidth / 2, MapWidth / 2));
 
-	void Scroll() {
-		float scroll = ScrollSpeed * Input.GetAxis("Mouse ScrollWheel");
-		if (scroll != 0) {
-			Camera.main.orthographicSize = Mathf.Clamp(
-				Camera.main.orthographicSize + scroll,
-				MinCameraZoom,
-				MaxCameraZoom
-			);
-		}
-	}
+        if (destination != origin) {
+            Camera.main.transform.position = Vector3.MoveTowards(origin, destination, Time.deltaTime * ScrollMaxSpeed);
+        }
+    }
 
-	// @todo move camera around, not just change eulerAngles...
-	void Rotate() {
-		Vector3 origin = Camera.main.transform.eulerAngles;
-		Vector3 destination = origin;
+    void Scroll() {
+        float scroll = ScrollSpeed * Input.GetAxis("Mouse ScrollWheel");
+        if (scroll != 0) {
+            Camera.main.orthographicSize = Mathf.Clamp(
+                Camera.main.orthographicSize - scroll,
+                MinCameraZoom,
+                MaxCameraZoom
+            );
+        }
+    }
 
-		// detect rotation amount if Command is being held and the Right mouse button is down
-		if ((Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.RightCommand)) && Input.GetMouseButton(1)) {
-			destination.x -= Input.GetAxis("Mouse Y") * RotateAmount;
-			destination.y += Input.GetAxis("Mouse X") * RotateAmount;
-		}
+    // @todo move camera around, not just change eulerAngles...
+    void Rotate() {
+        if ((Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) && Input.GetMouseButton(1)) {
+            if (Cursor.visible) {
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
+            }
+            Vector3 origin = Camera.main.transform.eulerAngles;
+            Vector3 destination = origin;
 
-		// if a change in position is detected perform the necessary update
-		if (destination != origin) {
-			Camera.main.transform.eulerAngles = Vector3.MoveTowards(origin, destination, Time.deltaTime * RotateSpeed);
-		}
-	}
+            // detect rotation amount if Command is being held and the Right mouse button is down
+            destination.x -= Input.GetAxis("Mouse Y") * RotateAmount;
+            destination.y += Input.GetAxis("Mouse X") * RotateAmount;
+
+            // if a change in position is detected perform the necessary update
+            if (destination != origin) {
+                Camera.main.transform.eulerAngles = Vector3.MoveTowards(origin, destination, Time.deltaTime * RotateSpeed);
+            }
+        } else if (!Cursor.visible) {
+            Cursor.lockState = CursorLockMode.Confined;
+            Cursor.visible = true;
+        }
+    }
 }
