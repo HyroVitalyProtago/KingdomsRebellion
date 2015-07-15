@@ -5,7 +5,7 @@ using UnityStandardAssets.Characters.ThirdPerson;
 
 public class PlayerActions : MonoBehaviour {
 
-	IList<GameObject> selectedObjects;
+	IList<GameObject>[] selectedObjects;
 
 	void OnEnable() {
 		Selection.OnSelection += OnSelection;
@@ -18,19 +18,20 @@ public class PlayerActions : MonoBehaviour {
 	}
 
 	void Start() {
-		selectedObjects = new List<GameObject>();
+		selectedObjects = new List<GameObject>[NetworkAPI.maxConnection];
+		for (int i = 0 ; i < selectedObjects.Length ; ++i) {
+			selectedObjects[i] = new List<GameObject>();
+		}
+
 	}
 
-	void OnSelection(IList<GameObject> selectedObjects) {
-		this.selectedObjects = selectedObjects;
-		Debug.Log("[" + GetInstanceID() + "] OnSelection : " + this.selectedObjects.Count);
+	void OnSelection(int playerID, IList<GameObject> selectedObjects) {
+		this.selectedObjects[playerID] = selectedObjects;
 	}
 
-	void OnMove(int playerId, Camera camera, Vector3 mousePosition) {
-		Debug.Log("[" + GetInstanceID() + "] OnSelection : " + this.selectedObjects.Count);
-		for (int i = 0; i < selectedObjects.Count; ++i) {
-			Debug.Log("[" + GetInstanceID() + "] Move object " + i);
-			selectedObjects[i].GetComponent<Movement>().Move(playerId, camera, mousePosition);
+	void OnMove(int playerID, Camera camera, Vector3 mousePosition) {
+		for (int i = 0; i < selectedObjects[playerID].Count; ++i) {
+			selectedObjects[playerID][i].GetComponent<Movement>().Move(playerID, camera, mousePosition);
 		}
 	}
 }

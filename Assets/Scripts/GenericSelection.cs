@@ -47,13 +47,13 @@ public class GenericSelection : MonoBehaviour {
 		}
 	}
 
-	protected virtual void SelectUnits(Vector3 originWorldPoint) {
+	protected virtual void SelectUnits(int playerID, Vector3 originWorldPoint) {
 		foreach (var unit in selectableObjects) {
 			if (IsInRect(unit, originWorldPoint)) {
 				selectedObjects.Add(unit);
 			}
 		}
-		ApplySelection();
+		ApplySelection(playerID);
 	}
 
 	void DeselectUnits() {
@@ -71,15 +71,15 @@ public class GenericSelection : MonoBehaviour {
 		return viewportBounds.Contains(camera.WorldToViewportPoint(gameObject.transform.position));
 	}
 
-	protected virtual void ApplySelection() {
+	protected virtual void ApplySelection(int playerID) {
 	}
 
 	protected virtual void ApplyDeselection() {
 	}
 
-	void OnSelect(int playerId, Camera camera, Vector3 mousePosition) {
+	void OnSelect(int playerID, Camera camera, Vector3 mousePosition) {
 		ray = camera.ScreenPointToRay(mousePosition);
-		if (playerId == playerId) {
+		if (playerID == NetworkAPI.PlayerId) {
 			this.originWorldMousePoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 		}
 		if (Physics.Raycast(ray.origin, ray.direction, out hit)) {
@@ -94,7 +94,7 @@ public class GenericSelection : MonoBehaviour {
 			if (selectableObjects.Contains(colliderGameObject)) {
 				if (!selectedObjects.Contains(colliderGameObject)) {
 					selectedObjects.Add(colliderGameObject);
-					ApplySelection(); // TEST network
+					ApplySelection(playerID); // TEST network
 				} else {
 					ApplyDeselection();
 					selectedObjects.Remove(colliderGameObject);
@@ -112,8 +112,8 @@ public class GenericSelection : MonoBehaviour {
 		}
 	}
 
-	void OnDrag(int playerId, Vector3 originWorldPoint, Camera currentCamera, Vector3 currentMousePousition) {
-		SelectUnits(originWorldPoint);
+	void OnDrag(int playerID, Vector3 originWorldPoint, Camera currentCamera, Vector3 currentMousePousition) {
+		SelectUnits(playerID, originWorldPoint);
 		isDragging = false;
 		timeLeftBeforeDragging = .15f;
 	}

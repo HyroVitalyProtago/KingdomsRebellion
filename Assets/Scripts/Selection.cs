@@ -9,8 +9,7 @@ public class Selection : GenericSelection {
 	IList<GameObject> playerPreSelected;
 	IList<GameObject> ennemyPreSelected;
 
-	public delegate void ESelection(IList<GameObject> listObjects);
-
+	public delegate void ESelection(int playerID, IList<GameObject> listObjects);
 	public static event ESelection OnSelection;
 
 	protected override void OnEnable() {
@@ -81,7 +80,7 @@ public class Selection : GenericSelection {
 		ennemyPreSelected = new List<GameObject>();
 	}
 
-	protected override void SelectUnits(Vector3 originWorldPoint) {
+	protected override void SelectUnits(int playerID, Vector3 originWorldPoint) {
 		if (playerPreSelected.Count > 0) {
 			selectedObjects = playerPreSelected;
 		} else if (ennemyPreSelected.Count > 0) {
@@ -92,15 +91,15 @@ public class Selection : GenericSelection {
 				unit.GetComponent<HealthBar>().ShowHealthBar();
 			}
 		}
-		ApplySelection();
+		ApplySelection(playerID);
 	}
 
-	protected override void ApplySelection() {
+	protected override void ApplySelection(int playerID) {
 		if (selectedObjects.Count == 1) { // show healthbar for selection of one unit
 			selectedObjects[0].GetComponent<HealthBar>().ShowHealthBar();
 		}
 		if (OnSelection != null)
-			OnSelection(selectedObjects);
+			OnSelection(playerID, selectedObjects);
 	}
 
 	protected override void ApplyDeselection() {
