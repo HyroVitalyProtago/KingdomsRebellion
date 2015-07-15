@@ -82,7 +82,7 @@ public class GenericSelection : MonoBehaviour {
 	}
 
 	void OnSelect(int playerID, Camera camera, Vector3 mousePosition) {
-		ray = camera.ScreenPointToRay(mousePosition);
+		ray = camera.ScreenPointToRay(camera.WorldToScreenPoint(mousePosition));
 		if (playerID == NetworkAPI.PlayerId) {
 			this.originWorldMousePoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 		}
@@ -95,8 +95,12 @@ public class GenericSelection : MonoBehaviour {
 		if (hit.collider != null) {
 			var colliderGameObject = hit.collider.gameObject;
 			// FIXME Resolve problem when holding LeftControl to forbid to select unit of different color.
+			Debug.Log("mousePosition = " + mousePosition);
+			Debug.Log("[1] " + playerID + " ; collider : " + hit.collider.gameObject.name);
 			if (selectableObjects.Contains(colliderGameObject)) {
+				Debug.Log("[2] " + playerID);
 				if (!selectedObjects[playerID].Contains(colliderGameObject)) {
+					Debug.Log("add something for player " + playerID);
 					selectedObjects[playerID].Add(colliderGameObject);
 					ApplySelection(playerID); // TEST network
 				} else {

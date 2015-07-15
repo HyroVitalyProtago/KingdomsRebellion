@@ -31,7 +31,7 @@ public class Movement : MonoBehaviour {
 	}
 
 	public void Move(int playerId, Camera camera, Vector3 mousePosition) {
-		ray = camera.ScreenPointToRay(mousePosition);
+		ray = camera.ScreenPointToRay(camera.WorldToScreenPoint(mousePosition));
 		if (aiCharacterControl.target != null) {
 			var go = aiCharacterControl.target.gameObject;
 			aiCharacterControl.SetTarget(null);
