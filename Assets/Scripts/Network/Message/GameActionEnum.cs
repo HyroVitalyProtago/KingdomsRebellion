@@ -1,6 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public enum GameActionEnum {
-	NoAction, SelectAction, DragAction, MoveAction
+namespace KingdomsRebellion.Network.Link {
+	public enum GameActionEnum {
+		NoAction,
+		SelectAction,
+		DragAction,
+		MoveAction
+	}
 }

@@ -4,130 +4,143 @@ using System.Collections;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using System;
+using KingdomsRebellion.Network.Link;
 
-/*
- * disable by default
- * only one instance
- * 
- */
-public class NetworkAPI : MonoBehaviour {
+namespace KingdomsRebellion.Network {
 
-	public delegate void MainCameraChangeEvent();
-	public static event MainCameraChangeEvent MainCameraChange;
+	/*
+	 * disable by default
+	 * only one instance
+	 */
+	public class NetworkAPI : MonoBehaviour {
 
-	// Event throw when a new player is connected
-	public delegate void ConnectionEvent();
-	public static event ConnectionEvent Connection;
+		public delegate void MainCameraChangeEvent();
 
-	// Event throw when action is received
-	public delegate void ActionEvent(int playerID,GameAction action);
-	public static event ActionEvent ReceiveAction;
+		public static event MainCameraChangeEvent MainCameraChange;
 
-	// Event throw when confirmation is received
-	public delegate void ConfirmationEvent(int playerID,GameConfirmation confirmation);
-	public static event ConfirmationEvent ReceiveConfirmation;
+		// Event throw when a new player is connected
+		public delegate void ConnectionEvent();
 
-	public static int[] Players;
-	public static int PlayerId { get; /*private*/ set; } // TODO player id set to private
-//	public static int NumberOfPlayers { get; private set; };
+		public static event ConnectionEvent Connection;
 
-	// Parameters
-	public static readonly int bufferSize = 1024;
-	public static readonly int maxConnection = 2; // min 2 for localhost
+		// Event throw when action is received
+		public delegate void ActionEvent(int playerID,GameAction action);
 
-	// Attributes
-	static MonoBehaviour self;
-	static byte error;
-	static byte[] buffer = new byte[bufferSize];
-	static int hostId, connectionId, channelSetupId, channelActionId, channelConfirmationId;
-	static int dataSize, recHostId, channelId;
-	static NetworkEventType eventType;
+		public static event ActionEvent ReceiveAction;
 
-	void Start() {
-		Debug.Assert(self == null, "NetworkAPI can't be instantiate more than one time...");
-		enabled = false;
-		self = this;
+		// Event throw when confirmation is received
+		public delegate void ConfirmationEvent(int playerID,GameConfirmation confirmation);
 
-		Players = new int[maxConnection];
-	}
+		public static event ConfirmationEvent ReceiveConfirmation;
 
-	public static void Setup(string port) {
-		NetworkTransport.Init();
+		public static int[] Players;
 
-		ConnectionConfig config = new ConnectionConfig();
-		channelSetupId = config.AddChannel(QosType.Reliable); // for lobby
-		channelActionId = config.AddChannel(QosType.Reliable); // action in game
-		channelConfirmationId = config.AddChannel(QosType.Reliable); // confirmation in game
+		public static int PlayerId { get; /*private*/ set; } // TODO player id set to private
+//		public static int NumberOfPlayers { get; private set; };
 
-		HostTopology topology = new HostTopology(config, maxConnection);
-		hostId = NetworkTransport.AddHost(topology, Convert.ToInt32(port));
+		// Parameters
+		public static readonly int bufferSize = 1024;
+		public static readonly int maxConnection = 2; // min 2 for localhost
 
-		self.enabled = true;
-	}
-	
-	public static void SendAction(GameAction action) {
-		byte[] buffer = action.ToBytes();
-		NetworkTransport.Send(hostId, connectionId, channelActionId, buffer, buffer.Length, out error);
+		// Attributes
+		static MonoBehaviour self;
+		static byte error;
+		static byte[] buffer = new byte[bufferSize];
+		static int hostId, connectionId, channelSetupId, channelActionId, channelConfirmationId;
+		static int dataSize, recHostId, channelId;
+		static NetworkEventType eventType;
 
-		if (error != (byte) NetworkError.Ok) {
-			Debug.LogError("[ERROR] NetworkAPI :: SendAction :: Send : " + error);
+		void Start() {
+			Debug.Assert(self == null, "NetworkAPI can't be instantiate more than one time...");
+			enabled = false;
+			self = this;
+
+			Players = new int[maxConnection];
 		}
-	}
-	
-	public static void SendConfirmation(GameConfirmation confirmation) {
-		byte[] buffer = confirmation.ToBytes();
-		NetworkTransport.Send(hostId, connectionId, channelConfirmationId, buffer, buffer.Length, out error);
 
-		if (error != (byte) NetworkError.Ok) {
-			Debug.LogError("[ERROR] NetworkAPI :: SendConfirmation :: Send : " + error);
+		public static void Setup(string port) {
+			NetworkTransport.Init();
+
+			ConnectionConfig config = new ConnectionConfig();
+			channelSetupId = config.AddChannel(QosType.Reliable); // for lobby
+			channelActionId = config.AddChannel(QosType.Reliable); // action in game
+			channelConfirmationId = config.AddChannel(QosType.Reliable); // confirmation in game
+
+			HostTopology topology = new HostTopology(config, maxConnection);
+			hostId = NetworkTransport.AddHost(topology, Convert.ToInt32(port));
+
+			self.enabled = true;
 		}
-	}
 	
-	public static void SetupClient(string ip, string port) {
-		PlayerId = 1; // TEST set player id to 1 for client
+		public static void SendAction(GameAction action) {
+			byte[] buffer = action.ToBytes();
+			NetworkTransport.Send(hostId, connectionId, channelActionId, buffer, buffer.Length, out error);
 
-		GameObject realMainCamera = GameObject.Find("Cameras/Camera ("+PlayerId+")") as GameObject;
-		realMainCamera.GetComponent<Camera>().enabled = true;
-		Camera.main.enabled = false; // Camera.main is now equal to realMainCamera.GetComponent<Camera>()
-
-		if (MainCameraChange != null) MainCameraChange();
-
-		connectionId = NetworkTransport.Connect(hostId, ip, Convert.ToInt32(port), 0, out error);
-
-		if (error != (byte) NetworkError.Ok) {
-			Debug.LogError("[ERROR] NetworkAPI :: SetupClient :: Connect : " + error);
-		}
-	}
-	
-	void Update() {
-		eventType = NetworkTransport.Receive(out recHostId, out connectionId, out channelId, buffer, bufferSize, out dataSize, out error);
-		if (error != (byte) NetworkError.Ok) {
-			Debug.LogError("[ERROR] NetworkAPI :: Update :: Receive : " + error);
-			return;
-		}
-		if (channelId == channelSetupId) {
-			switch (eventType) {
-				case NetworkEventType.ConnectEvent:
-					NetworkUI.Log("Connection on socket " + recHostId + ", connection : " + connectionId + ", channelId : " + channelId);
-					if (PlayerId == 0) {
-						Connection();
-					}
-					break;
-//			case NetworkEventType.DataEvent: break;
-				case NetworkEventType.DisconnectEvent:
-					Application.Quit(); // TEST quit on disconnect
-					break;
-			}
-		} else if (eventType == NetworkEventType.DataEvent) {
-			if (channelId == channelActionId && ReceiveAction != null) {
-				ReceiveAction(PlayerId == 0 ? 1 : 0, GameActionFactory.Get(buffer));
-			} else if (channelId == channelConfirmationId && ReceiveConfirmation != null) {
-				ReceiveConfirmation(PlayerId == 0 ? 1 : 0, GameConfirmation.FromBytes(buffer));
+			if (error != (byte)NetworkError.Ok) {
+				Debug.LogError("[ERROR] NetworkAPI :: SendAction :: Send : " + error);
 			}
 		}
-	}
 	
-	void OnApplicationQuit() {
-		NetworkTransport.Shutdown();
+		public static void SendConfirmation(GameConfirmation confirmation) {
+			byte[] buffer = confirmation.ToBytes();
+			NetworkTransport.Send(hostId, connectionId, channelConfirmationId, buffer, buffer.Length, out error);
+
+			if (error != (byte)NetworkError.Ok) {
+				Debug.LogError("[ERROR] NetworkAPI :: SendConfirmation :: Send : " + error);
+			}
+		}
+	
+		public static void SetupClient(string ip, string port) {
+			PlayerId = 1; // TEST set player id to 1 for client
+
+			GameObject realMainCamera = GameObject.Find("Cameras/Camera (" + PlayerId + ")") as GameObject;
+			realMainCamera.GetComponent<Camera>().enabled = true;
+			Camera.main.enabled = false; // Camera.main is now equal to realMainCamera.GetComponent<Camera>()
+
+			if (MainCameraChange != null)
+				MainCameraChange();
+
+			connectionId = NetworkTransport.Connect(hostId, ip, Convert.ToInt32(port), 0, out error);
+
+			if (error != (byte)NetworkError.Ok) {
+				Debug.LogError("[ERROR] NetworkAPI :: SetupClient :: Connect : " + error);
+			}
+		}
+	
+		void Update() {
+			eventType = NetworkTransport.Receive(out recHostId, out connectionId, out channelId, buffer, bufferSize, out dataSize, out error);
+			if (error != (byte)NetworkError.Ok) {
+				Debug.LogError("[ERROR] NetworkAPI :: Update :: Receive : " + error);
+				if (dataSize > bufferSize) {
+					Debug.LogError("[ERROR] NetworkAPI :: Update : Message too big for be handled by buffer...");
+				}
+				return;
+			}
+			if (channelId == channelSetupId) {
+				switch (eventType) {
+					case NetworkEventType.ConnectEvent:
+						NetworkUI.Log("Connection on socket " + recHostId + ", connection : " + connectionId + ", channelId : " + channelId);
+						if (PlayerId == 0) {
+							Connection();
+						}
+						break;
+//					case NetworkEventType.DataEvent: break;
+					case NetworkEventType.DisconnectEvent:
+						Application.Quit(); // TEST quit on disconnect
+						break;
+				}
+			} else if (eventType == NetworkEventType.DataEvent) {
+				if (channelId == channelActionId && ReceiveAction != null) {
+					ReceiveAction(PlayerId == 0 ? 1 : 0, GameActionFactory.Get(buffer));
+				} else if (channelId == channelConfirmationId && ReceiveConfirmation != null) {
+					ReceiveConfirmation(PlayerId == 0 ? 1 : 0, GameConfirmation.FromBytes(buffer));
+				}
+			}
+		}
+	
+		void OnApplicationQuit() {
+			NetworkTransport.Shutdown();
+		}
 	}
+
 }

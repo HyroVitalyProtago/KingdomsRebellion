@@ -1,37 +1,40 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MoveAction : SelectAction {
+namespace KingdomsRebellion.Network.Link {
+	public class MoveAction : SelectAction {
 
-	public delegate void EMoveAction(int playerId, Camera camera, Vector3 mousePosition);
-	public static event EMoveAction OnMove;
+		public delegate void EMoveAction(int playerId,Camera camera,Vector3 mousePosition);
 
-	public static new MoveAction FromBytes(byte[] data) {
-		return new MoveAction().GetFromBytes(data) as MoveAction;
-	}
+		public static event EMoveAction OnMove;
 
-	public MoveAction(
+		public static new MoveAction FromBytes(byte[] data) {
+			return new MoveAction().GetFromBytes(data) as MoveAction;
+		}
+
+		public MoveAction(
 		int lockStepTurn,
 		Vector3 cameraPosition,
 		Vector3 cameraRotation,
 		float cameraOrthographicSize,
 		Vector3 mousePosition) : base(lockStepTurn, cameraPosition, cameraRotation, cameraOrthographicSize, mousePosition) {
-	}
+		}
 	
-	protected MoveAction() : base() {
-	}
+		protected MoveAction() : base() {
+		}
 
-	public override byte ActionType() {
-		return (byte) GameActionEnum.MoveAction;
-	}
+		public override byte ActionType() {
+			return (byte)GameActionEnum.MoveAction;
+		}
 
-	public override void Process(int playerID) {
-		Debug.Log("MoveAction :: Process :: playerID == " + playerID);
+		public override void Process(int playerID) {
+			Debug.Log("MoveAction :: Process :: playerID == " + playerID);
 
-		SetPlayerData(playerID);
+			SetPlayerData(playerID);
 		
-		if (OnMove != null) {
-			OnMove(playerID, camera, mousePosition);
+			if (OnMove != null) {
+				OnMove(playerID, camera, mousePosition);
+			}
 		}
 	}
 }
