@@ -103,7 +103,7 @@ public class Selection : GenericSelection {
 			selectedObjects[playerID][0].GetComponent<HealthBar>().ShowHealthBar();
 		}
 		if (OnSelection != null)
-			OnSelection(playerID, selectedObjects);
+			OnSelection(playerID, selectedObjects[playerID]);
 	}
 
 	protected override void ApplyDeselection() {
