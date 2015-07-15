@@ -83,7 +83,7 @@ public class Lockstep : MonoBehaviour {
 		NetworkUI.Log("Receive action from player " + playerID + " for turn " + turn);
 
 		if (turn > 0) {
-			if (turn < 2 && actions[turn][playerID] == null) {
+			if (turn <= 2 && actions[turn][playerID] == null) {
 				actions[turn][playerID] = action;
 				++numberOfPlayerWhoSendAction[turn];
 			} else {
