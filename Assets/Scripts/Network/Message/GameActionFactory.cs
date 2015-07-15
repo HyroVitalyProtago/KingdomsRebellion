@@ -9,9 +9,9 @@ public static class GameActionFactory {
 		} else if (b == (byte) GameActionEnum.SelectAction) {
 			return SelectAction.FromBytes(data);
 		} else if (b == (byte) GameActionEnum.DragAction) {
-//			return DragAction.FromBytes(data, size);
+//			return DragAction.FromBytes(data);
 		} else if (b == (byte) GameActionEnum.MoveAction) {
-//			return MoveAction.FromBytes(data, size);
+			return MoveAction.FromBytes(data);
 		}
 
 		throw new ArgumentException("GameActionFactory :: Get : data type don't correspond a known GameAction");

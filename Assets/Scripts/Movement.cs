@@ -39,9 +39,9 @@ public class Movement : MonoBehaviour {
 				Destroy(go);
 			}
 		}
-		if (unit.playerId == NetworkAPI.PlayerId && Physics.Raycast(ray.origin, ray.direction, out hit)) {
+		if (unit.playerId == playerId && Physics.Raycast(ray.origin, ray.direction, out hit)) {
 			var ennemy = hit.collider.gameObject.GetComponent<Unit>();
-			if (ennemy != null && ennemy.playerId != NetworkAPI.PlayerId) {
+			if (ennemy != null && ennemy.playerId != playerId) {
 				unit.attacking = true;
 				unit.ennemyTargeted = ennemy;
 				aiCharacterControl.SetTarget(ennemy.transform);

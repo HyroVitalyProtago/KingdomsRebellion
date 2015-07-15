@@ -9,7 +9,6 @@ using System;
  * disable by default
  * only one instance
  * 
- * @todo handle errors, display, ...
  */
 public class NetworkAPI : MonoBehaviour {
 
@@ -69,11 +68,19 @@ public class NetworkAPI : MonoBehaviour {
 	public static void SendAction(GameAction action) {
 		byte[] buffer = action.ToBytes();
 		NetworkTransport.Send(hostId, connectionId, channelActionId, buffer, buffer.Length, out error);
+
+		if (error != (byte) NetworkError.Ok) {
+			Debug.LogError("[ERROR] NetworkAPI :: SendAction :: Send : " + error);
+		}
 	}
 	
 	public static void SendConfirmation(GameConfirmation confirmation) {
 		byte[] buffer = confirmation.ToBytes();
 		NetworkTransport.Send(hostId, connectionId, channelConfirmationId, buffer, buffer.Length, out error);
+
+		if (error != (byte) NetworkError.Ok) {
+			Debug.LogError("[ERROR] NetworkAPI :: SendConfirmation :: Send : " + error);
+		}
 	}
 	
 	public static void SetupClient(string ip, string port) {
@@ -86,10 +93,18 @@ public class NetworkAPI : MonoBehaviour {
 		if (MainCameraChange != null) MainCameraChange();
 
 		connectionId = NetworkTransport.Connect(hostId, ip, Convert.ToInt32(port), 0, out error);
+
+		if (error != (byte) NetworkError.Ok) {
+			Debug.LogError("[ERROR] NetworkAPI :: SetupClient :: Connect : " + error);
+		}
 	}
 	
 	void Update() {
 		eventType = NetworkTransport.Receive(out recHostId, out connectionId, out channelId, buffer, bufferSize, out dataSize, out error);
+		if (error != (byte) NetworkError.Ok) {
+			Debug.LogError("[ERROR] NetworkAPI :: Update :: Receive : " + error);
+			return;
+		}
 		if (channelId == channelSetupId) {
 			switch (eventType) {
 				case NetworkEventType.ConnectEvent:
@@ -98,7 +113,7 @@ public class NetworkAPI : MonoBehaviour {
 						Connection();
 					}
 					break;
-//			case NetworkEventType.DataEvent: PlayerId = buffer[0]; print("playerid is now "+PlayerId.ToString()); break;
+//			case NetworkEventType.DataEvent: break;
 				case NetworkEventType.DisconnectEvent:
 					Application.Quit(); // TEST quit on disconnect
 					break;

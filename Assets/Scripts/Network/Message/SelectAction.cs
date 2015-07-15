@@ -10,7 +10,9 @@ public class SelectAction : GameAction {
 	Vector3 cameraPosition;
 	Vector3 cameraRotation;
 	float cameraOrthographicSize;
-	Vector3 mousePosition;
+	protected Vector3 mousePosition;
+	protected GameObject playerCamera;
+	protected Camera camera;
 
 	public static SelectAction FromBytes(byte[] data) {
 		return new SelectAction().GetFromBytes(data) as SelectAction;
@@ -26,13 +28,17 @@ public class SelectAction : GameAction {
 	protected SelectAction() : base() {
 	}
 
-	public override void Process(int playerID) {
-		GameObject playerCamera = GameObject.Find("Cameras/Camera (" + playerID + ")") as GameObject;
+	protected void SetPlayerData(int playerID) {
+		playerCamera = GameObject.Find("Cameras/Camera (" + playerID + ")") as GameObject;
 		playerCamera.transform.position = cameraPosition;
 		playerCamera.transform.localEulerAngles = cameraRotation;
-			
-		Camera camera = playerCamera.GetComponent<Camera>();
+		
+		camera = playerCamera.GetComponent<Camera>();
 		camera.orthographicSize = cameraOrthographicSize;
+	}
+
+	public override void Process(int playerID) {
+		SetPlayerData(playerID);
 
 		if (OnSelect != null) {
 			OnSelect(playerID, camera, mousePosition);

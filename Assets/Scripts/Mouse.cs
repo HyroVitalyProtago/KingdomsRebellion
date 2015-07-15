@@ -22,7 +22,7 @@ public class Mouse : MonoBehaviour {
         } else if (Input.GetMouseButtonUp(0)) {
 //			if (OnDrag != null) OnDrag(NetworkAPI.PlayerId, originWorldPoint, Camera.main, Input.mousePosition);
         } else if (Input.GetMouseButtonDown(1)) {
-//			if (OnRightClick != null) OnRightClick(NetworkAPI.PlayerId, Camera.main, Input.mousePosition);
+			if (OnRightClick != null) OnRightClick(NetworkAPI.PlayerId, Camera.main, Input.mousePosition);
         }
 	}
 

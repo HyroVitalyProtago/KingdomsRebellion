@@ -93,7 +93,7 @@ public class CameraIso : MonoBehaviour {
         }
     }
 
-    // @todo move camera around, not just change eulerAngles...
+    // TODO move camera around, not just change eulerAngles...
     void Rotate() {
         if ((Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) && Input.GetMouseButton(1)) {
             if (Cursor.visible) {

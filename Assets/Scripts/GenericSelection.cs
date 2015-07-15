@@ -79,7 +79,7 @@ public class GenericSelection : MonoBehaviour {
 
 	void OnSelect(int playerId, Camera camera, Vector3 mousePosition) {
 		ray = camera.ScreenPointToRay(mousePosition);
-		if (playerId == NetworkAPI.PlayerId) {
+		if (playerId == playerId) {
 			this.originWorldMousePoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 		}
 		if (Physics.Raycast(ray.origin, ray.direction, out hit)) {
