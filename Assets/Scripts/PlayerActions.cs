@@ -29,6 +29,7 @@ public class PlayerActions : MonoBehaviour {
 	}
 
 	void OnMove(int playerID, Camera camera, Vector3 mousePosition) {
+		Debug.Log("PlayerActions :: OnMove :: selectedObjects[" + playerID + "].Count == " + selectedObjects[playerID].Count);
 		for (int i = 0; i < selectedObjects[playerID].Count; ++i) {
 			selectedObjects[playerID][i].GetComponent<Movement>().Move(playerID, camera, mousePosition);
 		}

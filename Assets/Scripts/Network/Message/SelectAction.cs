@@ -38,6 +38,8 @@ public class SelectAction : GameAction {
 	}
 
 	public override void Process(int playerID) {
+		Debug.Log("SelectAction :: Process :: playerID == " + playerID);
+
 		SetPlayerData(playerID);
 
 		if (OnSelect != null) {

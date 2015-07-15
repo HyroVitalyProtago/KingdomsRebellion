@@ -21,7 +21,13 @@ public class MoveAction : SelectAction {
 	protected MoveAction() : base() {
 	}
 
+	public override byte ActionType() {
+		return (byte) GameActionEnum.MoveAction;
+	}
+
 	public override void Process(int playerID) {
+		Debug.Log("MoveAction :: Process :: playerID == " + playerID);
+
 		SetPlayerData(playerID);
 		
 		if (OnMove != null) {
