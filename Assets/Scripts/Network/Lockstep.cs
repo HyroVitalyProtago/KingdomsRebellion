@@ -83,12 +83,12 @@ public class Lockstep : MonoBehaviour {
 		NetworkUI.Log("Receive action from player " + playerID + " for turn " + turn);
 
 		if (turn > 0) {
-			if (actions[turn][playerID] == null) {
+			if (turn < 2 && actions[turn][playerID] == null) {
 				actions[turn][playerID] = action;
 				++numberOfPlayerWhoSendAction[turn];
 			} else {
-				NetworkUI.Log("Action allready received for LockstepTurn " + action.LockStepTurn);
-				NetworkUI.Log("Maybe my confirmation has not been received...");
+//				NetworkUI.Log("Action allready received for LockstepTurn " + action.LockStepTurn);
+//				NetworkUI.Log("Maybe my confirmation has not been received...");
 			}
 		}
 
