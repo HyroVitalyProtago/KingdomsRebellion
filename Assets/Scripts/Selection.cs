@@ -106,15 +106,15 @@ public class Selection : GenericSelection {
 			OnSelection(playerID, selectedObjects[playerID]);
 	}
 
-	protected override void ApplyDeselection() {
-//		foreach (var go in selectedObjects) {
-//			go.GetComponent<HealthBar>().HideHealthBar();
-//		}
+	protected override void ApplyDeselection(int playerID) {
+		foreach (var go in selectedObjects[playerID]) {
+			go.GetComponent<HealthBar>().HideHealthBar();
+		}
 	}
 
-	void OnSelectableDestroy(GameObject go) {
+	void OnSelectableDestroy(int playerID, GameObject go) {
 		selectableObjects.Remove(go);
-//		selectedObjects.Remove(go);
+		selectedObjects[playerID].Remove(go);
 		if (!playerPreSelected.Remove(go)) {
 			ennemyPreSelected.Remove(go);
 		}

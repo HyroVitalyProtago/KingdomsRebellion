@@ -60,9 +60,9 @@ public class GenericSelection : MonoBehaviour {
 		ApplySelection(playerID);
 	}
 
-	void DeselectUnits() {
-		ApplyDeselection();
-//		selectedObjects.Clear();
+	void DeselectUnits(int playerID) {
+		ApplyDeselection(playerID);
+		selectedObjects[playerID].Clear();
 	}
 
 	protected bool IsInRect(GameObject gameObject, Vector3 originWorldPoint) {
@@ -78,7 +78,7 @@ public class GenericSelection : MonoBehaviour {
 	protected virtual void ApplySelection(int playerID) {
 	}
 
-	protected virtual void ApplyDeselection() {
+	protected virtual void ApplyDeselection(int playerID) {
 	}
 
 	void OnSelect(int playerID, Camera camera, Vector3 mousePosition) {
@@ -89,7 +89,7 @@ public class GenericSelection : MonoBehaviour {
 		if (Physics.Raycast(ray.origin, ray.direction, out hit)) {
 			originCamera = camera;
 			if (!Input.GetKey(KeyCode.LeftControl)) {
-				DeselectUnits();
+				DeselectUnits(playerID);
 			}
 		}
 		if (hit.collider != null) {
@@ -100,7 +100,7 @@ public class GenericSelection : MonoBehaviour {
 					selectedObjects[playerID].Add(colliderGameObject);
 					ApplySelection(playerID); // TEST network
 				} else {
-					ApplyDeselection();
+					ApplyDeselection(playerID);
 					selectedObjects[playerID].Remove(colliderGameObject);
 				}
 			}
