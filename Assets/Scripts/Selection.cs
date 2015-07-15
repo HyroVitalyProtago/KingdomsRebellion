@@ -68,7 +68,11 @@ public class Selection : GenericSelection {
 	}
 
 	protected override void Start() {
-		selectedObjects = new List<GameObject>();
+		selectedObjects = new List<GameObject>[NetworkAPI.maxConnection];
+		for (int i = 0 ; i < selectedObjects.Length ; ++i) {
+			selectedObjects[i] = new List<GameObject>();
+		}
+
 		selectableObjects = new List<GameObject>();
 		foreach (Transform child in transform) {
 			selectableObjects.Add(child.gameObject);
@@ -82,12 +86,12 @@ public class Selection : GenericSelection {
 
 	protected override void SelectUnits(int playerID, Vector3 originWorldPoint) {
 		if (playerPreSelected.Count > 0) {
-			selectedObjects = playerPreSelected;
+			selectedObjects[playerID] = playerPreSelected;
 		} else if (ennemyPreSelected.Count > 0) {
-			selectedObjects = ennemyPreSelected;
+			selectedObjects[playerID] = ennemyPreSelected;
 		}
 		if (!isDragging) {
-			foreach (var unit in selectedObjects) {
+			foreach (var unit in selectedObjects[playerID]) {
 				unit.GetComponent<HealthBar>().ShowHealthBar();
 			}
 		}
@@ -95,22 +99,22 @@ public class Selection : GenericSelection {
 	}
 
 	protected override void ApplySelection(int playerID) {
-		if (selectedObjects.Count == 1) { // show healthbar for selection of one unit
-			selectedObjects[0].GetComponent<HealthBar>().ShowHealthBar();
+		if (selectedObjects[playerID].Count == 1) { // show healthbar for selection of one unit
+			selectedObjects[playerID][0].GetComponent<HealthBar>().ShowHealthBar();
 		}
 		if (OnSelection != null)
 			OnSelection(playerID, selectedObjects);
 	}
 
 	protected override void ApplyDeselection() {
-		foreach (var go in selectedObjects) {
-			go.GetComponent<HealthBar>().HideHealthBar();
-		}
+//		foreach (var go in selectedObjects) {
+//			go.GetComponent<HealthBar>().HideHealthBar();
+//		}
 	}
 
 	void OnSelectableDestroy(GameObject go) {
 		selectableObjects.Remove(go);
-		selectedObjects.Remove(go);
+//		selectedObjects.Remove(go);
 		if (!playerPreSelected.Remove(go)) {
 			ennemyPreSelected.Remove(go);
 		}

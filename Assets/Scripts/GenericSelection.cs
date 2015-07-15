@@ -7,7 +7,7 @@ public class GenericSelection : MonoBehaviour {
 
 	Ray ray;
 	private RaycastHit hit;
-	protected IList<GameObject> selectedObjects;
+	protected IList<GameObject>[] selectedObjects;
 	//Don't forget to notify (SendMessage) when new Selectable object is created.
 	protected IList<GameObject> selectableObjects;
 	protected Vector3 originWorldMousePoint;
@@ -28,7 +28,11 @@ public class GenericSelection : MonoBehaviour {
 	}
 
 	protected virtual void Start() {
-		selectedObjects = new List<GameObject>();
+		selectedObjects = new List<GameObject>[NetworkAPI.maxConnection];
+		for (int i = 0 ; i < selectedObjects.Length ; ++i) {
+			selectedObjects[i] = new List<GameObject>();
+		}
+
 		selectableObjects = new List<GameObject>();
 		foreach (Transform child in transform) {
 			selectableObjects.Add(child.gameObject);
@@ -50,7 +54,7 @@ public class GenericSelection : MonoBehaviour {
 	protected virtual void SelectUnits(int playerID, Vector3 originWorldPoint) {
 		foreach (var unit in selectableObjects) {
 			if (IsInRect(unit, originWorldPoint)) {
-				selectedObjects.Add(unit);
+				selectedObjects[playerID].Add(unit);
 			}
 		}
 		ApplySelection(playerID);
@@ -58,7 +62,7 @@ public class GenericSelection : MonoBehaviour {
 
 	void DeselectUnits() {
 		ApplyDeselection();
-		selectedObjects.Clear();
+//		selectedObjects.Clear();
 	}
 
 	protected bool IsInRect(GameObject gameObject, Vector3 originWorldPoint) {
@@ -92,12 +96,12 @@ public class GenericSelection : MonoBehaviour {
 			var colliderGameObject = hit.collider.gameObject;
 			// FIXME Resolve problem when holding LeftControl to forbid to select unit of different color.
 			if (selectableObjects.Contains(colliderGameObject)) {
-				if (!selectedObjects.Contains(colliderGameObject)) {
-					selectedObjects.Add(colliderGameObject);
+				if (!selectedObjects[playerID].Contains(colliderGameObject)) {
+					selectedObjects[playerID].Add(colliderGameObject);
 					ApplySelection(playerID); // TEST network
 				} else {
 					ApplyDeselection();
-					selectedObjects.Remove(colliderGameObject);
+					selectedObjects[playerID].Remove(colliderGameObject);
 				}
 			}
 		}

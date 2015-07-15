@@ -22,7 +22,6 @@ public class PlayerActions : MonoBehaviour {
 		for (int i = 0 ; i < selectedObjects.Length ; ++i) {
 			selectedObjects[i] = new List<GameObject>();
 		}
-
 	}
 
 	void OnSelection(int playerID, IList<GameObject> selectedObjects) {
