@@ -1,10 +1,11 @@
-﻿
+﻿using System.IO;
+
 namespace KingdomsRebellion.Core.Math {
 
-	/*
-	 * Light implementation of Vector3 with integers
-	 */
-	public struct Vec3 {
+	//
+	// Light implementation of Vector3 with integers
+	//
+	public class Vec3 {
 
 		int _x, _y, _z;
 
@@ -43,6 +44,16 @@ namespace KingdomsRebellion.Core.Math {
 			int y = _y - v._y;
 			int z = _z - v._z;
 			return (x * x) + (y * y) + (z * z);
+		}
+
+		public void Serialize(BinaryWriter writer) {
+			writer.Write(_x);
+			writer.Write(_y);
+			writer.Write(_z);
+		}
+
+		public static Vec3 Deserialize(BinaryReader reader) {
+			return new Vec3(reader.ReadInt32(), reader.ReadInt32(), reader.ReadInt32());
 		}
 	}
 
