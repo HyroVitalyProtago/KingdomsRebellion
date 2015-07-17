@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections;
+using KingdomsRebellion.Core.Math;
 
 namespace KingdomsRebellion.Core {
 
@@ -20,6 +21,7 @@ namespace KingdomsRebellion.Core {
 		public int strength;
 		public int defense;
 		public Unit ennemyTargeted;
+	    public Vec2 Position;
 		private GameObject spot;
 
 		//Events : 
@@ -55,7 +57,7 @@ namespace KingdomsRebellion.Core {
 			}
 
 			if (life <= 0) {
-				GameObject.Destroy(gameObject);
+				Destroy(gameObject);
 			}
 		}
 

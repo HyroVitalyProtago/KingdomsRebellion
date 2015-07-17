@@ -1,13 +1,11 @@
-using UnityEngine;
 using System;
-using System.Collections;
 using KingdomsRebellion.Core.Math;
 
 namespace KingdomsRebellion.Network.Link {
 
-	//
-	// Action send over the network for move units
-	//
+	/// <summary>
+	/// Action send over the network for move units.
+	/// </summary>
 	public class MoveAction : SelectAction {
 
 		public static event Action<int, Vec3> OnMove;
@@ -25,8 +23,6 @@ namespace KingdomsRebellion.Network.Link {
 		}
 
 		public override void Process(int playerID) {
-			Debug.Log("MoveAction :: Process :: playerID == " + playerID);
-		
 			if (OnMove != null) {
 				OnMove(playerID, _modelPoint);
 			}

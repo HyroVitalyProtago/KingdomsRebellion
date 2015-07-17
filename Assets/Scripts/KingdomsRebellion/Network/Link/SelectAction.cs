@@ -5,9 +5,9 @@ using KingdomsRebellion.Core.Math;
 
 namespace KingdomsRebellion.Network.Link {
 
-	//
-	// Action send over the network for select units
-	//
+	/// <summary>
+	/// Action send over the network for select units.
+	/// </summary>
 	public class SelectAction : GameAction {
 
 		public static event Action<int, Vec3> OnSelect;

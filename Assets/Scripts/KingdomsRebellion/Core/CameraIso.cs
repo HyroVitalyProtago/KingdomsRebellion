@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 namespace KingdomsRebellion.Core {
 
@@ -59,7 +58,7 @@ namespace KingdomsRebellion.Core {
 		void Move() {
 			float xpos = Input.mousePosition.x;
 			float ypos = Input.mousePosition.y;
-			Vector3 movement = new Vector3(0, 0, 0);
+			Vector3 movement = Vector3.zero;
 
 			// horizontal camera movement
 			movement.x = Speed(xpos, ScrollWidth, Screen.width, KeyCode.A, KeyCode.D);

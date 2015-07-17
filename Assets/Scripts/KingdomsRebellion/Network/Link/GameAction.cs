@@ -24,7 +24,7 @@ namespace KingdomsRebellion.Network.Link {
 
 		protected override void Deserialize(BinaryReader reader) {
 			if (reader.ReadByte() != ActionType()) {
-				throw new ArgumentException("GameAction :: Deserialize => Bad ActionType for deserialization : " + ActionType().ToString() + " != " + ((byte)ActionType()));
+				throw new ArgumentException("GameAction :: Deserialize => Bad ActionType for deserialization : " + ActionType().ToString() + " != " + ActionType());
 			}
 			base.Deserialize(reader);
 		}

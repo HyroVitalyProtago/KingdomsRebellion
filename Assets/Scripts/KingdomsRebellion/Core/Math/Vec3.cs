@@ -2,37 +2,37 @@
 
 namespace KingdomsRebellion.Core.Math {
 
-	//
-	// Light implementation of Vector3 with integers
-	//
+	/// <summary>
+	/// Light implementation of Vector3 with integers.
+	/// </summary>
 	public class Vec3 {
 
-		readonly int _x, _y, _z;
+		public readonly int X, Y, Z;
 
 		public Vec3(int x, int y, int z) {
-			_x = x; 
-			_y = y;
-			_z = z;
+			X = x; 
+			Y = y;
+			Z = z;
 		}
 			
 		public static Vec3 operator -(Vec3 v) {
-			return new Vec3(-v._x, -v._y, -v._z); 
+			return new Vec3(-v.X, -v.Y, -v.Z); 
 		}
 			
 		public static Vec3 operator +(Vec3 v1, Vec3 v2) { 
-			return new Vec3(v1._x + v2._x, v1._y + v2._y, v1._z + v2._z); 
+			return new Vec3(v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z); 
 		}
 			
 		public static Vec3 operator -(Vec3 v1, Vec3 v2) {
-			return new Vec3(v1._x - v2._x, v1._y - v2._y, v1._z - v2._z);
+			return new Vec3(v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z);
 		}
 			
 		public static Vec3 operator *(Vec3 v, int scalar) {
-			return new Vec3(v._x * scalar, v._y * scalar, v._z * scalar);
+			return new Vec3(v.X * scalar, v.Y * scalar, v.Z * scalar);
 		}
 			
 		public static Vec3 operator *(int scalar, Vec3 v) {
-			return new Vec3(v._x * scalar, v._y * scalar, v._z * scalar); 
+			return new Vec3(v.X * scalar, v.Y * scalar, v.Z * scalar); 
 		}
 
 		public static int Dist(Vec3 v1, Vec3 v2) {
@@ -40,16 +40,16 @@ namespace KingdomsRebellion.Core.Math {
 		}
 
 		public int Dist(Vec3 v) {
-			int x = _x - v._x;
-			int y = _y - v._y;
-			int z = _z - v._z;
+			int x = X - v.X;
+			int y = Y - v.Y;
+			int z = Z - v.Z;
 			return (x * x) + (y * y) + (z * z);
 		}
 
 		public void Serialize(BinaryWriter writer) {
-			writer.Write(_x);
-			writer.Write(_y);
-			writer.Write(_z);
+			writer.Write(X);
+			writer.Write(Y);
+			writer.Write(Z);
 		}
 
 		public static Vec3 Deserialize(BinaryReader reader) {

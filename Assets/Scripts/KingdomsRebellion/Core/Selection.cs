@@ -1,12 +1,10 @@
 ﻿using UnityEngine;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using KingdomsRebellion.Network;
 
 namespace KingdomsRebellion.Core {
-
-//TODO Divide preSelected in 2 lists: one for playerColor, one for others.
+	
 	public class Selection : GenericSelection {
 
 		protected Color playerColor;
