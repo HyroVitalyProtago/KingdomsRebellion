@@ -56,7 +56,7 @@ namespace KingdomsRebellion.Core {
 			}
 
 			if (life <= 0) {
-				GameObject.Destroy(gameObject);
+				Destroy(gameObject);
 			}
 		}
 

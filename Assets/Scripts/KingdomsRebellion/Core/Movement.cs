@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityStandardAssets.Characters.ThirdPerson;
-using System.Collections.Generic;
 
 namespace KingdomsRebellion.Core {
 
@@ -19,7 +17,7 @@ namespace KingdomsRebellion.Core {
 		void Start() {
 			aiCharacterControl = gameObject.GetComponent<AICharacterControl>();
 			targetPrefab = Resources.Load("Prefabs/Target");
-			unit = this.GetComponent<Unit>();
+			unit = GetComponent<Unit>();
 		}
 	
 		void Update() {
@@ -48,7 +46,7 @@ namespace KingdomsRebellion.Core {
 					unit.ennemyTargeted = ennemy;
 					aiCharacterControl.SetTarget(ennemy.transform);
 				} else {
-					GameObject target = GameObject.Instantiate(targetPrefab, hit.point, Quaternion.identity) as GameObject;
+					GameObject target = Instantiate(targetPrefab, hit.point, Quaternion.identity) as GameObject;
 					aiCharacterControl.SetTarget(target.transform);
 				}
 			}

@@ -16,12 +16,12 @@ namespace KingdomsRebellion.Network.Link {
 		private GameConfirmation() {
 		}
 
-		protected sealed override void Serialize(BinaryWriter writer) {
+		protected override void Serialize(BinaryWriter writer) {
 			base.Serialize(writer);
 			writer.Write(Wait);
 		}
 
-		protected sealed override void Deserialize(BinaryReader reader) {
+		protected override void Deserialize(BinaryReader reader) {
 			base.Deserialize(reader);
 			Wait = reader.ReadBoolean();
 		}

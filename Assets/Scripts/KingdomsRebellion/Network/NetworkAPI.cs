@@ -1,8 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
-using System.Collections;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO;
 using System;
 using KingdomsRebellion.Network.Link;
 
@@ -93,7 +90,7 @@ namespace KingdomsRebellion.Network {
 		public static void SetupClient(string ip, string port) {
 			PlayerId = 1; // TEST set player id to 1 for client
 
-			GameObject realMainCamera = GameObject.Find("Cameras/Camera (" + PlayerId + ")") as GameObject;
+			GameObject realMainCamera = GameObject.Find("Cameras/Camera (" + PlayerId + ")");
 			realMainCamera.GetComponent<Camera>().enabled = true;
 			Camera.main.enabled = false; // Camera.main is now equal to realMainCamera.GetComponent<Camera>()
 

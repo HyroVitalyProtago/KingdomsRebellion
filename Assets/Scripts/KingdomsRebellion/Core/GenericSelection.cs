@@ -90,7 +90,7 @@ namespace KingdomsRebellion.Core {
 		void OnSelect(int playerID, Camera camera, Vector3 mousePosition) {
 			ray = camera.ScreenPointToRay(camera.WorldToScreenPoint(mousePosition));
 			if (playerID == NetworkAPI.PlayerId) {
-				this.originWorldMousePoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+				originWorldMousePoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 			}
 			if (Physics.Raycast(ray.origin, ray.direction, out hit)) {
 				originCamera = camera;

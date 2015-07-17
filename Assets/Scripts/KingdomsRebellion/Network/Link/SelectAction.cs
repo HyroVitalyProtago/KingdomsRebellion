@@ -1,5 +1,4 @@
 using UnityEngine;
-using System;
 using System.IO;
 
 namespace KingdomsRebellion.Network.Link {
@@ -34,7 +33,7 @@ namespace KingdomsRebellion.Network.Link {
 		protected SelectAction() : base() {}
 
 		protected void SetPlayerData(int playerID) {
-			playerCamera = GameObject.Find("Cameras/Camera (" + playerID + ")") as GameObject;
+			playerCamera = GameObject.Find("Cameras/Camera (" + playerID + ")");
 			playerCamera.transform.position = cameraPosition;
 			playerCamera.transform.localEulerAngles = cameraRotation;
 		

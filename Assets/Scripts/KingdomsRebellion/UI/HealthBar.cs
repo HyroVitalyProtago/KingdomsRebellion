@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.UI;
 using KingdomsRebellion.Network;
 
@@ -28,7 +27,7 @@ namespace KingdomsRebellion.Core {
 		}
 
 		void Start() {
-			healthContainer = this.GetComponentInChildren<Image>().gameObject;
+			healthContainer = GetComponentInChildren<Image>().gameObject;
 			healthContainer.GetComponentInParent<Canvas>().worldCamera = Camera.main;
 			rectTransform = healthContainer.GetComponent<RectTransform>();
 			healthBar = healthContainer.transform.FindChild("HealthBar").GetComponent<RectTransform>();
@@ -45,9 +44,6 @@ namespace KingdomsRebellion.Core {
 			healthContainer.transform.position = transform.position + 2 * Vector3.up;
 			float lifePercent = (float)unitData.life / (float)unitData.lifeMax;
 			var scale = rectTransform.localScale = Vector3.one + (1 - Camera.main.orthographicSize / initCameraSize) * Vector3.one;
-			if (scale.x < 0.3f) {
-				scale = 0.3f * Vector3.one;
-			}
 			healthBar.sizeDelta = new Vector2(initWidth * lifePercent, healthBar.rect.height);
 			if (lifePercent <= 0.66f && lifePercent > 0.33f) {
 				image.color = Color.yellow;
