@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using KingdomsRebellion.Network;
@@ -12,9 +13,7 @@ namespace KingdomsRebellion.Core {
 		IList<GameObject> playerPreSelected;
 		IList<GameObject> ennemyPreSelected;
 
-		public delegate void ESelection(int playerID,IList<GameObject> listObjects);
-
-		public static event ESelection OnSelection;
+		public static event Action< int, IList<GameObject> > OnSelection;
 
 		protected override void OnEnable() {
 			base.OnEnable();

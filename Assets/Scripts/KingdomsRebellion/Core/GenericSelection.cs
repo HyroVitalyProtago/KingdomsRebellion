@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Network;
 using KingdomsRebellion.Network.Link;
 using KingdomsRebellion.Inputs;
@@ -7,14 +8,14 @@ using KingdomsRebellion.Tools.UI;
 
 namespace KingdomsRebellion.Core {
 
-//TODO: Make this class more generic.
-//This class Select all selectable unit
+	// TODO: Make this class more generic.
+	// This class Select all selectable unit
 	public class GenericSelection : MonoBehaviour {
 
 		Ray ray;
 		private RaycastHit hit;
 		protected IList<GameObject>[] selectedObjects;
-		//Don't forget to notify (SendMessage) when new Selectable object is created.
+		// Don't forget to notify (SendMessage) when new Selectable object is created.
 		protected IList<GameObject> selectableObjects;
 		protected Vector3 originWorldMousePoint;
 		Camera originCamera;
@@ -81,40 +82,35 @@ namespace KingdomsRebellion.Core {
 			return viewportBounds.Contains(camera.WorldToViewportPoint(gameObject.transform.position));
 		}
 
-		protected virtual void ApplySelection(int playerID) {
-		}
+		protected virtual void ApplySelection(int playerID) {}
 
-		protected virtual void ApplyDeselection(int playerID) {
-		}
+		protected virtual void ApplyDeselection(int playerID) {}
 
-		void OnSelect(int playerID, Camera camera, Vector3 mousePosition) {
-			ray = camera.ScreenPointToRay(camera.WorldToScreenPoint(mousePosition));
-			if (playerID == NetworkAPI.PlayerId) {
-				this.originWorldMousePoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-			}
-			if (Physics.Raycast(ray.origin, ray.direction, out hit)) {
-				originCamera = camera;
-				if (!Input.GetKey(KeyCode.LeftControl)) {
-					DeselectUnits(playerID);
-				}
-			}
-			if (hit.collider != null) {
-				var colliderGameObject = hit.collider.gameObject;
-				// FIXME Resolve problem when holding LeftControl to forbid to select unit of different color.
-				Debug.Log("mousePosition = " + mousePosition);
-				Debug.Log("[1] " + playerID + " ; collider : " + hit.collider.gameObject.name);
-				if (selectableObjects.Contains(colliderGameObject)) {
-					Debug.Log("[2] " + playerID);
-					if (!selectedObjects[playerID].Contains(colliderGameObject)) {
-						Debug.Log("add something for player " + playerID);
-						selectedObjects[playerID].Add(colliderGameObject);
-						ApplySelection(playerID); // TEST network
-					} else {
-						ApplyDeselection(playerID);
-						selectedObjects[playerID].Remove(colliderGameObject);
-					}
-				}
-			}
+		// TODO get unit on modelPoint position and select it
+		// if there is no unit on modelPoint, deselect current units
+		void OnSelect(int playerID, Vec3 modelPoint) {
+//			ray = camera.ScreenPointToRay(camera.WorldToScreenPoint(mousePosition));
+//			if (playerID == NetworkAPI.PlayerId) {
+//				this.originWorldMousePoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+//			}
+//			if (Physics.Raycast(ray.origin, ray.direction, out hit)) {
+//				originCamera = camera;
+//				if (!Input.GetKey(KeyCode.LeftControl)) {
+//					DeselectUnits(playerID);
+//				}
+//			}
+//			if (hit.collider != null) {
+//				var colliderGameObject = hit.collider.gameObject;
+//				if (selectableObjects.Contains(colliderGameObject)) {
+//					if (!selectedObjects[playerID].Contains(colliderGameObject)) {
+//						selectedObjects[playerID].Add(colliderGameObject);
+//						ApplySelection(playerID);
+//					} else {
+//						ApplyDeselection(playerID);
+//						selectedObjects[playerID].Remove(colliderGameObject);
+//					}
+//				}
+//			}
 		}
 
 		protected virtual void OnUpdateDrag(int playerId, Vector3 originWorldPoint, Camera currentCamera, Vector3 currentMousePousition) {

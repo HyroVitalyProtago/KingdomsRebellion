@@ -1,75 +1,49 @@
 using UnityEngine;
 using System;
 using System.IO;
+using KingdomsRebellion.Core.Math;
 
 namespace KingdomsRebellion.Network.Link {
 
-	/*
-	 * Action send over the network for select units
-	 */
+	//
+	// Action send over the network for select units
+	//
 	public class SelectAction : GameAction {
 
-		public delegate void ESelectAction(int playerId, Camera camera, Vector3 mousePosition);
-		public static event ESelectAction OnSelect;
+		public static event Action<int, Vec3> OnSelect;
 
-		Vector3 cameraPosition;
-		Vector3 cameraRotation;
-		float cameraOrthographicSize;
-
-		protected Vector3 mousePosition;
-		protected GameObject playerCamera;
-		protected Camera camera;
+		protected Vec3 _modelPoint;
 
 		public static SelectAction FromBytes(byte[] data) {
 			return new SelectAction().GetFromBytes(data) as SelectAction;
 		}
 	
-		public SelectAction(int lockStepTurn, Vector3 cameraPosition, Vector3 cameraRotation, float cameraOrthographicSize, Vector3 mousePosition) : base(lockStepTurn) {
-			this.cameraPosition = cameraPosition;
-			this.cameraRotation = cameraRotation;
-			this.cameraOrthographicSize = cameraOrthographicSize;
-			this.mousePosition = mousePosition;
+		public SelectAction(uint lockStepTurn, Vec3 modelPoint) : base(lockStepTurn) {
+			_modelPoint = modelPoint;
 		}
 
-		protected SelectAction() : base() {}
-
-		protected void SetPlayerData(int playerID) {
-			playerCamera = GameObject.Find("Cameras/Camera (" + playerID + ")") as GameObject;
-			playerCamera.transform.position = cameraPosition;
-			playerCamera.transform.localEulerAngles = cameraRotation;
-		
-			camera = playerCamera.GetComponent<Camera>();
-			camera.orthographicSize = cameraOrthographicSize;
-		}
+		protected SelectAction() {}
 
 		public override void Process(int playerID) {
 			Debug.Log("SelectAction :: Process :: playerID == " + playerID);
 
-			SetPlayerData(playerID);
-
 			if (OnSelect != null) {
-				OnSelect(playerID, camera, mousePosition);
+				OnSelect(playerID, _modelPoint);
 			}
 		}
 
 		public override byte ActionType() {
-			return (byte)GameActionEnum.SelectAction;
+			return (byte) GameActionEnum.SelectAction;
 		}
 
 		protected override void Serialize(BinaryWriter writer) {
 			base.Serialize(writer);
-			SerializeVector3(cameraPosition, writer);
-			SerializeVector3(cameraRotation, writer);
-			writer.Write(cameraOrthographicSize);
-			SerializeVector3(mousePosition, writer);
+			_modelPoint.Serialize(writer);
 		}
 	
 		protected override void Deserialize(BinaryReader reader) {
 			base.Deserialize(reader);
-			cameraPosition = DeserializeVector3(reader);
-			cameraRotation = DeserializeVector3(reader);
-			cameraOrthographicSize = reader.ReadSingle();
-			mousePosition = DeserializeVector3(reader);
+			_modelPoint = Vec3.Deserialize(reader);
 		}
 
 	}

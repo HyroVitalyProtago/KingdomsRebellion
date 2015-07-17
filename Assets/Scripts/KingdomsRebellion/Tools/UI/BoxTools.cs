@@ -3,9 +3,9 @@ using System.Collections;
 
 namespace KingdomsRebellion.Tools.UI {
 
-	/*
-	 * Static class that can be used to create Rect (with Border).
-	 */
+	//
+	// Static class that can be used to create Rect (with Border).
+	//
 	public static class BoxTools {
 
 		private static Texture2D _whiteTexture;

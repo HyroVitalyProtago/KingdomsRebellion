@@ -8,34 +8,19 @@ using KingdomsRebellion.Network.Link;
 
 namespace KingdomsRebellion.Network {
 
-	/*
-	 * disable by default
-	 * only one instance
-	 */
+	//
+	// Disable by default
+	// Only one instance
+	//
 	public class NetworkAPI : MonoBehaviour {
 
-		public delegate void MainCameraChangeEvent();
+		public static event Action MainCameraChange;
+		public static event Action Connection; // Event throw when a new player is connected
+		public static event Action<int, GameAction> ReceiveAction; // Event throw when action is received
+		public static event Action<int, GameConfirmation> ReceiveConfirmation; // Event throw when confirmation is received
 
-		public static event MainCameraChangeEvent MainCameraChange;
-
-		// Event throw when a new player is connected
-		public delegate void ConnectionEvent();
-
-		public static event ConnectionEvent Connection;
-
-		// Event throw when action is received
-		public delegate void ActionEvent(int playerID,GameAction action);
-
-		public static event ActionEvent ReceiveAction;
-
-		// Event throw when confirmation is received
-		public delegate void ConfirmationEvent(int playerID,GameConfirmation confirmation);
-
-		public static event ConfirmationEvent ReceiveConfirmation;
-
-		public static int[] Players;
-
-		public static int PlayerId { get; /*private*/ set; } // TODO player id set to private
+//		public static int[] Players;
+		public static byte PlayerId { get; private set; } // TODO player id set to private
 //		public static int NumberOfPlayers { get; private set; };
 
 		// Parameters
@@ -55,7 +40,7 @@ namespace KingdomsRebellion.Network {
 			enabled = false;
 			self = this;
 
-			Players = new int[maxConnection];
+//			Players = new byte[maxConnection];
 		}
 
 		public static void Setup(string port) {
@@ -102,14 +87,14 @@ namespace KingdomsRebellion.Network {
 
 			connectionId = NetworkTransport.Connect(hostId, ip, Convert.ToInt32(port), 0, out error);
 
-			if (error != (byte)NetworkError.Ok) {
+			if (error != (byte) NetworkError.Ok) {
 				Debug.LogError("[ERROR] NetworkAPI :: SetupClient :: Connect : " + error);
 			}
 		}
 	
 		void Update() {
 			eventType = NetworkTransport.Receive(out recHostId, out connectionId, out channelId, buffer, bufferSize, out dataSize, out error);
-			if (error != (byte)NetworkError.Ok) {
+			if (error != (byte) NetworkError.Ok) {
 				Debug.LogError("[ERROR] NetworkAPI :: Update :: Receive : " + error);
 				if (dataSize > bufferSize) {
 					Debug.LogError("[ERROR] NetworkAPI :: Update : Message too big for be handled by buffer...");

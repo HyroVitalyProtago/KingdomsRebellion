@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 
 namespace KingdomsRebellion.Core {
@@ -22,9 +23,7 @@ namespace KingdomsRebellion.Core {
 		private GameObject spot;
 
 		//Events : 
-		public delegate void EOnDeath(int playerID,GameObject go);
-
-		public static event EOnDeath OnDeath;
+		public static event Action<int, GameObject> OnDeath;
 
 		// Use this for initialization
 		void Start() {

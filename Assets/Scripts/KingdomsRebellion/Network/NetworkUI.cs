@@ -8,20 +8,11 @@ namespace KingdomsRebellion.Network {
 	[RequireComponent (typeof(NetworkAPI))]
 	public class NetworkUI : MonoBehaviour {
 
-		// TEST inc frame i
-		// =====================
-		static int i = 0;
-
-		public static void Inc() {
-			++i;
-		}
-		// =====================
-
+		static StringBuilder Builder = new StringBuilder().AppendLine("Console :");
 		static int BuilderNbLines = 0;
-		static StringBuilder builder = new StringBuilder().AppendLine("Console :");
 		static string Console = "Console :";
-		string ip, port;
 		static bool IsSetup, IsConnected, IsLaunched;
+		string ip, port;
 
 		void Start() {
 			ip = "127.0.0.1";
@@ -30,10 +21,12 @@ namespace KingdomsRebellion.Network {
 
 		void OnEnable() {
 			NetworkAPI.Connection += OnConnectionEvent;
+//			EventConductor.On(this, "Network.Connection", OnConnectionEvent);
 		}
 
 		void OnDisable() {
 			NetworkAPI.Connection -= OnConnectionEvent;
+//			EventConductor.Off(this, "Network.Connection", OnConnectionEvent);
 		}
 
 		void OnConnectionEvent() {
@@ -42,7 +35,7 @@ namespace KingdomsRebellion.Network {
 		}
 
 		public static void ClearLog() {
-			builder = new StringBuilder().AppendLine("Console :");
+			Builder = new StringBuilder().AppendLine("Console :");
 			BuilderNbLines = 0;
 		}
 
@@ -50,7 +43,7 @@ namespace KingdomsRebellion.Network {
 			if (BuilderNbLines > 30) {
 				ClearLog();
 			}
-			Console = builder.AppendLine(log).ToString();
+			Console = Builder.AppendLine(log).ToString();
 			++BuilderNbLines;
 		}
 
@@ -60,10 +53,7 @@ namespace KingdomsRebellion.Network {
 			ip = GUILayout.TextField(ip, 32);
 			port = GUILayout.TextField(port, 4);
 
-			// TEST display player id
-			// =====================
-			GUILayout.Label("playerID " + NetworkAPI.PlayerId);
-			// =====================
+			GUILayout.Label("playerID " + NetworkAPI.PlayerId); // TEST display player id
 
 			if (!IsSetup && GUILayout.Button("Init")) {
 				Log("Init network on port " + port);
@@ -80,11 +70,6 @@ namespace KingdomsRebellion.Network {
 				gameObject.GetComponent<Lockstep>().enabled = true;
 				IsLaunched = true;
 			}
-
-			// TEST display frame id
-			// =====================
-			GUILayout.Label("" + i);
-			// =====================
 
 			GUILayout.Label(Console);
 

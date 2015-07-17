@@ -5,10 +5,10 @@ using KingdomsRebellion.Network;
 
 namespace KingdomsRebellion.Core {
 
-//TODO Call SetActive only one time by creating an event.
-/*
- *Display a HealthBar on GameObject which have a Canvas containing an Image which contains another name HealthBar. 
- */
+	//TODO Call SetActive only one time by creating an event.
+	//
+	// Display a HealthBar on GameObject which have a Canvas containing an Image which contains another name HealthBar. 
+	//
 	public class HealthBar : MonoBehaviour {
 
 		private GameObject healthContainer;

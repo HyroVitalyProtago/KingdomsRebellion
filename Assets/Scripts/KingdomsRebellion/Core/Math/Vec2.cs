@@ -7,7 +7,7 @@ namespace KingdomsRebellion.Core.Math {
 	//
 	public class Vec2 {
 		
-		int _x, _y;
+		readonly int _x, _y;
 		
 		public Vec2(int x, int y) {
 			_x = x; 

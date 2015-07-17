@@ -9,12 +9,11 @@ namespace KingdomsRebellion.Network.Link {
 			return new GameConfirmation().GetFromBytes(data) as GameConfirmation;
 		}
 
-		public GameConfirmation(int lockStepTurn, bool wait) : base(lockStepTurn) {
+		public GameConfirmation(uint lockStepTurn, bool wait) : base(lockStepTurn) {
 			Wait = wait;
 		}
 
-		private GameConfirmation() {
-		}
+		private GameConfirmation() {}
 
 		protected sealed override void Serialize(BinaryWriter writer) {
 			base.Serialize(writer);

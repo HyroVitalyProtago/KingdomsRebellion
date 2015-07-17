@@ -3,42 +3,38 @@ using System;
 using System.Collections.Generic;
 using KingdomsRebellion.Network.Link;
 using KingdomsRebellion.Inputs;
+using KingdomsRebellion.Core.Math;
 
 namespace KingdomsRebellion.Network {
 
 	[RequireComponent (typeof(NetworkAPI))]
 	public class Lockstep : MonoBehaviour {
 
-		static int WaitingTime = 4; // in game frame
+		static readonly float gameFrameTurnLength = 50f; // in milliseconds
+
+		static readonly uint WaitingTime = 4; // in game frame
+		static readonly uint gameFramesPerLockstepTurn = 4;
+		static readonly uint firstLockstepTurn = 0;
+		static readonly uint numberOfPlayers = 2;
 
 		float accumulatedTime;
-		int gameFrame;
-		float gameFrameTurnLength;
-		int gameFramesPerLockstepTurn;
-		int firstLockStepTurnID;
-		int lockStepTurnID;
-		int numberOfPlayers;
+		uint gameFrame;
+		uint lockstepTurn;
+
 		Queue<GameAction> actionQueue;
+
 		GameAction[][] actions; // [turn, player]
-		int[] numberOfPlayerWhoSendAction; // [turn]
-
+		uint[] numberOfPlayerWhoSendAction; // [turn]
 		bool[][] playerHaveConfirmedMyAction; // [turn, player]
-		int[] numberOfPlayerWhoConfirmedMyAction; // [turn]
-
-		int[][] wait; // [turn, player]
+		uint[] numberOfPlayerWhoConfirmedMyAction; // [turn]
+		uint[][] wait; // [turn, player]
 	
 		void Start() {
 			enabled = false;
 
 			accumulatedTime = 0;
 			gameFrame = 0;
-			gameFrameTurnLength = 50f; // 50 miliseconds
-			gameFramesPerLockstepTurn = 4;
-
-			firstLockStepTurnID = 0;
-			lockStepTurnID = 0;
-
-			numberOfPlayers = 2;
+			lockstepTurn = 0;
 
 			actionQueue = new Queue<GameAction>();
 
@@ -47,18 +43,18 @@ namespace KingdomsRebellion.Network {
 				actions[i] = new GameAction[numberOfPlayers]; // allready set to null
 			}
 
-			numberOfPlayerWhoSendAction = new int[3]; // allready set to 0
+			numberOfPlayerWhoSendAction = new uint[3]; // allready set to 0
 
 			playerHaveConfirmedMyAction = new bool[3][];
 			for (int i = 0; i < playerHaveConfirmedMyAction.Length; ++i) {
 				playerHaveConfirmedMyAction[i] = new bool[numberOfPlayers]; // allready set to false
 			}
 		
-			numberOfPlayerWhoConfirmedMyAction = new int[3]; // allready set to 0
+			numberOfPlayerWhoConfirmedMyAction = new uint[3]; // allready set to 0
 
-			wait = new int[3][];
+			wait = new uint[3][];
 			for (int i = 0; i < wait.Length; ++i) {
-				wait[i] = new int[numberOfPlayers]; // allready set to false
+				wait[i] = new uint[numberOfPlayers]; // allready set to false
 			}
 		}
 
@@ -79,12 +75,11 @@ namespace KingdomsRebellion.Network {
 		}
 
 		void OnAction(int playerID, GameAction action) {
-			int turn = action.LockStepTurn - lockStepTurnID;
-			bool wait = turn > 2; // Send wait message for stop overloaded network
+			if (action.LockstepTurn > lockstepTurn) {
+				uint turn = action.LockstepTurn - lockstepTurn;
 
-			NetworkUI.Log("Receive action from player " + playerID + " for turn " + turn);
+				NetworkUI.Log("Receive action from player " + playerID + " for turn " + turn);
 
-			if (turn > 0) {
 				if (turn <= 2 && actions[turn][playerID] == null) {
 					actions[turn][playerID] = action;
 					++numberOfPlayerWhoSendAction[turn];
@@ -94,20 +89,23 @@ namespace KingdomsRebellion.Network {
 				}
 			}
 
-			NetworkAPI.SendConfirmation(new GameConfirmation(action.LockStepTurn, wait));
+			// Send wait message for stop overloaded network
+			bool wait = action.LockstepTurn > lockstepTurn + 2;
+
+			NetworkAPI.SendConfirmation(new GameConfirmation(action.LockstepTurn, wait));
 		}
 
 		void OnConfirmation(int playerID, GameConfirmation confirmation) {
-			int turn = confirmation.LockStepTurn - lockStepTurnID;
-
-			if (turn < 0) { // Discard
+			if (confirmation.LockstepTurn < lockstepTurn) { // Discard
 				return;
 			}
 
-			if (turn > 2) {
-				Debug.LogError("Lockstep : Confirmation from player " + playerID + " on impossible turn > 2 : " + turn);
+			if (confirmation.LockstepTurn > lockstepTurn + 2) {
+				Debug.LogError("Lockstep : Confirmation from player " + playerID + " on impossible turn (> 2)");
 				return;
 			}
+
+			uint turn = confirmation.LockstepTurn - lockstepTurn;
 
 			NetworkUI.Log("Receive confirmation from player " + playerID + " for turn " + turn);
 
@@ -121,22 +119,22 @@ namespace KingdomsRebellion.Network {
 				playerHaveConfirmedMyAction[turn][playerID] = true;
 				++numberOfPlayerWhoConfirmedMyAction[turn];
 			} else {
-				NetworkUI.Log("Confirmation allready received for LockstepTurn " + confirmation.LockStepTurn);
+				NetworkUI.Log("Confirmation allready received for LockstepTurn " + confirmation.LockstepTurn);
 			}
 		}
 
 		void Update() {
-			accumulatedTime = accumulatedTime + Convert.ToInt32((Time.deltaTime * 1000));
+			accumulatedTime += Time.deltaTime * 1000f;
 
 			while (accumulatedTime > gameFrameTurnLength) {
 				GameFrameTurn();
-				accumulatedTime = accumulatedTime - gameFrameTurnLength;
+				accumulatedTime -= gameFrameTurnLength;
 			}
 		}
 
 		void GameFrameTurn() {
 			NetworkUI.ClearLog(); // TEST network ui clear log on game frame turn
-			NetworkUI.Log("LockstepTurn : " + lockStepTurnID + " ; gameFrame : " + gameFrame);
+			NetworkUI.Log("LockstepTurn : " + lockstepTurn + " ; gameFrame : " + gameFrame);
 
 			if (gameFrame == 0) {
 				if (LockStepTurn()) {
@@ -156,7 +154,7 @@ namespace KingdomsRebellion.Network {
 		}
 
 		void NextTurn() {
-			++lockStepTurnID;
+			++lockstepTurn;
 
 			// Shift left actions
 			for (int i = 0; i < actions.Length-1; ++i) {
@@ -189,23 +187,22 @@ namespace KingdomsRebellion.Network {
 			numberOfPlayerWhoConfirmedMyAction[numberOfPlayerWhoConfirmedMyAction.Length - 1] = 0;
 		}
 
-		/*
-		 * Did we receive every client’s action for the next turn ?
-		 * Did every client confirm that they received our action ?
-		 */
+		//
+		// Did we receive every client’s action for the next turn ?
+		// Did every client confirm that they received our action ?
+		//
 		bool LockStepTurn() {
 			bool allActionsReceived = numberOfPlayerWhoSendAction[0] == numberOfPlayers;
 			bool allActionsConfirmed = numberOfPlayerWhoConfirmedMyAction[0] == numberOfPlayers;
-			bool readyForTurn = (allActionsReceived && allActionsConfirmed) || lockStepTurnID < firstLockStepTurnID + 2;
+			bool readyForTurn = (allActionsReceived && allActionsConfirmed) || lockstepTurn < firstLockstepTurn + 2;
 
 			if (readyForTurn) {
-				NetworkUI.Log("Ready for turn " + lockStepTurnID);
+				NetworkUI.Log("Ready for turn " + lockstepTurn);
 
 				SetAction(); // set wantedActions[1]
 
-				if (lockStepTurnID >= firstLockStepTurnID + 3) {
+				if (lockstepTurn >= firstLockstepTurn + 3) {
 					ProcessActions();
-					NetworkUI.Inc(); // TEST NetworUI inc frame number
 				}
 			} else {
 				if (!allActionsReceived) {
@@ -256,10 +253,10 @@ namespace KingdomsRebellion.Network {
 		void SetAction() {
 			if (actionQueue.Count > 0) {
 				GameAction action = actionQueue.Dequeue();
-				action.LockStepTurn = lockStepTurnID + 2;
+				action.LockstepTurn = lockstepTurn + 2;
 				actions[2][NetworkAPI.PlayerId] = action;
 			} else {
-				actions[2][NetworkAPI.PlayerId] = new NoAction(lockStepTurnID + 2);
+				actions[2][NetworkAPI.PlayerId] = new NoAction(lockstepTurn + 2);
 			}
 
 			NetworkUI.Log("SetAction " + actions[2][NetworkAPI.PlayerId]);
@@ -278,21 +275,23 @@ namespace KingdomsRebellion.Network {
 			// TODO check if the last action is of the same type,
 			// if true, override the previous with it, else, enqueue it
 			actionQueue.Enqueue(new SelectAction(
-				lockStepTurnID, // bad lockStepTurnID for create action...
-				camera.transform.localPosition,
-				camera.transform.localEulerAngles,
-				camera.orthographicSize,
-				mousePosition
+				lockstepTurn, // bad lockstepTurn for create action...
+				new Vec3(0,0,0) // TODO get real modelPosition
+//				camera.transform.localPosition,
+//				camera.transform.localEulerAngles,
+//				camera.orthographicSize,
+//				mousePosition
 			));
 		}
 
 		void OnRightClick(int playerId, Camera camera, Vector3 mousePosition) {
 			actionQueue.Enqueue(new MoveAction(
-				lockStepTurnID, // bad lockStepTurnID for create action...
-				camera.transform.localPosition,
-				camera.transform.localEulerAngles,
-				camera.orthographicSize,
-				mousePosition
+				lockstepTurn, // bad lockstepTurn for create action...
+				new Vec3(0,0,0) // TODO get real modelPosition
+//				camera.transform.localPosition,
+//				camera.transform.localEulerAngles,
+//				camera.orthographicSize,
+//				mousePosition
 			));
 		}
 	}

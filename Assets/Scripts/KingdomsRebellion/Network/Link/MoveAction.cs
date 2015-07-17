@@ -1,40 +1,36 @@
-﻿using UnityEngine;
+using UnityEngine;
+using System;
 using System.Collections;
+using KingdomsRebellion.Core.Math;
 
 namespace KingdomsRebellion.Network.Link {
+
+	//
+	// Action send over the network for move units
+	//
 	public class MoveAction : SelectAction {
 
-		public delegate void EMoveAction(int playerId,Camera camera,Vector3 mousePosition);
-
-		public static event EMoveAction OnMove;
+		public static event Action<int, Vec3> OnMove;
 
 		public static new MoveAction FromBytes(byte[] data) {
 			return new MoveAction().GetFromBytes(data) as MoveAction;
 		}
 
-		public MoveAction(
-		int lockStepTurn,
-		Vector3 cameraPosition,
-		Vector3 cameraRotation,
-		float cameraOrthographicSize,
-		Vector3 mousePosition) : base(lockStepTurn, cameraPosition, cameraRotation, cameraOrthographicSize, mousePosition) {
-		}
+		public MoveAction(uint lockStepTurn, Vec3 modelPoint) : base(lockStepTurn, modelPoint) {}
 	
-		protected MoveAction() : base() {
-		}
+		protected MoveAction() {}
 
 		public override byte ActionType() {
-			return (byte)GameActionEnum.MoveAction;
+			return (byte) GameActionEnum.MoveAction;
 		}
 
 		public override void Process(int playerID) {
 			Debug.Log("MoveAction :: Process :: playerID == " + playerID);
-
-			SetPlayerData(playerID);
 		
 			if (OnMove != null) {
-				OnMove(playerID, camera, mousePosition);
+				OnMove(playerID, _modelPoint);
 			}
 		}
 	}
+
 }

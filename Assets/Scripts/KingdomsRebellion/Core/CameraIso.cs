@@ -3,11 +3,10 @@ using System.Collections;
 
 namespace KingdomsRebellion.Core {
 
-	/*
-	 * Navigation system for RTS
-	 * @advice Attach on camera
-	 */
-
+	//
+	// Navigation system for RTS
+	// @advice Attach on camera
+	//
 	// TODO: Block player in the map and zoom on the cursor position
 	public class CameraIso : MonoBehaviour {
 

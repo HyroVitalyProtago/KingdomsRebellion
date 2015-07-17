@@ -1,18 +1,15 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using KingdomsRebellion.Network;
 
 namespace KingdomsRebellion.Inputs {
 	public class Mouse : MonoBehaviour {
 
-		public delegate void EClickAction(int playerId,Camera camera,Vector3 mousePosition);
-
-		public delegate void EDragAction(int playerId,Vector3 originWorldPoint,Camera currentCamera,Vector3 currentMousePousition);
-
-		public static event EClickAction OnLeftClick;
-		public static event EClickAction OnRightClick;
-		public static event EDragAction OnUpdateDrag;
-		public static event EDragAction OnDrag;
+		public static event Action<int, Camera, Vector3> OnLeftClick;
+		public static event Action<int, Camera, Vector3> OnRightClick;
+		public static event Action<int, Vector3, Camera, Vector3> OnUpdateDrag;
+		public static event Action<int, Vector3, Camera, Vector3> OnDrag;
 
 		// Vector3 originWorldPoint;
 

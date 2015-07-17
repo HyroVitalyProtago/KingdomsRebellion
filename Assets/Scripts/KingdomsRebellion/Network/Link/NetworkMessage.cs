@@ -1,16 +1,25 @@
-﻿using UnityEngine;
+﻿using System;
 using System.IO;
+using KingdomsRebellion.Network;
 
 namespace KingdomsRebellion.Network.Link {
 	public abstract class NetworkMessage {
 
-		public int LockStepTurn { get; set; }
-
-		protected NetworkMessage(int lockStepTurn) {
-			LockStepTurn = lockStepTurn;
+		uint? _lockstepTurn;
+		public uint LockstepTurn {
+			get {
+				return _lockstepTurn.Value; // throw InvalidStateException if null
+			}
+			set {
+				_lockstepTurn = (uint?) value;
+			}
 		}
 
-		protected NetworkMessage() : this(-1) {}
+		protected NetworkMessage(uint lockstepTurn) {
+			_lockstepTurn = (uint?) lockstepTurn;
+		}
+
+		protected NetworkMessage() {}
 
 		protected NetworkMessage GetFromBytes(byte[] data) {
 			using (MemoryStream m = new MemoryStream(data)) {
@@ -31,26 +40,11 @@ namespace KingdomsRebellion.Network.Link {
 		}
 
 		protected virtual void Serialize(BinaryWriter writer) {
-			writer.Write(LockStepTurn);
+			writer.Write(LockstepTurn);
 		}
 
 		protected virtual void Deserialize(BinaryReader reader) {
-			LockStepTurn = reader.ReadInt32();
-		}
-
-		// TOOLS
-		protected void SerializeVector3(Vector3 v3, BinaryWriter writer) {
-			writer.Write(v3.x);
-			writer.Write(v3.y);
-			writer.Write(v3.z);
-		}
-
-		protected Vector3 DeserializeVector3(BinaryReader reader) {
-			Vector3 v3 = new Vector3();
-			v3.x = reader.ReadSingle();
-			v3.y = reader.ReadSingle();
-			v3.z = reader.ReadSingle();
-			return v3;
+			LockstepTurn = reader.ReadUInt32();
 		}
 
 	}

@@ -9,14 +9,11 @@ namespace KingdomsRebellion.Network.Link {
 		//	return new GameAction().GetFromBytes(data) as GameAction;
 		// }
 
-		public GameAction(int lockStepTurn) : base(lockStepTurn) {
-		}
+		protected GameAction(uint lockStepTurn) : base(lockStepTurn) {}
 
-		protected GameAction() : base() {
-		}
+		protected GameAction() {}
 
-		public virtual void Process(int playerID) {
-		}
+		public virtual void Process(int playerID) {}
 
 		public abstract byte ActionType();
 
