@@ -2,9 +2,9 @@
 
 namespace KingdomsRebellion.Tools.UI {
 
-	//
-	// Static class that can be used to create Rect (with Border).
-	//
+	/// <summary>
+	/// Static class that can be used to create Rect (with Border).
+	/// </summary>
 	public static class BoxTools {
 
 		private static Texture2D _whiteTexture;

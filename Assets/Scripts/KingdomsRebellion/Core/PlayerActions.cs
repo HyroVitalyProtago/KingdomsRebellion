@@ -5,7 +5,7 @@ using KingdomsRebellion.Network.Link;
 using KingdomsRebellion.Core.Math;
 
 namespace KingdomsRebellion.Core {
-	public class PlayerActions : MonoBehaviour {
+	public class PlayerActions : KRBehaviour {
 
 		IList<GameObject>[] selectedObjects;
 

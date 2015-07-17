@@ -3,12 +3,13 @@ using System;
 using System.Collections.Generic;
 using KingdomsRebellion.Network.Link;
 using KingdomsRebellion.Inputs;
+using KingdomsRebellion.Core;
 using KingdomsRebellion.Core.Math;
 
 namespace KingdomsRebellion.Network {
 
 	[RequireComponent (typeof(NetworkAPI))]
-	public class Lockstep : MonoBehaviour {
+	public class Lockstep : KRBehaviour {
 
 		static readonly float gameFrameTurnLength = 50f; // in milliseconds
 

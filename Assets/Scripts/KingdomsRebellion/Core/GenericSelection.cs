@@ -10,7 +10,7 @@ namespace KingdomsRebellion.Core {
 
 	// TODO: Make this class more generic.
 	// This class Select all selectable unit
-	public class GenericSelection : MonoBehaviour {
+	public class GenericSelection : KRBehaviour {
 
 		Ray ray;
 		private RaycastHit hit;

@@ -6,7 +6,7 @@ namespace KingdomsRebellion.Core {
 // TODO: How do we do when target isn't reachable ?
 // And with more than one unit ?
 // This script must control all the movement of units and create transform to set target if needed
-	public class Movement : MonoBehaviour {
+	public class Movement : KRBehaviour {
 
 		private Ray ray;
 		private RaycastHit hit;

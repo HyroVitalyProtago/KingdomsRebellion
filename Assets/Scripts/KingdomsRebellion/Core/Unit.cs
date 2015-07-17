@@ -7,7 +7,7 @@ namespace KingdomsRebellion.Core {
 
 //TODO: All attributes HAVE TO be private.
 //Create events to modify attributes when needed.
-	public class Unit : MonoBehaviour {
+	public class Unit : KRBehaviour {
 
 		public Color color;
 		public int playerId;

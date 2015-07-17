@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using System.Text;
+using KingdomsRebellion.Core;
 
 namespace KingdomsRebellion.Network {
 
 	[RequireComponent (typeof(NetworkAPI))]
-	public class NetworkUI : MonoBehaviour {
+	public class NetworkUI : KRBehaviour {
 
 		static StringBuilder Builder = new StringBuilder().AppendLine("Console :");
 		static int BuilderNbLines = 0;

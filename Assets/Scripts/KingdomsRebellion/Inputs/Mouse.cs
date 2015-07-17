@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using System;
+using KingdomsRebellion.Core;
 using KingdomsRebellion.Network;
 
 namespace KingdomsRebellion.Inputs {
-	public class Mouse : MonoBehaviour {
+	public class Mouse : KRBehaviour {
 
 		public static event Action<int, Camera, Vector3> OnLeftClick;
 		public static event Action<int, Camera, Vector3> OnRightClick;

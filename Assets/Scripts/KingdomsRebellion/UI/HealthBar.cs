@@ -8,7 +8,7 @@ namespace KingdomsRebellion.Core {
 	//
 	// Display a HealthBar on GameObject which have a Canvas containing an Image which contains another name HealthBar. 
 	//
-	public class HealthBar : MonoBehaviour {
+	public class HealthBar : KRBehaviour {
 
 		private GameObject healthContainer;
 		private RectTransform healthBar;

@@ -1,15 +1,15 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 using System;
+using KingdomsRebellion.Core;
 using KingdomsRebellion.Network.Link;
 
 namespace KingdomsRebellion.Network {
 
-	//
-	// Disable by default
-	// Only one instance
-	//
-	public class NetworkAPI : MonoBehaviour {
+	/// <summary>
+	/// NetworkAPI is the higher level api for exchange messages with others players in network.
+	/// </summary>
+	public class NetworkAPI : KRBehaviour {
 
 		public static event Action MainCameraChange;
 		public static event Action Connection; // Event throw when a new player is connected

@@ -7,7 +7,7 @@ namespace KingdomsRebellion.Core {
 	// @advice Attach on camera
 	//
 	// TODO: Block player in the map and zoom on the cursor position
-	public class CameraIso : MonoBehaviour {
+	public class CameraIso : KRBehaviour {
 
 		public static float ScrollWidth { get { return 1f; } }
 		public static float ScrollHeight { get { return 1f; } }

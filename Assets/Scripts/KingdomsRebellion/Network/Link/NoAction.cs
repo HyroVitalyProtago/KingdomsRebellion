@@ -1,9 +1,9 @@
 ﻿
 namespace KingdomsRebellion.Network.Link {
 
-	//
-	// Default action send over the network with no behaviour
-	//
+	/// <summary>
+	/// Default action send over the network with no behaviour.
+	/// </summary>
 	public sealed class NoAction : GameAction {
 
 		public static NoAction FromBytes(byte[] data) {
