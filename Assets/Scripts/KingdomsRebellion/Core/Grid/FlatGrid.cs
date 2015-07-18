@@ -8,17 +8,30 @@ using KingdomsRebellion.Core.Math;
 namespace KingdomsRebellion.Core.Grid {
 	public class FlatGrid : AbstractGrid {
 
+	    private static FlatGrid _instance;
+	    private static readonly object instancelock = new object();
 		private readonly GameObject[] _grid;
 		private int _xSquareNumber;
 		private int _ySquareNumber;
 
-		public FlatGrid() {
+	    public static FlatGrid GetInstance() {
+	        if (_instance == null) {
+	            lock (instancelock) {
+	                if (_instance == null) {
+	                    _instance = new FlatGrid();
+	                }
+	            }
+	        }
+	        return _instance;
+	    }
+
+		private FlatGrid() {
 			_xSquareNumber = 256;
 			_ySquareNumber = 256;
 			_grid = new GameObject[_xSquareNumber * _ySquareNumber];
 		}
 
-		public FlatGrid(int xSquareNumber, int ySquareNumber) {
+		private FlatGrid(int xSquareNumber, int ySquareNumber) {
 			_xSquareNumber = xSquareNumber;
 			_ySquareNumber = ySquareNumber;
 			_grid = new GameObject[_xSquareNumber * _ySquareNumber];
@@ -56,11 +69,19 @@ namespace KingdomsRebellion.Core.Grid {
 			return position < _grid.Length;
 		}
 
-		public override Vec2[] GetNearGameObjects(Vec2 position) {
-			int square = _xSquareNumber * position.Y + position.X;
-			if (IsInBounds(square)) {
-			}
-			throw new NotImplementedException();
+		public override List<GameObject> GetNearGameObjects(Vec2 position) {
+		    List<Vec2> list = GetVec2Between(position + new Vec2(1, 1), position - new Vec2(1, 1));
+            List<GameObject> goList = new List<GameObject>();
+		    foreach (var pos in list) {
+		        try {
+		            goList.Add(GetGameObjectByPosition(pos));
+                } catch (IndexOutOfRangeException) { }
+		    }
+		    return goList;
 		}
+
+	    public Vec2 GetVec2FromGridPosition(int position) {
+	        return new Vec2(position%_xSquareNumber, position/_xSquareNumber);
+	    }
 	}
 }
