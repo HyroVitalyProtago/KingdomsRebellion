@@ -1,6 +1,9 @@
-﻿using System;
+﻿using UnityEngine;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq.Expressions;
+using System.Linq;
 
 namespace KingdomsRebellion.Core {
 
@@ -11,217 +14,218 @@ namespace KingdomsRebellion.Core {
 	/// </summary>
 	public static class EventConductor {
 
-		public class DenialBeforeOfferException : Exception {}
-		public class OffBeforeOnException : Exception {}
+		public class EventNotFoundException : Exception {}
+		public class CallbackNotFoundException : Exception {}
+		public class CallbackBadTypeException : Exception {}
+		public class EventNotRegisteredException : Exception {}
+		public class CallbackNotRegisteredException : Exception {}
+		public class EventNotMatchCallbackException : Exception {}
+
+		static readonly String EventPrefixAdd = "add_";
+		static readonly int EventAddID = 0;
+		static readonly String EventPrefixRemove = "remove_";
+		static readonly int EventRemoveID = 1;
+
+		static readonly BindingFlags StaticNonPublic = BindingFlags.Static | BindingFlags.NonPublic;
+		static readonly BindingFlags InstanceNonPublic = BindingFlags.Instance | BindingFlags.NonPublic;
 
 		/// <summary>
 		/// The static talkers correspond to classes who launch static events.
 		/// </summary>
-		static Dictionary<Type, IList<string>> StaticTalkers = new Dictionary<Type, IList<string>>();
+		static Dictionary<Type, Dictionary<String, MethodInfo[]>> StaticTalkers =
+			new Dictionary<Type, Dictionary<String, MethodInfo[]>>();
 
 		/// <summary>
 		/// The dynamic talkers correspond to classes who launch events which refer to them.
 		/// </summary>
-		static Dictionary<Object, IList<string>> DynamicTalkers = new Dictionary<object, IList<string>>();
+		static Dictionary<System.Object, Dictionary<String, MethodInfo[]>> DynamicTalkers =
+			new Dictionary<System.Object, Dictionary<String, MethodInfo[]>>();
 
 		/// <summary>
 		/// The listeners correspond to classes who attend some events for fire callbacks.
-		/// There is two kinds of listeners :
-		/// - Object : correspond to listener who use callbacks which refer to it.
-		/// - Delegate : correspond to callback declenched by an event.
+		/// There can be two kinds of listeners : Type (for static method) and Object (for instance method)
 		/// </summary>
-		static Dictionary<string, IList<KeyValuePair<Object, Delegate>>> Listeners = new Dictionary<string, IList<KeyValuePair<Object, Delegate>>>();
+		static Dictionary<String, Dictionary<System.Object, Delegate>> Listeners =
+			new Dictionary<String, Dictionary<System.Object, Delegate>>();
 
 		#region Talkers
 
-		/// <summary>
-		/// Abstracts the offer.
-		/// </summary>
-		/// <param name="talker">Talker.</param>
-		/// <param name="eventName">Event name.</param>
-		/// <param name="typ">Type of talker.</param>
-		/// <param name="dic">Dictionary related to talker.</param>
-		/// <typeparam name="T">Type of talker.</typeparam>
 		static void AbstractOffer<T>(
 			T talker,
-			string eventName,
-			Type typ,
-			Dictionary<T, IList<string>> dic
+			String eventName,
+			BindingFlags flags,
+			Dictionary<T, Dictionary<String, MethodInfo[]>> talkers
 		) {
+			if (talker == null || eventName == null) {
+				throw new ArgumentNullException();
+			}
+
+			Type typ = talker is Type ? talker as Type : talker.GetType();
+
+			MethodInfo eventAdd = typ.GetMethod(EventPrefixAdd + eventName, flags);
+			MethodInfo eventRemove = typ.GetMethod(EventPrefixRemove + eventName, flags);
+			if (eventAdd == null || eventRemove == null) {
+				throw new EventNotFoundException();
+			}
+
+			System.Object invokedTalker = talker is Type ? null : talker as System.Object;
+
 			// Connect all listeners
-			foreach (var pair in Listeners[eventName]) {
-				typ.GetEvent(eventName).AddEventHandler(pair.Key, pair.Value);
+			if (Listeners.ContainsKey(eventName)) {
+				foreach (var pair in Listeners[eventName]) {
+					try {
+						eventAdd.Invoke(invokedTalker, new object[] { pair.Value });
+					} catch(ArgumentException) {
+						throw new EventNotMatchCallbackException();
+					}
+				}
 			}
-			
-			// Add in dic talkers
-			if (dic[talker] == null) {
-				dic[talker] = new List<string>();
+
+			// Add in static talkers
+			if (!talkers.ContainsKey(talker)) {
+				talkers[talker] = new Dictionary<String, MethodInfo[]>();
 			}
-			dic[talker].Add(eventName);
+			talkers[talker].Add(eventName, new MethodInfo[]{ eventAdd, eventRemove });
 		}
 
-		/// <summary>
-		/// Abstracts the denial.
-		/// </summary>
-		/// <param name="talker">Talker.</param>
-		/// <param name="eventName">Event name.</param>
-		/// <param name="typ">Type of talker.</param>
-		/// <param name="dic">Dictionary related to talker.</param>
-		/// <typeparam name="T">Type of talker.</typeparam>
 		static void AbstractDenial<T>(
 			T talker,
 			string eventName,
-			Type typ,
-			Dictionary<T, IList<string>> dic
+			Dictionary<T, Dictionary<String, MethodInfo[]>> talkers
 		) {
-			// Disconnect all listeners
-			foreach (var pair in Listeners[eventName]) {
-				typ.GetEvent(eventName).RemoveEventHandler(pair.Key, pair.Value);
+			if (talker == null || eventName == null) {
+				throw new ArgumentNullException();
 			}
 			
-			// Remove from static talkers
-			if (dic[talker] == null) {
-				throw new DenialBeforeOfferException();
+			if (!talkers.ContainsKey(talker) || !talkers[talker].ContainsKey(eventName)) {
+				throw new EventNotRegisteredException();
 			}
-			dic[talker].Remove(eventName);
+
+			System.Object invokedTalker = talker is Type ? null : talker as System.Object;
+
+			// Disconnect all listeners
+			if (Listeners.ContainsKey(eventName)) {
+				foreach (var pair in Listeners[eventName]) {
+					talkers[talker][eventName][EventRemoveID].Invoke(invokedTalker, new object[] { pair.Value });
+				}
+			}
+			
+			talkers[talker].Remove(eventName);
 		}
 
-		/// <summary>
-		/// Offer the specified typ and eventName.
-		/// </summary>
-		/// <param name="typ">Typ.</param>
-		/// <param name="eventName">Event name.</param>
-		public static void Offer(Type typ, string eventName) {
-			AbstractOffer<Type>(typ, eventName, typ, StaticTalkers);
+		public static void Offer(Type typ, String eventName) {
+			AbstractOffer<Type>(typ, eventName, StaticNonPublic, StaticTalkers);
 		}
 
-		/// <summary>
-		/// Denial the specified typ and eventName.
-		/// </summary>
-		/// <param name="typ">Typ.</param>
-		/// <param name="eventName">Event name.</param>
 		public static void Denial(Type typ, string eventName) {
-			AbstractDenial<Type>(typ, eventName, typ, StaticTalkers);
+			AbstractDenial<Type>(typ, eventName, StaticTalkers);
 		}
 
-		/// <summary>
-		/// Offer the specified obj and eventName.
-		/// </summary>
-		/// <param name="obj">Object.</param>
-		/// <param name="eventName">Event name.</param>
-		public static void Offer(Object obj, string eventName) {
-			AbstractOffer<Object>(obj, eventName, obj.GetType(), DynamicTalkers);
+		public static void Offer(System.Object self, string eventName) {
+			AbstractOffer<System.Object>(self, eventName, InstanceNonPublic, DynamicTalkers);
 		}
 
-		/// <summary>
-		/// Denial the specified obj and eventName.
-		/// </summary>
-		/// <param name="obj">Object.</param>
-		/// <param name="eventName">Event name.</param>
-		public static void Denial(Object obj, string eventName) {
-			AbstractDenial<Object>(obj, eventName, obj.GetType(), DynamicTalkers);
+		public static void Denial(System.Object self, string eventName) {
+			AbstractDenial<System.Object>(self, eventName, DynamicTalkers);
 		}
 
 		#endregion
 
 		#region Listeners
 
-		/// <summary>
-		/// Abstracts the on.
-		/// </summary>
-		/// <param name="listener">Listener.</param>
-		/// <param name="eventName">Event name.</param>
-		/// <param name="callback">Callback.</param>
-		static void AbstractOn(Object listener, string eventName, Delegate callback) {
+		static void AbstractOn(System.Object self, String eventName, BindingFlags flags) {
+			if (self == null || eventName == null) {
+				throw new ArgumentNullException();
+			}
+
+			Type typ = self is Type ? self as Type : self.GetType();
+
+			MethodInfo method = typ.GetMethod(eventName, flags);
+			if (method == null) {
+				throw new CallbackNotFoundException();
+			}
+			
+			Delegate callback;
+			try {
+				if (self is Type) {
+					callback = Delegate.CreateDelegate(DelegateType(method), typ, eventName);
+				} else {
+					callback = Delegate.CreateDelegate(DelegateType(method), self, eventName);
+				}
+			} catch(ArgumentException) {
+				throw new CallbackBadTypeException();
+			} // MethodAccessException
+			
 			// Connect all talkers
 			foreach (var pair in StaticTalkers) {
-				if (pair.Value.Contains(eventName)) {
-					pair.Key.GetEvent(eventName).AddEventHandler(listener, callback);
+				if (pair.Value.ContainsKey(eventName)) {
+					pair.Value[eventName][EventAddID].Invoke(null, new object[] { callback });
 				}
 			}
 			foreach (var pair in DynamicTalkers) {
-				if (pair.Value.Contains(eventName)) {
-					pair.Key.GetType().GetEvent(eventName).AddEventHandler(listener, callback);
+				if (pair.Value.ContainsKey(eventName)) {
+					pair.Value[eventName][EventAddID].Invoke(pair.Key, new object[] { callback });
 				}
 			}
 			
 			// Add in listeners
-			if (Listeners[eventName] == null) {
-				Listeners[eventName] = new List<KeyValuePair<Object, Delegate>>();
+			if (!Listeners.ContainsKey(eventName)) {
+				Listeners[eventName] = new Dictionary<System.Object, Delegate>();
 			}
-			Listeners[eventName].Add(new KeyValuePair<Object, Delegate>(listener, callback));
+			Listeners[eventName].Add(self, callback);
 		}
 
-		/// <summary>
-		/// Abstracts the off.
-		/// </summary>
-		/// <param name="listener">Listener.</param>
-		/// <param name="eventName">Event name.</param>
-		/// <param name="callback">Callback.</param>
-		static void AbstractOff(Object listener, string eventName, Delegate callback) {
-			// Disonnect all talkers
+		static void AbstractOff(System.Object obj, String eventName) {
+			if (obj == null || eventName == null) {
+				throw new ArgumentNullException();
+			}
+			
+			if (!Listeners.ContainsKey(eventName) || !Listeners[eventName].ContainsKey(obj)) {
+				throw new CallbackNotRegisteredException();
+			}
+			
+			// Disconnect all talkers
 			foreach (var pair in StaticTalkers) {
-				if (pair.Value.Contains(eventName)) {
-					pair.Key.GetEvent(eventName).RemoveEventHandler(listener, callback);
+				if (pair.Value.ContainsKey(eventName)) {
+					pair.Value[eventName][EventRemoveID].Invoke(null, new object[] { Listeners[eventName][obj] });
 				}
 			}
 			foreach (var pair in DynamicTalkers) {
-				if (pair.Value.Contains(eventName)) {
-					pair.Key.GetType().GetEvent(eventName).RemoveEventHandler(listener, callback);
+				if (pair.Value.ContainsKey(eventName)) {
+					pair.Value[eventName][EventRemoveID].Invoke(pair.Key, new object[] { Listeners[eventName][obj] });
 				}
 			}
-
-			// Remove from static talkers
-			if (Listeners[eventName] == null) {
-				throw new DenialBeforeOfferException();
-			}
-			foreach (var pair in Listeners[eventName]) {
-				if (pair.Key == listener && pair.Value == callback) {
-					Listeners.Remove(eventName);
-					break;
-				}
-			}
+			
+			Listeners[eventName].Remove(obj);
 		}
 
-		/// <summary>
-		/// Raises the  event.
-		/// </summary>
-		/// <param name="eventName">Event name.</param>
-		/// <param name="callback">Callback.</param>
-		public static void On(string eventName, Delegate callback) {
-			AbstractOn(callback, eventName, callback);
+		public static void On(Type typ, string eventName) {
+			AbstractOn(typ, eventName, StaticNonPublic);
 		}
 
-		/// <summary>
-		/// Off the specified eventName and callback.
-		/// </summary>
-		/// <param name="eventName">Event name.</param>
-		/// <param name="callback">Callback.</param>
-		public static void Off(string eventName, Delegate callback) {
-			AbstractOff(callback, eventName, callback);
+		public static void Off(Type typ, string eventName) {
+			AbstractOff(typ, eventName);
 		}
 
-		/// <summary>
-		/// Raises the  event.
-		/// </summary>
-		/// <param name="self">Self.</param>
-		/// <param name="eventName">Event name.</param>
-		/// <param name="callback">Callback.</param>
-		public static void On(Object self, string eventName, Delegate callback) {
-			AbstractOn(self, eventName, callback);
+		public static void On(System.Object self, string eventName) {
+			AbstractOn(self, eventName, InstanceNonPublic);
 		}
 
-		/// <summary>
-		/// Off the specified self, eventName and callback.
-		/// </summary>
-		/// <param name="self">Self.</param>
-		/// <param name="eventName">Event name.</param>
-		/// <param name="callback">Callback.</param>
-		public static void Off(Object self, string eventName, Delegate callback) {
-			AbstractOff(self, eventName, callback);
+		public static void Off(System.Object self, string eventName) {
+			AbstractOff(self, eventName);
 		}
 
 		#endregion
+
+		static Type DelegateType(MethodInfo method) {
+			List<Type> args = new List<Type>(method.GetParameters().Select(p => p.ParameterType));
+			if (method.ReturnType == typeof(void)) {
+				return Expression.GetActionType(args.ToArray());
+			} else {
+				args.Add(method.ReturnType);
+				return Expression.GetFuncType(args.ToArray());
+			}
+		}
 	}
 
 }
