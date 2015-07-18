@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
+using KingdomsRebellion.Core.Model;
 using UnityStandardAssets.Characters.ThirdPerson;
 
-namespace KingdomsRebellion.Core {
+namespace KingdomsRebellion.Core.Player {
 
 // TODO: How do we do when target isn't reachable ?
 // And with more than one unit ?

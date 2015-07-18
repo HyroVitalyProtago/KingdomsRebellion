@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace KingdomsRebellion.Core {
+namespace KingdomsRebellion.Core.Player {
 
 	//
 	// Navigation system for RTS

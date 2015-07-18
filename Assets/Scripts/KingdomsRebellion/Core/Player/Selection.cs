@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
+using KingdomsRebellion.Core.Model;
 using KingdomsRebellion.Network;
 
-namespace KingdomsRebellion.Core {
+namespace KingdomsRebellion.Core.Player {
 	
 	public class Selection : GenericSelection {
 

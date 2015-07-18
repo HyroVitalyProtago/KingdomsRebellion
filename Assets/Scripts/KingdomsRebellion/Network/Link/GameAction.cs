@@ -1,7 +1,10 @@
 ﻿using System;
 using System.IO;
+using KingdomsRebellion.Attributes;
 
 namespace KingdomsRebellion.Network.Link {
+
+	// [StaticFactory("FromBytes", Parameters = new Type[] { typeof(byte[]) })]
 	public abstract class GameAction : NetworkMessage {
 
 		// Template for GameAction static builder

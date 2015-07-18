@@ -6,7 +6,7 @@ using KingdomsRebellion.Network.Link;
 using KingdomsRebellion.Inputs;
 using KingdomsRebellion.Tools.UI;
 
-namespace KingdomsRebellion.Core {
+namespace KingdomsRebellion.Core.Player {
 
 	// TODO: Make this class more generic.
 	// This class Select all selectable unit

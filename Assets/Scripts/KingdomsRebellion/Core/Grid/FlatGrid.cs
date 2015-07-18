@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using KingdomsRebellion.Core;
-using KingdomsRebellion.Core.Grid;
+using KingdomsRebellion.Core.Model;
 using KingdomsRebellion.Core.Math;
 
 namespace KingdomsRebellion.Core.Grid {

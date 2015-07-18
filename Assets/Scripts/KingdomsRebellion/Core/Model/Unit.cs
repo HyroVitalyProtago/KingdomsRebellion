@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using KingdomsRebellion.Core.Math;
 
-namespace KingdomsRebellion.Core {
+namespace KingdomsRebellion.Core.Model {
 
 //TODO: All attributes HAVE TO be private.
 //Create events to modify attributes when needed.
