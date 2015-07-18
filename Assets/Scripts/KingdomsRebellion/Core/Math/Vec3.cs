@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using UnityEngine;
 
 namespace KingdomsRebellion.Core.Math {
 
@@ -55,6 +56,10 @@ namespace KingdomsRebellion.Core.Math {
 		public static Vec3 Deserialize(BinaryReader reader) {
 			return new Vec3(reader.ReadInt32(), reader.ReadInt32(), reader.ReadInt32());
 		}
+
+	    public static Vec3 FromVector3(Vector3 vector3) {
+	        return new Vec3(Mathf.FloorToInt(vector3.x), Mathf.FloorToInt(vector3.y), Mathf.FloorToInt(vector3.z));
+	    }
 	}
 
 }
