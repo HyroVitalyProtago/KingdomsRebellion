@@ -46,8 +46,8 @@ namespace KingdomsRebellion.Core {
 		protected void Denial(string eventName) {
 			AbstractEventConductor(
 				eventName,
-				EventConductor.Offer,
-				EventConductor.Offer,
+				EventConductor.Denial,
+				EventConductor.Denial,
 				typeof(EventConductor.EventNotRegisteredException)
 			);
 		}
