@@ -8,33 +8,49 @@ using KingdomsRebellion.Core.Math;
 namespace KingdomsRebellion.Core.Grid {
 	public class FlatGrid : AbstractGrid {
 
-		private readonly GameObject[] _grid;
-		private int _xSquareNumber;
-		private int _ySquareNumber;
+		readonly GameObject[] _grid;
+	    Dictionary<Unit, int> _objects; 
+		int _xSquareNumber;
+		int _ySquareNumber;
 
 		public FlatGrid(int xSquareNumber, int ySquareNumber) {
 			_xSquareNumber = xSquareNumber;
 			_ySquareNumber = ySquareNumber;
 			_grid = new GameObject[_xSquareNumber * _ySquareNumber];
+            _objects = new Dictionary<Unit, int>();
 		}
 
 		public override void Add(GameObject go, Vec2 pos) {
-			Add(go.GetComponent<Unit>(), pos);
+			Add(go.GetComponent<Unit>(), pos, false);
 		}
 
-		void Add(Unit unit, Vec2 pos) {
-			unit.SetProperty("position", pos);
-			_grid[ValidPosition(pos.Y * _xSquareNumber + pos.X)] = unit.gameObject;
+		void Add(Unit unit, Vec2 modelPos, bool isIntern) {
+            //unit.SetProperty("position", modelPos);
+		    int pos = ValidPosition(modelPos.Y*_xSquareNumber + modelPos.X);
+			_grid[pos] = unit.gameObject;
+		    bool keyExist = _objects.ContainsKey(unit);
+		    if (!keyExist && !isIntern) {
+		        _objects.Add(unit, pos);
+		    } else if (keyExist && isIntern) {
+		        _objects[unit] = pos;
+		    }
 		}
 
 		public override bool Remove(GameObject go) {
-			return Remove(go.GetComponent<Unit>());
+			return Remove(go.GetComponent<Unit>(), false);
 		}
 
-		bool Remove(Unit unit) {
+		bool Remove(Unit unit, bool isIntern) {
 			if (unit == null) return false;
-			Vec2 unitPos = unit.GetProperty<Vec2>("position");
+			Vec2 unitPos = GetPositionOf(unit.gameObject);
 			_grid[ValidPosition(unitPos.Y * _xSquareNumber + unitPos.X)] = null;
+            bool keyExist = _objects.ContainsKey(unit);
+		    if (!keyExist) {
+		        return false;
+		    }
+		    if (!isIntern) {
+		        _objects.Remove(unit);
+		    }
 			return true;
 		}
 
@@ -43,8 +59,8 @@ namespace KingdomsRebellion.Core.Grid {
 		}
 
 		bool Move(Unit unit, Vec2 newPosition) {
-			if (unit != null && IsEmpty(unit.GetProperty<Vec2>("position")) && Remove(unit.gameObject)) {
-				Add(unit.gameObject, newPosition);
+			if (unit != null && IsEmpty(newPosition) && Remove(unit, true)) {
+				Add(unit, newPosition, true);
 				return true;
 			}
 			return false;
@@ -71,6 +87,18 @@ namespace KingdomsRebellion.Core.Grid {
 
 	    public Vec2 GetVec2FromGridPosition(int position) {
 	        return new Vec2(position % _xSquareNumber, position / _xSquareNumber);
+	    }
+
+	    public override Dictionary<Unit, int> GetGameObjects() {
+	        return _objects;
+	    }
+
+	    public override Vec2 GetPositionOf(GameObject go) {
+	        Unit unit = go.GetComponent<Unit>();
+	        if (_objects.ContainsKey(unit)) {
+	            return GetVec2FromGridPosition(_objects[unit]);
+	        }
+	        return null;
 	    }
 	}
 }

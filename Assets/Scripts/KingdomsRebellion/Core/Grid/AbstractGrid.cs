@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using KingdomsRebellion.Core.Math;
+using KingdomsRebellion.Core.Model;
 
 namespace KingdomsRebellion.Core.Grid {
     
@@ -46,5 +47,8 @@ namespace KingdomsRebellion.Core.Grid {
             }
             return result;
         }
+
+        public abstract Dictionary<Unit, int> GetGameObjects();
+        public abstract Vec2 GetPositionOf(GameObject go);
     }
 }

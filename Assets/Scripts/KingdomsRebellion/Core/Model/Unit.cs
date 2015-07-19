@@ -44,6 +44,7 @@ namespace KingdomsRebellion.Core.Model {
 			} else {
 				playerId = 1;
 			}
+		    KRFacade.GetGrid().Add(gameObject, Vec2.FromVector3(transform.position));
 		}
 	
 		// Update is called once per frame

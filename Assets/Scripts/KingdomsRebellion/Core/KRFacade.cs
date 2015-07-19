@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using KingdomsRebellion.Inputs;
 using KingdomsRebellion.Core.Grid;
+using KingdomsRebellion.Core.Model;
+using KingdomsRebellion.Core.Player;
 
 namespace KingdomsRebellion.Core {
 	public class KRFacade : KRBehaviour {
@@ -23,7 +26,10 @@ namespace KingdomsRebellion.Core {
 		}
 
 		public static void UpdateGame() {
-
+            var units = new List<Unit>(Grid.GetGameObjects().Keys);
+		    foreach (var unit in units) {
+		        unit.GetComponent<Movement>().UpdateGame();
+		    }
 		}
 
 #if UNITY_EDITOR
