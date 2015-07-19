@@ -7,6 +7,13 @@ namespace KingdomsRebellion.Core.Grid {
     
     public abstract class AbstractGrid {
 
+		static bool Instantiated = false;
+
+		protected AbstractGrid() {
+			Debug.Assert(!Instantiated);
+			Instantiated = true;
+		}
+
         public abstract void Add(GameObject go, Vec2 position);
         public abstract bool Remove(GameObject go);
         public abstract bool Move(GameObject go, Vec2 newPosition);

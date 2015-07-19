@@ -19,16 +19,14 @@ namespace KingdomsRebellion.Network {
 		}
 
 		void OnEnable() {
-			NetworkAPI.Connection += OnConnectionEvent;
-//			EventConductor.On(this, "Network.Connection", OnConnectionEvent);
+			On("OnConnection");
 		}
 
 		void OnDisable() {
-			NetworkAPI.Connection -= OnConnectionEvent;
-//			EventConductor.Off(this, "Network.Connection", OnConnectionEvent);
+			Off("OnConnection");
 		}
 
-		void OnConnectionEvent() {
+		void OnConnection() {
 			Log("Second player is in the place !");
 			IsConnected = true;
 		}

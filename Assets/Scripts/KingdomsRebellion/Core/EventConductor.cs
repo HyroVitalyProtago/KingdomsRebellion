@@ -15,9 +15,11 @@ namespace KingdomsRebellion.Core {
 	public static class EventConductor {
 
 		public class EventNotFoundException : Exception {}
+		public class EventNotRegisteredException : Exception {}
+		public class EventAllreadyOffered : Exception {} // TODO
 		public class CallbackNotFoundException : Exception {}
 		public class CallbackBadTypeException : Exception {}
-		public class EventNotRegisteredException : Exception {}
+		public class CallbackAllreadyConnected : Exception {} // TODO
 		public class CallbackNotRegisteredException : Exception {}
 		public class EventNotMatchCallbackException : Exception {}
 

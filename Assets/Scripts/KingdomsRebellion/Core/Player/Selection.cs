@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using KingdomsRebellion.Core.Model;
 using KingdomsRebellion.Network;
+using KingdomsRebellion.Core.Math;
+using KingdomsRebellion.Core.Grid;
 
 namespace KingdomsRebellion.Core.Player {
 	
@@ -12,11 +14,13 @@ namespace KingdomsRebellion.Core.Player {
 		IList<GameObject> playerPreSelected;
 		IList<GameObject> ennemyPreSelected;
 
-		public static event Action< int, IList<GameObject> > OnSelection;
+		event Action< int, IList<GameObject> > OnSelection;
 
 		protected override void OnEnable() {
 			base.OnEnable();
 			Unit.OnDeath += OnSelectableDestroy;
+
+			Offer("OnSelection");
 		}
 
 		void PreSelected(GameObject go) {
@@ -78,6 +82,13 @@ namespace KingdomsRebellion.Core.Player {
 			selectableObjects = new List<GameObject>();
 			foreach (Transform child in transform) {
 				selectableObjects.Add(child.gameObject);
+
+				// TEST add game objects in FlatGrid
+				if (child.position.x >= 0 && child.position.z >= 0) {
+					Vec2 modelPosition = Vec2.FromVector3(child.position);
+					Debug.Log("Add unit on (" + modelPosition.X + ", " + modelPosition.Y + ")");
+					KRFacade.GetGrid().Add(child.gameObject, modelPosition);
+				}
 			}
 			timeLeftBeforeDragging = .15f;
 			isDragging = false;
@@ -104,8 +115,9 @@ namespace KingdomsRebellion.Core.Player {
 			if (selectedObjects[playerID].Count == 1) { // show healthbar for selection of one unit
 				selectedObjects[playerID][0].GetComponent<HealthBar>().ShowHealthBar();
 			}
-			if (OnSelection != null)
+			if (OnSelection != null) {
 				OnSelection(playerID, selectedObjects[playerID]);
+			}
 		}
 
 		protected override void ApplyDeselection(int playerID) {
@@ -121,5 +133,12 @@ namespace KingdomsRebellion.Core.Player {
 				ennemyPreSelected.Remove(go);
 			}
 		}
+
+
+		// TODO EventCondutor inheritance check
+		protected override void OnModelSelect(int player, Vec3 modelPosition) {
+			base.OnModelSelect(player, modelPosition);
+		}
+
 	}
 }

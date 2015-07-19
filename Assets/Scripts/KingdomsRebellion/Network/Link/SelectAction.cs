@@ -10,7 +10,7 @@ namespace KingdomsRebellion.Network.Link {
 	/// </summary>
 	public class SelectAction : GameAction {
 
-		public static event Action<int, Vec3> OnSelect;
+		event Action<int, Vec3> OnModelSelect;
 
 		protected Vec3 _modelPoint;
 
@@ -25,11 +25,11 @@ namespace KingdomsRebellion.Network.Link {
 		protected SelectAction() {}
 
 		public override void Process(int playerID) {
-			Debug.Log("SelectAction :: Process :: playerID == " + playerID);
-
-			if (OnSelect != null) {
-				OnSelect(playerID, _modelPoint);
+			Offer("OnModelSelect");
+			if (OnModelSelect != null) {
+				OnModelSelect(playerID, _modelPoint);
 			}
+			Denial("OnModelSelect");
 		}
 
 		public override byte ActionType() {

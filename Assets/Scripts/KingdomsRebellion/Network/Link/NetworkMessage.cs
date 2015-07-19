@@ -1,9 +1,10 @@
 ﻿using System;
 using System.IO;
+using KingdomsRebellion.Core;
 using KingdomsRebellion.Network;
 
 namespace KingdomsRebellion.Network.Link {
-	public abstract class NetworkMessage {
+	public abstract class NetworkMessage : KRObject {
 
 		uint? _lockstepTurn;
 		public uint LockstepTurn {

@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using KingdomsRebellion.Core.Model;
 using KingdomsRebellion.Network;
 
-namespace KingdomsRebellion.Core {
+namespace KingdomsRebellion.Core.Player {
 
 	//TODO Call SetActive only one time by creating an event.
 	//
@@ -19,15 +19,13 @@ namespace KingdomsRebellion.Core {
 		private RectTransform rectTransform;
 		private Image image;
 
-		void OnEnable() {
-			NetworkAPI.MainCameraChange += OnMainCameraChange;
-		}
-
 		void OnMainCameraChange() {
 			healthContainer.GetComponentInParent<Canvas>().worldCamera = Camera.main;
 		}
 
 		void Start() {
+			On("OnMainCameraChange");
+
 			healthContainer = GetComponentInChildren<Image>().gameObject;
 			healthContainer.GetComponentInParent<Canvas>().worldCamera = Camera.main;
 			rectTransform = healthContainer.GetComponent<RectTransform>();

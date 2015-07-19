@@ -21,7 +21,7 @@ namespace KingdomsRebellion.Core.Model {
 		public int strength;
 		public int defense;
 		public Unit ennemyTargeted;
-	    public Vec2 Position;
+//	    public Vec2 Position;
 		private GameObject spot;
 
 		//Events : 

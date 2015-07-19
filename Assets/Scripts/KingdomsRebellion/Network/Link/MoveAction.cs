@@ -8,7 +8,7 @@ namespace KingdomsRebellion.Network.Link {
 	/// </summary>
 	public class MoveAction : SelectAction {
 
-		public static event Action<int, Vec3> OnMove;
+		event Action<int, Vec3> OnMove;
 
 		public static new MoveAction FromBytes(byte[] data) {
 			return new MoveAction().GetFromBytes(data) as MoveAction;
@@ -23,9 +23,11 @@ namespace KingdomsRebellion.Network.Link {
 		}
 
 		public override void Process(int playerID) {
+			Offer("OnMove");
 			if (OnMove != null) {
 				OnMove(playerID, _modelPoint);
 			}
+			Denial("OnMove");
 		}
 	}
 

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace KingdomsRebellion.Core {
 
@@ -9,6 +10,24 @@ namespace KingdomsRebellion.Core {
 	/// in relation with KingdomsRebellion system and architecture.
 	/// </summary>
 	public class KRBehaviour : MonoBehaviour {
+
+		Dictionary<String, System.Object> _properties;
+
+		protected KRBehaviour() {
+			_properties = new Dictionary<String, System.Object>();
+		}
+
+		public void SetProperty(String name, System.Object value) {
+			if (value == null) {
+				_properties.Remove(name);
+			} else {
+				_properties.Add(name, value);
+			}
+		}
+
+		public T GetProperty<T>(String name) {
+			return (T) _properties[name];
+		}
 
 		void AbstractEventConductor(
 			string eventName,

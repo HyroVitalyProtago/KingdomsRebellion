@@ -8,43 +8,26 @@ using KingdomsRebellion.Core.Math;
 namespace KingdomsRebellion.Core.Grid {
 	public class FlatGrid : AbstractGrid {
 
-	    private static FlatGrid _instance;
-	    private static readonly object instancelock = new object();
 		private readonly GameObject[] _grid;
 		private int _xSquareNumber;
 		private int _ySquareNumber;
 
-	    public static FlatGrid GetInstance() {
-	        if (_instance == null) {
-	            lock (instancelock) {
-	                if (_instance == null) {
-	                    _instance = new FlatGrid();
-	                }
-	            }
-	        }
-	        return _instance;
-	    }
-
-		private FlatGrid() {
-			_xSquareNumber = 256;
-			_ySquareNumber = 256;
-			_grid = new GameObject[_xSquareNumber * _ySquareNumber];
-		}
-
-		private FlatGrid(int xSquareNumber, int ySquareNumber) {
+		public FlatGrid(int xSquareNumber, int ySquareNumber) {
 			_xSquareNumber = xSquareNumber;
 			_ySquareNumber = ySquareNumber;
 			_grid = new GameObject[_xSquareNumber * _ySquareNumber];
 		}
 
 		public override void Add(GameObject go, Vec2 position) {
+			go.GetComponent<Unit>().SetProperty("position", position);
 			_grid[ValidPosition(position.Y * _xSquareNumber + position.X)] = go;
 		}
 
 		public override bool Remove(GameObject go) {
 			Unit unit = go.GetComponent<Unit>();
 			if (unit != null) {
-				_grid[ValidPosition(unit.Position.Y * _xSquareNumber + unit.Position.X)] = null;
+				Vec2 unitPos = unit.GetProperty<Vec2>("position");
+				_grid[ValidPosition(unitPos.Y * _xSquareNumber + unitPos.X)] = null;
 				return true;
 			}
 			return false;
@@ -53,7 +36,7 @@ namespace KingdomsRebellion.Core.Grid {
 		public override bool Move(GameObject go, Vec2 newPosition) {
 			Unit unit = go.GetComponent<Unit>();
 			if (unit != null) {
-				if (IsEmpty(unit.Position) && Remove(go)) {
+				if (IsEmpty(unit.GetProperty<Vec2>("position")) && Remove(go)) {
 					Add(go, newPosition);
 					return true;
 				} 
@@ -75,13 +58,13 @@ namespace KingdomsRebellion.Core.Grid {
 		    foreach (var pos in list) {
 		        try {
 		            goList.Add(GetGameObjectByPosition(pos));
-                } catch (IndexOutOfRangeException) { }
+                } catch (IndexOutOfRangeException) {}
 		    }
 		    return goList;
 		}
 
 	    public Vec2 GetVec2FromGridPosition(int position) {
-	        return new Vec2(position%_xSquareNumber, position/_xSquareNumber);
+	        return new Vec2(position % _xSquareNumber, position / _xSquareNumber);
 	    }
 	}
 }

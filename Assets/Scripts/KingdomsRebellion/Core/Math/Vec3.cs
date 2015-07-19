@@ -60,6 +60,10 @@ namespace KingdomsRebellion.Core.Math {
 	    public static Vec3 FromVector3(Vector3 vector3) {
 	        return new Vec3(Mathf.FloorToInt(vector3.x), Mathf.FloorToInt(vector3.y), Mathf.FloorToInt(vector3.z));
 	    }
+
+		public Vector3 ToVector3() {
+			return new Vector3(X, Y, Z);
+		}
 	}
 
 }

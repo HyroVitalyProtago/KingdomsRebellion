@@ -5,6 +5,7 @@ using KingdomsRebellion.Network;
 using KingdomsRebellion.Network.Link;
 using KingdomsRebellion.Inputs;
 using KingdomsRebellion.Tools.UI;
+using KingdomsRebellion.Core.Grid;
 
 namespace KingdomsRebellion.Core.Player {
 
@@ -23,15 +24,13 @@ namespace KingdomsRebellion.Core.Player {
 		protected float timeLeftBeforeDragging;
 
 		protected virtual void OnEnable() {
-			Mouse.OnUpdateDrag += OnUpdateDrag;
-			SelectAction.OnSelect += OnSelect;
-			Mouse.OnDrag += OnDrag;
+			On("OnModelSelect");
+			On("OnModelMove");
 		}
 
 		protected virtual void OnDisable() {
-			Mouse.OnUpdateDrag -= OnUpdateDrag;
-			SelectAction.OnSelect -= OnSelect;
-			Mouse.OnDrag -= OnDrag;
+			Off("OnModelSelect");
+			Off("OnModelMove");
 		}
 
 		protected virtual void Start() {
@@ -88,29 +87,49 @@ namespace KingdomsRebellion.Core.Player {
 
 		// TODO get unit on modelPoint position and select it
 		// if there is no unit on modelPoint, deselect current units
-		void OnSelect(int playerID, Vec3 modelPoint) {
-//			ray = camera.ScreenPointToRay(camera.WorldToScreenPoint(mousePosition));
+		void OnSelect() {
+			ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 //			if (playerID == NetworkAPI.PlayerId) {
 //				this.originWorldMousePoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 //			}
-//			if (Physics.Raycast(ray.origin, ray.direction, out hit)) {
-//				originCamera = camera;
-//				if (!Input.GetKey(KeyCode.LeftControl)) {
-//					DeselectUnits(playerID);
-//				}
-//			}
-//			if (hit.collider != null) {
-//				var colliderGameObject = hit.collider.gameObject;
-//				if (selectableObjects.Contains(colliderGameObject)) {
-//					if (!selectedObjects[playerID].Contains(colliderGameObject)) {
-//						selectedObjects[playerID].Add(colliderGameObject);
-//						ApplySelection(playerID);
-//					} else {
-//						ApplyDeselection(playerID);
-//						selectedObjects[playerID].Remove(colliderGameObject);
-//					}
-//				}
-//			}
+			if (Physics.Raycast(ray.origin, ray.direction, out hit)) {
+				originCamera = GetComponent<Camera>();
+				if (!Input.GetKey(KeyCode.LeftControl)) {
+					DeselectUnits(NetworkAPI.PlayerId);
+				}
+			}
+			if (hit.collider != null) {
+				var colliderGameObject = hit.collider.gameObject;
+				if (selectableObjects.Contains(colliderGameObject)) {
+					if (!selectedObjects[NetworkAPI.PlayerId].Contains(colliderGameObject)) {
+						selectedObjects[NetworkAPI.PlayerId].Add(colliderGameObject);
+						// ApplySelection(NetworkAPI.PlayerId);
+					} else {
+						// ApplyDeselection(NetworkAPI.PlayerId);
+						selectedObjects[NetworkAPI.PlayerId].Remove(colliderGameObject);
+					}
+				}
+			}
+		}
+
+		protected virtual void OnModelSelect(int player, Vec3 modelPosition) {
+			DeselectUnits(player);
+
+			GameObject go = KRFacade.GetGrid().GetGameObjectByPosition(new Vec2(modelPosition.X, modelPosition.Z));
+			if (go != null) {
+				selectedObjects[player].Add(go);
+				ApplySelection(player);
+			}
+		}
+
+		protected virtual void OnModelMove(int player, Vec3 modelPosition) {
+			DeselectUnits(player);
+			
+			GameObject go = KRFacade.GetGrid().GetGameObjectByPosition(new Vec2(modelPosition.X, modelPosition.Z));
+			if (go != null) {
+				selectedObjects[player].Add(go);
+				ApplySelection(player);
+			}
 		}
 
 		protected virtual void OnUpdateDrag(int playerId, Vector3 originWorldPoint, Camera currentCamera, Vector3 currentMousePousition) {

@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
 using KingdomsRebellion.Core.Model;
 using UnityStandardAssets.Characters.ThirdPerson;
+using KingdomsRebellion.Core.Math;
 
 namespace KingdomsRebellion.Core.Player {
 
-// TODO: How do we do when target isn't reachable ?
-// And with more than one unit ?
-// This script must control all the movement of units and create transform to set target if needed
+	// TODO: How do we do when target isn't reachable ?
+	// And with more than one unit ?
+	// This script must control all the movement of units and create transform to set target if needed
 	public class Movement : KRBehaviour {
 
 		private Ray ray;
@@ -31,8 +32,7 @@ namespace KingdomsRebellion.Core.Player {
 			}
 		}
 
-		public void Move(int playerId, Camera camera, Vector3 mousePosition) {
-			ray = camera.ScreenPointToRay(camera.WorldToScreenPoint(mousePosition));
+		public void Move(int player, Vec3 targetModelPosition) {
 			if (aiCharacterControl.target != null) {
 				var go = aiCharacterControl.target.gameObject;
 				aiCharacterControl.SetTarget(null);
@@ -40,14 +40,19 @@ namespace KingdomsRebellion.Core.Player {
 					Destroy(go);
 				}
 			}
-			if (unit.playerId == playerId && Physics.Raycast(ray.origin, ray.direction, out hit)) {
-				var ennemy = hit.collider.gameObject.GetComponent<Unit>();
-				if (ennemy != null && ennemy.playerId != playerId) {
+			if (unit.playerId == player) {
+				var go = KRFacade.GetGrid().GetGameObjectByPosition(new Vec2(targetModelPosition.X, targetModelPosition.Z));
+				if (go == null) {
+					Debug.Log("No game object found on (" + targetModelPosition.X + ", " + targetModelPosition.Z + ")");
+				}
+
+				var ennemy = (go == null) ? null : go.GetComponent<Unit>();
+				if (go != null && ennemy != null && ennemy.playerId != player) {
 					unit.attacking = true;
 					unit.ennemyTargeted = ennemy;
 					aiCharacterControl.SetTarget(ennemy.transform);
 				} else {
-					GameObject target = Instantiate(targetPrefab, hit.point, Quaternion.identity) as GameObject;
+					GameObject target = Instantiate(targetPrefab, targetModelPosition.ToVector3(), Quaternion.identity) as GameObject;
 					aiCharacterControl.SetTarget(target.transform);
 				}
 			}

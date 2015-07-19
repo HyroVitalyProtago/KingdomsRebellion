@@ -11,10 +11,10 @@ namespace KingdomsRebellion.Network {
 	/// </summary>
 	public class NetworkAPI : KRBehaviour {
 
-		public static event Action MainCameraChange;
-		public static event Action Connection; // Event throw when a new player is connected
-		public static event Action<int, GameAction> ReceiveAction; // Event throw when action is received
-		public static event Action<int, GameConfirmation> ReceiveConfirmation; // Event throw when confirmation is received
+		static event Action OnMainCameraChange;
+		event Action OnConnection; // Event throw when a new player is connected
+		event Action<int, GameAction> OnAction; // Event throw when action is received
+		event Action<int, GameConfirmation> OnConfirmation; // Event throw when confirmation is received
 
 //		public static int[] Players;
 		public static byte PlayerId { get; private set; } // TODO player id set to private
@@ -31,6 +31,20 @@ namespace KingdomsRebellion.Network {
 		static int hostId, connectionId, channelSetupId, channelActionId, channelConfirmationId;
 		static int dataSize, recHostId, channelId;
 		static NetworkEventType eventType;
+
+		void OnEnable() {
+			Offer("OnMainCameraChange");
+			Offer("OnConnection");
+			Offer("OnAction");
+			Offer("OnConfirmation");
+		}
+
+		void OnDisable() {
+			Denial("OnMainCameraChange");
+			Denial("OnConnection");
+			Denial("OnAction");
+			Denial("OnConfirmation");
+		}
 
 		void Start() {
 			Debug.Assert(self == null, "NetworkAPI can't be instantiate more than one time...");
@@ -79,8 +93,8 @@ namespace KingdomsRebellion.Network {
 			realMainCamera.GetComponent<Camera>().enabled = true;
 			Camera.main.enabled = false; // Camera.main is now equal to realMainCamera.GetComponent<Camera>()
 
-			if (MainCameraChange != null)
-				MainCameraChange();
+			if (OnMainCameraChange != null)
+				OnMainCameraChange();
 
 			connectionId = NetworkTransport.Connect(hostId, ip, Convert.ToInt32(port), 0, out error);
 
@@ -103,7 +117,7 @@ namespace KingdomsRebellion.Network {
 					case NetworkEventType.ConnectEvent:
 						NetworkUI.Log("Connection on socket " + recHostId + ", connection : " + connectionId + ", channelId : " + channelId);
 						if (PlayerId == 0) {
-							Connection();
+							OnConnection();
 						}
 						break;
 //					case NetworkEventType.DataEvent: break;
@@ -112,10 +126,10 @@ namespace KingdomsRebellion.Network {
 						break;
 				}
 			} else if (eventType == NetworkEventType.DataEvent) {
-				if (channelId == channelActionId && ReceiveAction != null) {
-					ReceiveAction(PlayerId == 0 ? 1 : 0, GameActionFactory.Get(buffer));
-				} else if (channelId == channelConfirmationId && ReceiveConfirmation != null) {
-					ReceiveConfirmation(PlayerId == 0 ? 1 : 0, GameConfirmation.FromBytes(buffer));
+				if (channelId == channelActionId && OnAction != null) {
+					OnAction(PlayerId == 0 ? 1 : 0, GameActionFactory.Get(buffer));
+				} else if (channelId == channelConfirmationId && OnConfirmation != null) {
+					OnConfirmation(PlayerId == 0 ? 1 : 0, GameConfirmation.FromBytes(buffer));
 				}
 			}
 		}

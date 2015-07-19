@@ -18,8 +18,8 @@ namespace KingdomsRebellion.Core.Player {
 		public static float RotateSpeed { get { return 100f; } }
 		public static float MinCameraZoom { get { return 3f; } }
 		public static float MaxCameraZoom { get { return 80f; } }
-		public static float MapWidth { get { return 100f; } }
-		public static float MapHeigth { get { return 100f; } }
+		public static float MapWidth { get { return 1000f; } }
+		public static float MapHeigth { get { return 1000f; } }
 
 		void Start() {
 			Cursor.lockState = CursorLockMode.Confined;

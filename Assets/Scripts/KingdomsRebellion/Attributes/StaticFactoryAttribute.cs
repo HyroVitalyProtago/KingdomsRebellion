@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Globalization;
-using System.ComponentModel.DataAnnotations;
+// using System.ComponentModel.DataAnnotations;
 
 namespace KingdomsRebellion.Attributes {
-	
+/*
 	[AttributeUsage(AttributeTargets.Class, Inherited = true)]
 	public class StaticFactoryAttribute : ValidationAttribute {
 
@@ -21,5 +21,5 @@ namespace KingdomsRebellion.Attributes {
 		}
 
 	}
-
+*/
 }

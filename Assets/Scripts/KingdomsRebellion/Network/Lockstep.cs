@@ -60,19 +60,19 @@ namespace KingdomsRebellion.Network {
 		}
 
 		void OnEnable() {
-			NetworkAPI.ReceiveAction += OnAction;
-			NetworkAPI.ReceiveConfirmation += OnConfirmation;
+			On("OnAction");
+			On("OnConfirmation");
 
-			Mouse.OnLeftClick += OnLeftClick;
-			Mouse.OnRightClick += OnRightClick;
+			On("OnModelSelectDemand");
+			On("OnModelMoveDemand");
 		}
 
 		void OnDisable() {
-			NetworkAPI.ReceiveAction -= OnAction;
-			NetworkAPI.ReceiveConfirmation -= OnConfirmation;
+			Off("OnAction");
+			Off("OnConfirmation");
 
-			Mouse.OnLeftClick -= OnLeftClick;
-			Mouse.OnRightClick -= OnRightClick;
+			Off("OnModelSelectDemand");
+			Off("OnModelMoveDemand");
 		}
 
 		void OnAction(int playerID, GameAction action) {
@@ -269,31 +269,17 @@ namespace KingdomsRebellion.Network {
 		}
 	
 		void UpdateGame() {
-			// [...]
+			KRFacade.UpdateGame();
 		}
 
-		void OnLeftClick(int playerId, Camera camera, Vector3 mousePosition) {
+		void OnModelSelectDemand(Vec3 modelPosition) {
 			// TODO check if the last action is of the same type,
 			// if true, override the previous with it, else, enqueue it
-			actionQueue.Enqueue(new SelectAction(
-				lockstepTurn, // bad lockstepTurn for create action...
-				new Vec3(0,0,0) // TODO get real modelPosition
-//				camera.transform.localPosition,
-//				camera.transform.localEulerAngles,
-//				camera.orthographicSize,
-//				mousePosition
-			));
+			actionQueue.Enqueue(new SelectAction(lockstepTurn, modelPosition));
 		}
 
-		void OnRightClick(int playerId, Camera camera, Vector3 mousePosition) {
-			actionQueue.Enqueue(new MoveAction(
-				lockstepTurn, // bad lockstepTurn for create action...
-				new Vec3(0,0,0) // TODO get real modelPosition
-//				camera.transform.localPosition,
-//				camera.transform.localEulerAngles,
-//				camera.orthographicSize,
-//				mousePosition
-			));
+		void OnModelMoveDemand(Vec3 modelPosition) {
+			actionQueue.Enqueue(new MoveAction(lockstepTurn, modelPosition));
 		}
 	}
 
