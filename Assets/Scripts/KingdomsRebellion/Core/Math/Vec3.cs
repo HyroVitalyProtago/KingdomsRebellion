@@ -64,6 +64,10 @@ namespace KingdomsRebellion.Core.Math {
 		public Vector3 ToVector3() {
 			return new Vector3(X, Y, Z);
 		}
+
+		public string ToString() {
+			return "(" + X + ", " + Y + ", " + Z + ")";
+		}
 	}
 
 }

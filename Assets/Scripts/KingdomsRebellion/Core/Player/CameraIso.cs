@@ -25,7 +25,7 @@ namespace KingdomsRebellion.Core.Player {
 			Cursor.lockState = CursorLockMode.Confined;
 		}
 
-		void Update() {
+		void FixedUpdate() {
 			Move();
 			Scroll();
 			Rotate();

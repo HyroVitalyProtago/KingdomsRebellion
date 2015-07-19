@@ -27,7 +27,11 @@ namespace KingdomsRebellion.Inputs {
 			Ray ray = Camera.main.ScreenPointToRay(mousePosition);
 			RaycastHit hit;
 			if (Physics.Raycast(ray.origin, ray.direction, out hit)) {
-				worldPosition = hit.collider.gameObject.transform.position;
+				if (hit.collider.gameObject.tag == "Selectable") {
+					worldPosition = hit.collider.gameObject.transform.position;
+				} else {
+					worldPosition = hit.point;
+				}
 			}
 
 			if (OnModelSelectDemand != null) {

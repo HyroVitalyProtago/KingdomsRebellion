@@ -32,16 +32,16 @@ namespace KingdomsRebellion.Network {
 		}
 
 		public static void ClearLog() {
-			Builder = new StringBuilder().AppendLine("Console :");
-			BuilderNbLines = 0;
+//			Builder = new StringBuilder().AppendLine("Console :");
+//			BuilderNbLines = 0;
 		}
 
 		public static void Log(string log) {
 			if (BuilderNbLines > 30) {
 				ClearLog();
 			}
-			Console = Builder.AppendLine(log).ToString();
-			++BuilderNbLines;
+//			Console = Builder.AppendLine(log).ToString();
+//			++BuilderNbLines;
 		}
 
 		void OnGUI() {

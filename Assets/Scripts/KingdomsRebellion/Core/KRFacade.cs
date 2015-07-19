@@ -25,5 +25,22 @@ namespace KingdomsRebellion.Core {
 		public static void UpdateGame() {
 
 		}
+
+#if UNITY_EDITOR
+		void Update() {
+			for (int i = -25 ; i < 25 ; ++i) {
+				Debug.DrawLine(
+					transform.position + Vector3.left * 25 + i * Vector3.forward,
+					transform.position - Vector3.left * 25 + i * Vector3.forward
+				);
+
+				Debug.DrawLine(
+					transform.position + Vector3.forward * 25 + i * Vector3.right,
+					transform.position - Vector3.forward * 25 + i * Vector3.right
+				);
+			}
+		}
+#endif
+
 	}
 }

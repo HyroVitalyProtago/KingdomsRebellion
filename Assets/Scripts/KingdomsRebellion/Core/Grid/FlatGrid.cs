@@ -18,28 +18,34 @@ namespace KingdomsRebellion.Core.Grid {
 			_grid = new GameObject[_xSquareNumber * _ySquareNumber];
 		}
 
-		public override void Add(GameObject go, Vec2 position) {
-			go.GetComponent<Unit>().SetProperty("position", position);
-			_grid[ValidPosition(position.Y * _xSquareNumber + position.X)] = go;
+		public override void Add(GameObject go, Vec2 pos) {
+			Add(go.GetComponent<Unit>(), pos);
+		}
+
+		void Add(Unit unit, Vec2 pos) {
+			unit.SetProperty("position", pos);
+			_grid[ValidPosition(pos.Y * _xSquareNumber + pos.X)] = unit.gameObject;
 		}
 
 		public override bool Remove(GameObject go) {
-			Unit unit = go.GetComponent<Unit>();
-			if (unit != null) {
-				Vec2 unitPos = unit.GetProperty<Vec2>("position");
-				_grid[ValidPosition(unitPos.Y * _xSquareNumber + unitPos.X)] = null;
-				return true;
-			}
-			return false;
+			return Remove(go.GetComponent<Unit>());
+		}
+
+		bool Remove(Unit unit) {
+			if (unit == null) return false;
+			Vec2 unitPos = unit.GetProperty<Vec2>("position");
+			_grid[ValidPosition(unitPos.Y * _xSquareNumber + unitPos.X)] = null;
+			return true;
 		}
 
 		public override bool Move(GameObject go, Vec2 newPosition) {
-			Unit unit = go.GetComponent<Unit>();
-			if (unit != null) {
-				if (IsEmpty(unit.GetProperty<Vec2>("position")) && Remove(go)) {
-					Add(go, newPosition);
-					return true;
-				} 
+			return Move(go.GetComponent<Unit>(), newPosition);
+		}
+
+		bool Move(Unit unit, Vec2 newPosition) {
+			if (unit != null && IsEmpty(unit.GetProperty<Vec2>("position")) && Remove(unit.gameObject)) {
+				Add(unit.gameObject, newPosition);
+				return true;
 			}
 			return false;
 		}

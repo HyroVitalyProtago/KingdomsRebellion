@@ -16,14 +16,29 @@ namespace KingdomsRebellion.Core.Player {
 		private Object targetPrefab;
 		private Unit unit;
 
+		NavMeshPath path;
+
 		void Start() {
 			aiCharacterControl = gameObject.GetComponent<AICharacterControl>();
 			targetPrefab = Resources.Load("Prefabs/Target");
 			unit = GetComponent<Unit>();
+
+			path = new NavMeshPath();
 		}
 	
 		void Update() {
 			if (aiCharacterControl.target != null && (transform.position - aiCharacterControl.target.transform.position).magnitude < 1f) {
+				var go = aiCharacterControl.target.gameObject;
+				aiCharacterControl.SetTarget(null);
+				if (go.CompareTag("Target")) {
+					Destroy(go);
+				}
+			}
+
+			for (int i = 0; i < path.corners.Length-1; i++)
+				Debug.DrawLine(path.corners[i], path.corners[i+1], Color.red);
+
+			if (path.corners.Length > 0 && aiCharacterControl.target != null && (transform.position - path.corners[path.corners.Length-1]).magnitude < 1) {
 				var go = aiCharacterControl.target.gameObject;
 				aiCharacterControl.SetTarget(null);
 				if (go.CompareTag("Target")) {
@@ -52,8 +67,12 @@ namespace KingdomsRebellion.Core.Player {
 					unit.ennemyTargeted = ennemy;
 					aiCharacterControl.SetTarget(ennemy.transform);
 				} else {
-					GameObject target = Instantiate(targetPrefab, targetModelPosition.ToVector3(), Quaternion.identity) as GameObject;
-					aiCharacterControl.SetTarget(target.transform);
+					if (NavMesh.CalculatePath(gameObject.transform.position, targetModelPosition.ToVector3(), NavMesh.AllAreas, path) && (targetModelPosition.ToVector3() - path.corners[path.corners.Length-1]).magnitude < 1) {
+						GameObject target = Instantiate(targetPrefab, targetModelPosition.ToVector3(), Quaternion.identity) as GameObject;
+						aiCharacterControl.SetTarget(target.transform);
+					} else {
+						Debug.Log("I can't go here !!");
+					}
 				}
 			}
 		}
