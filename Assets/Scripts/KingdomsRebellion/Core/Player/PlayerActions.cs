@@ -31,7 +31,6 @@ namespace KingdomsRebellion.Core.Player {
 		}
 
 		void OnMove(int playerID, Vec3 modelPoint) {
-			Debug.Log("PlayerActions :: OnMove :: selectedObjects[" + playerID + "].Count == " + _selectedObjects[playerID].Count);
 			for (int i = 0; i < _selectedObjects[playerID].Count; ++i) {
 				_selectedObjects[playerID][i].GetComponent<Movement>().Move(playerID, modelPoint);
 			}
