@@ -112,7 +112,7 @@ namespace KingdomsRebellion.Core.Player {
 		}
 
 		protected override void ApplySelection(int playerID) {
-			if (selectedObjects[playerID].Count == 1) { // show healthbar for selection of one unit
+			if (playerID == NetworkAPI.PlayerId && selectedObjects[playerID].Count == 1) { // show healthbar for selection of one unit
 				selectedObjects[playerID][0].GetComponent<HealthBar>().ShowHealthBar();
 			}
 			if (OnSelection != null) {

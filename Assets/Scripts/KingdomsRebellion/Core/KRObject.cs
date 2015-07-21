@@ -25,7 +25,7 @@ namespace KingdomsRebellion.Core {
 		}
 		
 		/// <summary>
-		/// Useful utility for Offer some services (event) with the EventConductor.
+		/// Useful utility to offer some services (event) with the EventConductor.
 		/// Detect automatically if this event is static or depend on instance
 		/// </summary>
 		/// <param name="eventName">Event name.</param>

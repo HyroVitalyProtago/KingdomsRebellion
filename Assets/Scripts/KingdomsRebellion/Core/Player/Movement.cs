@@ -27,8 +27,6 @@ namespace KingdomsRebellion.Core.Player {
 			if (_target == null || _pos == _target) { return; }
 
 			// TODO Calculate path
-			Debug.Log(_pos);
-			Debug.Log(_target);
 
 			Vec2 nextPos = _pos;
 			int dx = _target.X - _pos.X;
