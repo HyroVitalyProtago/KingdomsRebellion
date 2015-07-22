@@ -50,5 +50,8 @@ namespace KingdomsRebellion.Core.Grid {
 
         public abstract Dictionary<Unit, int> GetGameObjects();
         public abstract Vec2 GetPositionOf(GameObject go);
+
+		public abstract Node NodeOf(Vec2 v);
+		public abstract IEnumerable<Node> GetNeighbours(Node n);
     }
 }

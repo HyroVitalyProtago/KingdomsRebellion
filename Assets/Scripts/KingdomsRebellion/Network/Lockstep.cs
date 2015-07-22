@@ -275,11 +275,12 @@ namespace KingdomsRebellion.Network {
 		void OnModelSelectDemand(Vec3 modelPosition) {
 			// TODO check if the last action is of the same type,
 			// if true, override the previous with it, else, enqueue it
-			Debug.Log(modelPosition.ToString());
+			Debug.Log("select on " + modelPosition);
 			actionQueue.Enqueue(new SelectAction(lockstepTurn, modelPosition));
 		}
 
 		void OnModelMoveDemand(Vec3 modelPosition) {
+			Debug.Log("move on " + modelPosition);
 			actionQueue.Enqueue(new MoveAction(lockstepTurn, modelPosition));
 		}
 	}

@@ -8,15 +8,16 @@ using KingdomsRebellion.Core.Math;
 namespace KingdomsRebellion.Core.Grid {
 	public class FlatGrid : AbstractGrid {
 
-		readonly GameObject[] _grid;
-	    Dictionary<Unit, int> _objects; 
-		int _xSquareNumber;
-		int _ySquareNumber;
+		readonly Node[] _grid;
+	    readonly Dictionary<Unit, int> _objects; 
+		readonly int _xSquareNumber;
+		readonly int _ySquareNumber;
 
 		public FlatGrid(int xSquareNumber, int ySquareNumber) {
 			_xSquareNumber = xSquareNumber;
 			_ySquareNumber = ySquareNumber;
-			_grid = new GameObject[_xSquareNumber * _ySquareNumber];
+			_grid = new Node[_xSquareNumber * _ySquareNumber];
+			for (int i = 0; i < _grid.Length ; ++i) { _grid[i] = new Node(GetVec2FromGridPosition(i)); }
             _objects = new Dictionary<Unit, int>();
 		}
 
@@ -25,9 +26,8 @@ namespace KingdomsRebellion.Core.Grid {
 		}
 
 		void Add(Unit unit, Vec2 modelPos, bool isIntern) {
-            //unit.SetProperty("position", modelPos);
 		    int pos = ValidPosition(modelPos.Y*_xSquareNumber + modelPos.X);
-			_grid[pos] = unit.gameObject;
+			_grid[pos].GameObject = unit.gameObject;
 		    bool keyExist = _objects.ContainsKey(unit);
 		    if (!keyExist && !isIntern) {
 		        _objects.Add(unit, pos);
@@ -43,7 +43,7 @@ namespace KingdomsRebellion.Core.Grid {
 		bool Remove(Unit unit, bool isIntern) {
 			if (unit == null) return false;
 			Vec2 unitPos = GetPositionOf(unit.gameObject);
-			_grid[ValidPosition(unitPos.Y * _xSquareNumber + unitPos.X)] = null;
+			_grid[ValidPosition(unitPos.Y * _xSquareNumber + unitPos.X)].GameObject = null;
             bool keyExist = _objects.ContainsKey(unit);
 		    if (!keyExist) {
 		        return false;
@@ -67,7 +67,7 @@ namespace KingdomsRebellion.Core.Grid {
 		}
 
 		public override GameObject GetGameObjectByPosition(Vec2 position) {
-			return _grid[ValidPosition(position.Y * _xSquareNumber + position.X)];
+			return _grid[ValidPosition(position.Y * _xSquareNumber + position.X)].GameObject;
 		}
 
 		public override bool IsInBounds(int position) {
@@ -100,5 +100,21 @@ namespace KingdomsRebellion.Core.Grid {
 	        }
 	        return null;
 	    }
+
+		public override Node NodeOf(Vec2 v) {
+			return _grid[ValidPosition(v.Y * _xSquareNumber + v.X)];
+		}
+
+		public override IEnumerable<Node> GetNeighbours(Node n) {
+			List<Vec2> neighbours = GetVec2Between(n.Pos + Vec2.One, n.Pos - Vec2.One);
+			List<Node> nodes = new List<Node>();
+			foreach (Vec2 pos in neighbours) {
+				if (pos == n.Pos) continue;
+				try {
+					nodes.Add(NodeOf(pos));
+				} catch (IndexOutOfRangeException) {}
+			}
+			return nodes;
+		}
 	}
 }
