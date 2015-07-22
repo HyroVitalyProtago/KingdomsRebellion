@@ -25,6 +25,7 @@ namespace KingdomsRebellion.Core {
             var units = new List<Unit>(Grid.GetGameObjects().Keys);
 		    foreach (var unit in units) {
 		        unit.GetComponent<Movement>().UpdateGame();
+		        unit.GetComponent<Attack>().UpdateGame();
 		    }
 		}
 	}

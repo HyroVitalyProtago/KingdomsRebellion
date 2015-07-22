@@ -10,7 +10,7 @@ namespace KingdomsRebellion.Core.Player {
 		AbstractGrid _grid;
 		Unit _unit;
 		Vec2 _target;
-		Vec2 _pos;
+        Vec2 _pos;
 
 		void Start() {
 			_unit = GetComponent<Unit>();
@@ -47,7 +47,7 @@ namespace KingdomsRebellion.Core.Player {
 
 			GameObject go = _grid.GetGameObjectByPosition(target);
 			Unit ennemy = (go == null) ? null : go.GetComponent<Unit>();
-			if (go != null && ennemy != null && ennemy.playerId != player) {
+			if (ennemy != null && ennemy.playerId != player) {
 				Debug.Log("@NotImplemented attack...");
 			} else {
 				_target = target;

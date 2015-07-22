@@ -12,11 +12,13 @@ namespace KingdomsRebellion.Core.Player {
 		void OnEnable() {
 			On("OnSelection");
 			On("OnMove");
+		    On("OnAttack");
 		}
 
 		void OnDisable() {
 			Off("OnSelection");
 			Off("OnMove");
+		    Off("OnAttack");
 		}
 
 		void Start() {
@@ -35,5 +37,11 @@ namespace KingdomsRebellion.Core.Player {
 				_selectedObjects[playerID][i].GetComponent<Movement>().Move(playerID, modelPoint);
 			}
 		}
+
+	    void OnAttack(int playerID, Vec3 modelPoint) {
+            for (int i = 0; i < _selectedObjects[playerID].Count; ++i) {
+                _selectedObjects[playerID][i].GetComponent<Attack>().OnAttack(playerID, modelPoint);
+            }
+	    }
 	}
 }

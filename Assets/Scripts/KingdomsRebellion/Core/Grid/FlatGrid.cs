@@ -25,7 +25,6 @@ namespace KingdomsRebellion.Core.Grid {
 		}
 
 		void Add(Unit unit, Vec2 modelPos, bool isIntern) {
-            //unit.SetProperty("position", modelPos);
 		    int pos = ValidPosition(modelPos.Y*_xSquareNumber + modelPos.X);
 			_grid[pos] = unit.gameObject;
 		    bool keyExist = _objects.ContainsKey(unit);
@@ -74,12 +73,15 @@ namespace KingdomsRebellion.Core.Grid {
 			return position < _grid.Length;
 		}
 
-		public override List<GameObject> GetNearGameObjects(Vec2 position) {
-		    List<Vec2> list = GetVec2Between(position + new Vec2(1, 1), position - new Vec2(1, 1));
+		public override List<GameObject> GetNearGameObjects(Vec2 position, int range) {
+		    List<Vec2> list = GetVec2Between(position + new Vec2(range, range), position - new Vec2(range, range));
             List<GameObject> goList = new List<GameObject>();
 		    foreach (var pos in list) {
+		        if (pos == position) continue;
 		        try {
-		            goList.Add(GetGameObjectByPosition(pos));
+		            GameObject go = GetGameObjectByPosition(pos);
+		            if (go == null) continue;
+		            goList.Add(go);
                 } catch (IndexOutOfRangeException) {}
 		    }
 		    return goList;

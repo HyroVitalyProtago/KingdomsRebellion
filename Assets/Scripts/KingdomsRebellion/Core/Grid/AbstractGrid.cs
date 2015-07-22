@@ -32,7 +32,7 @@ namespace KingdomsRebellion.Core.Grid {
             return position;
         }
 
-        public abstract List<GameObject> GetNearGameObjects(Vec2 position);
+        public abstract List<GameObject> GetNearGameObjects(Vec2 position, int range);
 
         public List<Vec2> GetVec2Between(Vec2 v1, Vec2 v2) {
             int minX = v1.X < v2.X ? v1.X : v2.X;
