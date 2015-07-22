@@ -25,10 +25,13 @@ namespace KingdomsRebellion.Core.Model {
 		private GameObject spot;
 
 		//Events : 
-		public static event Action<int, GameObject> OnDeath;
+	    static event Action<GameObject> OnUnitDeath;
 
-		// Use this for initialization
-		void Start() {
+	    static Unit() {
+            EventConductor.Offer(typeof(Unit), "OnUnitDeath");
+	    }
+
+        void Start() {
 			//   selected = false;
 			lifeMax = 30;
 			life = 30;
@@ -68,9 +71,9 @@ namespace KingdomsRebellion.Core.Model {
 					spot.SetActive(true);
 					ennemy.life -= strength - ennemy.defense;
 				}
-				if (ennemy.life <= 0) {
-					attacking = false;
-				}
+                //if (ennemy.life <= 0) {
+                //    attacking = false;
+                //}
 				yield return new WaitForSeconds(0.2f);
 				spot.SetActive(false);
 				yield return new WaitForSeconds(1.8f);
@@ -79,7 +82,9 @@ namespace KingdomsRebellion.Core.Model {
 		}
 
 		void OnDestroy() {
-			OnDeath(playerId, gameObject);
+            OnUnitDeath(gameObject);
+		    KRFacade.GetGrid().Remove(gameObject);
+            
 		}
 	}
 }

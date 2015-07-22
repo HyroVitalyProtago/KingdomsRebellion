@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using KingdomsRebellion.Core.Model;
 using KingdomsRebellion.Network;
 using KingdomsRebellion.Core.Math;
@@ -18,7 +19,7 @@ namespace KingdomsRebellion.Core.Player {
 
 		protected override void OnEnable() {
 			base.OnEnable();
-			Unit.OnDeath += OnSelectableDestroy;
+            On("OnUnitDeath");
 
 			Offer("OnSelection");
 		}
@@ -122,14 +123,17 @@ namespace KingdomsRebellion.Core.Player {
 
 		protected override void ApplyDeselection(int playerID) {
 			foreach (var go in selectedObjects[playerID]) {
+                // ATTENTION: if testing on one computer, selected units died only on one side.
 				go.GetComponent<HealthBar>().HideHealthBar();
 			}
 		}
 
-		void OnSelectableDestroy(int playerID, GameObject go) {
+        void OnUnitDeath(GameObject go) {
 			selectableObjects.Remove(go);
-			selectedObjects[playerID].Remove(go);
-			if (!playerPreSelected.Remove(go)) {
+            for (int player = 0; player < selectedObjects.Length; ++player) {
+                selectedObjects[player].Remove(go);
+            }
+            if (!playerPreSelected.Remove(go)) {
 				ennemyPreSelected.Remove(go);
 			}
 		}

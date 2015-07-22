@@ -34,6 +34,9 @@ namespace KingdomsRebellion.Core.Player {
 				Debug.Log("FindPath from " + _pos + " to " + _target);
 				_waypoints = Pathfinding.FindPath(_pos, _target);
 				Debug.Log("Path found !");
+				if (_waypoints.Count() <= 1) {
+					_target = null;
+				}
 			}
 
 			if (_waypoints.Count() > 0) {

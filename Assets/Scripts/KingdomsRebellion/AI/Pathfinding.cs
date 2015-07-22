@@ -35,6 +35,9 @@ namespace KingdomsRebellion.AI {
 				
 				foreach (Node neighbour in _grid.GetNeighbours(currentNode)) {
 					if (!neighbour.Walkable || closedSet.Contains(neighbour)) {
+						if (neighbour == targetNode) {
+							return RetracePath(startNode, currentNode);
+						}
 						continue;
 					}
 					

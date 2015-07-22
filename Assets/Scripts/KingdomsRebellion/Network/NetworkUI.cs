@@ -68,7 +68,7 @@ namespace KingdomsRebellion.Network {
 				IsLaunched = true;
 			}
 
-			GUILayout.Label(Console);
+			// GUILayout.Label(Console);
 
 			GUILayout.EndVertical();
 		}
