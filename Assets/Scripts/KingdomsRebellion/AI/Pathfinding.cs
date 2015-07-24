@@ -22,6 +22,7 @@ namespace KingdomsRebellion.AI {
 			IList<Node> openSet = new List<Node>();
 			HashSet<Node> closedSet = new HashSet<Node>();
 			openSet.Add(startNode);
+			startNode.GCost = 0;
 			
 			while (openSet.Count > 0) {
 				Node currentNode = openSet.Min();
@@ -32,7 +33,7 @@ namespace KingdomsRebellion.AI {
 
 				openSet.Remove(currentNode);
 				closedSet.Add(currentNode);
-				
+
 				foreach (Node neighbour in _grid.GetNeighbours(currentNode)) {
 					if (!neighbour.Walkable || closedSet.Contains(neighbour)) {
 						if (neighbour == targetNode) {
@@ -52,7 +53,7 @@ namespace KingdomsRebellion.AI {
 				}
 			}
 
-			return null; // empty IEnumerable
+			return openSet; // empty IEnumerable
 		}
 		
 		static IEnumerable<Node> RetracePath(Node startNode, Node endNode) {

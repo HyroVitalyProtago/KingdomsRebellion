@@ -21,25 +21,34 @@ namespace KingdomsRebellion.Core.Player {
 			_grid = KRFacade.GetGrid();
 			_pos = _grid.GetPositionOf(gameObject);
 			_target = null;
+
+			_test = -1;
 		}
 	
 		void Update() {
 			transform.position = _pos.ToVector3();
 		}
 
+		int _test;
 		public void UpdateGame() {
 			if (_target == null || _pos == _target) { return; }
 
-			if (_waypoints == null) {
-				Debug.Log("FindPath from " + _pos + " to " + _target);
+//			if (_waypoints == null) {
+//				Debug.Log("FindPath from " + _pos + " to " + _target);
 				_waypoints = Pathfinding.FindPath(_pos, _target);
-				Debug.Log("Path found !");
-				if (_waypoints.Count() <= 1) {
-					_target = null;
-				}
-			}
+//				Debug.Log("Path found !");
+//				if (_waypoints.Count() <= 1) {
+//					_target = null;
+//				}
+//			}
 
 			if (_waypoints.Count() > 0) {
+				if (_test > 0) {
+					--_test;
+					return;
+				} else {
+					_test = 8;
+				}
 				Vec2 nextPos = _waypoints.First().Pos;
 				Debug.Log("current " + _pos);
 				Debug.Log("next" + nextPos);
@@ -58,6 +67,7 @@ namespace KingdomsRebellion.Core.Player {
 			Vec2 target = targetv3.ToVec2();
 			if (_unit.playerId != player || _pos == target) { return; }
 			_target = target;
+			_test = 8;
 		}
 	}
 }
