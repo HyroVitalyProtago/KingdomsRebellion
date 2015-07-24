@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using KingdomsRebellion.Core.Math;
+using KingdomsRebellion.Core.Player;
 
 namespace KingdomsRebellion.Core.Model {
 
@@ -9,20 +10,17 @@ namespace KingdomsRebellion.Core.Model {
 //Create events to modify attributes when needed.
 	public class Unit : KRBehaviour {
 
-		public Color color;
-		public int playerId;
+	    public Color color;
+		public int PlayerId { get; private set; }
 
 		public string type { get; private set; }
 		// public bool selected;
 		public int life;
 		public int lifeMax;
-		public bool attacking;
-		private bool attacklaunched;
-		public int strength;
-		public int defense;
-		public Unit ennemyTargeted;
+		int defense;
+	    AttackTypeEnum weakness;
+	    public AttackTypeEnum AttackType { get; private set; }
 //	    public Vec2 Position;
-		private GameObject spot;
 
 		//Events : 
 	    static event Action<GameObject> OnUnitDeath;
@@ -35,56 +33,31 @@ namespace KingdomsRebellion.Core.Model {
 			//   selected = false;
 			lifeMax = 30;
 			life = 30;
-			attacking = false;
-			attacklaunched = false;
-			strength = 14;
 			defense = 10;
-			spot = gameObject.GetComponentInChildren<Light>().gameObject;
-			spot.GetComponent<Light>().color = color;
-			spot.SetActive(false);
-			if (color == Color.blue) {
-				playerId = 0;
+            if (color == Color.blue) {
+                Debug.Log("blue");
+				PlayerId = 0;
+                weakness = AttackTypeEnum.Sword;
+                AttackType = AttackTypeEnum.Arrow;
 			} else {
-				playerId = 1;
+				PlayerId = 1;
 			}
 		    KRFacade.GetGrid().Add(gameObject, Vec2.FromVector3(transform.position));
 		}
 	
-		// Update is called once per frame
-		void Update() {
-			if (attacking && !attacklaunched) {
-				StartCoroutine(Attack(ennemyTargeted));
-				attacklaunched = true;
-			} else if (!attacking && attacklaunched) {
-				StopCoroutine(Attack(ennemyTargeted));
-				attacklaunched = false;
-			}
-
-			if (life <= 0) {
-				Destroy(gameObject);
-			}
-		}
-
-		public IEnumerator Attack(Unit ennemy) {
-			while (attacking && ennemy != null) {
-				if ((ennemy.transform.position - transform.position).magnitude <= 1.1f) {
-					spot.SetActive(true);
-					ennemy.life -= strength - ennemy.defense;
-				}
-                //if (ennemy.life <= 0) {
-                //    attacking = false;
-                //}
-				yield return new WaitForSeconds(0.2f);
-				spot.SetActive(false);
-				yield return new WaitForSeconds(1.8f);
-			}
-			yield return null;
-		}
-
 		void OnDestroy() {
+		    GetComponent<Attack>().isDead = true;
             OnUnitDeath(gameObject);
 		    KRFacade.GetGrid().Remove(gameObject);
             
 		}
+
+	    public void OnDamageDone(AttackTypeEnum type, int damage) {
+	            if (weakness == type) {
+	                life -= Mathf.FloorToInt(1.3f*(damage - defense));
+	            } else {
+	                life -= damage - defense;
+	            }
+	    }
 	}
 }

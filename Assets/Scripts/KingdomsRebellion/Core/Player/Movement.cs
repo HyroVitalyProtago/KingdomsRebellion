@@ -41,13 +41,13 @@ namespace KingdomsRebellion.Core.Player {
 
 	    public void Move(int player, Vec3 targetv3) {
 			Vec2 target = targetv3.ToVec2();
-			if (_unit.playerId != player || _pos == target) {
+			if (_unit.PlayerId != player || _pos == target) {
 				return;
 			}
 
 			GameObject go = _grid.GetGameObjectByPosition(target);
 			Unit ennemy = (go == null) ? null : go.GetComponent<Unit>();
-			if (ennemy != null && ennemy.playerId != player) {
+			if (ennemy != null && ennemy.PlayerId != player) {
 				Debug.Log("@NotImplemented attack...");
 			} else {
 				_target = target;

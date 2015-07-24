@@ -29,7 +29,7 @@ namespace KingdomsRebellion.Core.Player {
 			if (unit == null)
 				return;
 
-			if (unit.color == playerColor) {
+            if (unit.color == playerColor) {
 				if (!playerPreSelected.Contains(go)) {
 					playerPreSelected.Add(go);
 				}
