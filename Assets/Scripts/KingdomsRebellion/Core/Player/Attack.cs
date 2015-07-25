@@ -35,7 +35,7 @@ namespace KingdomsRebellion.Core.Player {
             isDead = false;
         }
 
-        public void OnAttack(int playerID, Vec3 modelPoint) {
+        public void LaunchAttack(int playerID, Vec3 modelPoint) {
             _unit.GetComponent<Movement>().Move(playerID, modelPoint);
             _target = _grid.GetGameObjectByPosition(new Vec2(modelPoint.X, modelPoint.Z));
             _isAttacking = true;
@@ -53,7 +53,7 @@ namespace KingdomsRebellion.Core.Player {
                     foreach (var obj in nearObjects) {
                         Debug.Log(obj + " : " + obj.GetComponent<Unit>().PlayerId);
                         if (obj.GetComponent<Unit>().PlayerId != _unit.PlayerId) {
-                            OnAttack(_unit.PlayerId, Vec3.FromVector3(obj.transform.position));
+                            LaunchAttack(_unit.PlayerId, Vec3.FromVector3(obj.transform.position));
                             break;
                         }
                     }
@@ -63,7 +63,7 @@ namespace KingdomsRebellion.Core.Player {
             }
 
             if (_isAttacking && attackSpeed == 0) {
-                OnAttack();
+                Attacking();
                 attackSpeed = 8;
             } else if (_isAttacking) {
                 --attackSpeed;
@@ -81,7 +81,7 @@ namespace KingdomsRebellion.Core.Player {
             }
         }
 
-        private void OnAttack() {
+        private void Attacking() {
             if ( _target != null) {
                 // TODO Replace 1 by the range of the attack
                 if (Vec2.Dist(_grid.GetPositionOf(_target), _grid.GetPositionOf(gameObject)) == 1) {

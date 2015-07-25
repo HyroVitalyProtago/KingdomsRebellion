@@ -40,7 +40,7 @@ namespace KingdomsRebellion.Core.Player {
 
 	    void OnAttack(int playerID, Vec3 modelPoint) {
             for (int i = 0; i < _selectedObjects[playerID].Count; ++i) {
-                _selectedObjects[playerID][i].GetComponent<Attack>().OnAttack(playerID, modelPoint);
+                _selectedObjects[playerID][i].GetComponent<Attack>().LaunchAttack(playerID, modelPoint);
             }
 	    }
 	}

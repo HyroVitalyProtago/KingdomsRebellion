@@ -2,13 +2,15 @@
 using System;
 using KingdomsRebellion.Core;
 using KingdomsRebellion.Core.Math;
+using KingdomsRebellion.Core.Model;
+using KingdomsRebellion.Network;
 
 namespace KingdomsRebellion.Inputs {
 	public class InputNetworkAdapter : KRObject {
 
 		event Action<Vec3> OnModelSelectDemand; // modelPosition
 		event Action<Vec3> OnModelMoveDemand; // modelPosition
-
+        event Action<Vec3> OnModelAttackDemand; // modelPosition
 		static bool Instatiated = false;
 
 		public InputNetworkAdapter() {
@@ -19,6 +21,7 @@ namespace KingdomsRebellion.Inputs {
 			On("OnRightClick");
 			Offer("OnModelSelectDemand");
 			Offer("OnModelMoveDemand");
+            Offer("OnModelAttackDemand");
 		}
 
 		void OnLeftClick(Vector3 mousePosition) {
@@ -45,8 +48,15 @@ namespace KingdomsRebellion.Inputs {
 			Ray ray = Camera.main.ScreenPointToRay(mousePosition);
 			RaycastHit hit;
 			if (Physics.Raycast(ray.origin, ray.direction, out hit)) {
-				if (hit.collider.gameObject.tag == "Selectable") {
-					worldPosition = hit.collider.gameObject.transform.position;
+			    GameObject go = hit.collider.gameObject;
+				if (go.CompareTag("Selectable")) {
+					worldPosition = go.transform.position;
+				    if (go.GetComponent<Unit>().PlayerId != NetworkAPI.PlayerId) {
+				        if (OnModelAttackDemand != null) {
+				            OnModelAttackDemand(Vec3.FromVector3(worldPosition));
+				            return;
+				        }
+				    }
 				} else {
 					worldPosition = hit.point;
 				}
