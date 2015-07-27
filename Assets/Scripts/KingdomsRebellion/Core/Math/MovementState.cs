@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using KingdomsRebellion.Core.Player;
+using KingdomsRebellion.Core.Model;
 
 namespace KingdomsRebellion.Core.AI {
 
@@ -17,6 +18,7 @@ namespace KingdomsRebellion.Core.AI {
         }
 
         public override void Execute() {
+			if (_movement._Follow) _movement.Target = _movement._Follow.GetComponent<Unit>().Pos;
             if (_movement.Target == null || _movement.Pos == _movement.Target) {
                 fsm.PopState();
                 return;

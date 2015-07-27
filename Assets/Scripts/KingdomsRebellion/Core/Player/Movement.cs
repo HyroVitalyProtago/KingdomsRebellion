@@ -19,8 +19,11 @@ namespace KingdomsRebellion.Core.Player {
 
 	public class Movement : KRBehaviour, IPos {
 
+		public GameObject _Follow { get; private set; }
+
+
 		Unit _unit;
-		public Vec2 Target { get; private set; }
+		public Vec2 Target { get; /*private*/ set; }
 		Vec2 _pos;
 		public Vec2 Pos {
 			get {
@@ -110,6 +113,7 @@ namespace KingdomsRebellion.Core.Player {
 				} else {
 					_waypoints = null;
 					Target = null;
+					_Follow = null;
 				}
 			}
 		}
@@ -155,7 +159,7 @@ namespace KingdomsRebellion.Core.Player {
 		}
 
 	    public void Follow(GameObject target) {
-	        Target = Vec2.FromVector3(target.transform.position);
+			_Follow = target;
 	    }
 	}
 }
