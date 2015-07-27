@@ -11,8 +11,9 @@ using KingdomsRebellion.Core.Interfaces;
 namespace KingdomsRebellion.Core.Player {
 
 	static class Tools {
+		static Vector3 offset = new Vector3(.5f,0,.5f);
 		public static Vector3 Adjusted(this Vector3 v) {
-			return v + new Vector3(.5f,0,.5f);
+			return v + offset;
 		}
 	}
 
