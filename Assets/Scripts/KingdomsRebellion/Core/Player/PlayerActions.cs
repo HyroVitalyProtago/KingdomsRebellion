@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using KingdomsRebellion.Core.AI;
 using KingdomsRebellion.Network;
 using KingdomsRebellion.Network.Link;
 using KingdomsRebellion.Core.Math;
@@ -34,13 +35,13 @@ namespace KingdomsRebellion.Core.Player {
 
 		void OnMove(int playerID, Vec3 modelPoint) {
 			for (int i = 0; i < _selectedObjects[playerID].Count; ++i) {
-				_selectedObjects[playerID][i].GetComponent<Movement>().Move(playerID, modelPoint);
+				_selectedObjects[playerID][i].GetComponent<FiniteStateMachine>().Move(playerID, modelPoint);
 			}
 		}
 
 	    void OnAttack(int playerID, Vec3 modelPoint) {
             for (int i = 0; i < _selectedObjects[playerID].Count; ++i) {
-                _selectedObjects[playerID][i].GetComponent<Attack>().OnAttack(playerID, modelPoint);
+                _selectedObjects[playerID][i].GetComponent<FiniteStateMachine>().Attack(playerID, modelPoint);
             }
 	    }
 	}

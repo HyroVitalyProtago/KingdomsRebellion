@@ -48,7 +48,7 @@ namespace KingdomsRebellion.Core.Map {
 			if (!IsInBounds(pos)) {
 				return default(T);
 			}
-			return _node.Find(pos).Objects.Single(obj => obj.Pos == pos);
+			return _node.Find(pos).Objects.SingleOrDefault(obj => obj.Pos == pos);
 		}
 
 		public bool IsInBounds(Vec2 pos) { return _node.IsInBound(pos); }

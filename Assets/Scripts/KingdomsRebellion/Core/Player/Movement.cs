@@ -20,7 +20,7 @@ namespace KingdomsRebellion.Core.Player {
 	public class Movement : KRBehaviour, IPos {
 
 		Unit _unit;
-		Vec2 _target;
+		public Vec2 Target { get; private set; }
 		Vec2 _pos;
 		public Vec2 Pos {
 			get {
@@ -39,14 +39,14 @@ namespace KingdomsRebellion.Core.Player {
 
 		void Start() {
 			_unit = GetComponent<Unit>();
-			_target = null;
+			Target = null;
 
 			_test = -1;
 		}
 
 		int _test;
 		public void UpdateGame() {
-			if (_target == null || Pos == _target) { return; }
+			if (Target == null || Pos == Target) { return; }
 
 			if (_test > 0) {
 				--_test;
@@ -55,16 +55,16 @@ namespace KingdomsRebellion.Core.Player {
 				_test = 8;
 			}
 
-			_waypoints = KRFacade.FindPath(Pos, _target);
+			_waypoints = KRFacade.FindPath(Pos, Target);
 			_waypoints.ToList().ForEach(delegate(QuadTreeNode<Unit> w) { if (!test3.Contains(w)) test3.Add(w); });
 			if (_waypoints == null) {
-				_target = null;
+				Target = null;
 			} else {
 				QuadTreeNode<Unit> node;
 				Vec2 nextPos = Pos;
 
 				if (_waypoints.Count() == 0) {
-					nextPos = _target;
+					nextPos = Target;
 				} else {
 
 					int guard = 1000;
@@ -73,22 +73,22 @@ namespace KingdomsRebellion.Core.Player {
 					do {
 						if (--guard < 0) { Debug.LogError("Infinite loop"); break; }
 						node = _waypoints.ElementAtOrDefault(1);
-						nextPos = (node == null) ? _target : node.Pos;
+						nextPos = (node == null) ? Target : node.Pos;
 						Bresenham.Line(Pos.X, Pos.Y, nextPos.X, nextPos.Y, delegate(int x, int y) {
 							if (!KRFacade.GetMap().IsEmpty(new Vec2(x,y))) {
 								canTraceStraightLine = false;
-								if (nextPos == _target) { nextPos = _waypoints.First().Pos; }
+								if (nextPos == Target) { nextPos = _waypoints.First().Pos; }
 								return false;
 							}
 							return true;
 						});
 						if (canTraceStraightLine) {
-							if (nextPos != _target) { _waypoints = _waypoints.Skip(1); }
+							if (nextPos != Target) { _waypoints = _waypoints.Skip(1); }
 						} else {
 							node = _waypoints.FirstOrDefault();
-							nextPos = (node == null) ? _target : node.Pos;
+							nextPos = (node == null) ? Target : node.Pos;
 						}
-					} while(canTraceStraightLine && nextPos != _target);
+					} while(canTraceStraightLine && nextPos != Target);
 
 				}
 
@@ -109,6 +109,7 @@ namespace KingdomsRebellion.Core.Player {
 					test.Add(Pos);
 				} else {
 					_waypoints = null;
+					Target = null;
 				}
 			}
 		}
@@ -119,9 +120,10 @@ namespace KingdomsRebellion.Core.Player {
 
 	    public void Move(int player, Vec3 targetv3) {
 			Vec2 target = targetv3.ToVec2();
-			if (_unit.playerId != player || Pos == target) { return; }
-			if (_target == null) { _test = 8; }
-			_target = target;
+
+			if (_unit.PlayerId != player || Pos == target) { return; }
+			if (Target == null) { _test = 8; }
+			Target = target;
 
 			test.Clear();
 			test.Add(Pos);
@@ -151,5 +153,9 @@ namespace KingdomsRebellion.Core.Player {
 				Gizmos.DrawLine(test[i].ToVector3().Adjusted(), test[i+1].ToVector3().Adjusted());
 			}
 		}
+
+	    public void Follow(GameObject target) {
+	        Target = Vec2.FromVector3(target.transform.position);
+	    }
 	}
 }

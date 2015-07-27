@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using KingdomsRebellion.Core.Grid;
@@ -9,58 +10,57 @@ namespace KingdomsRebellion.Core.Player {
 
     public class Attack : KRBehaviour {
 
+        event Action<GameObject, AttackTypeEnum, int> OnDamageDone;
 
-        AbstractGrid _grid;
+//        AbstractGrid _grid;
         Unit _unit;
         Vec2 _oldPos;
-        GameObject _target;
-        bool _isAttacking;
+        public GameObject Target { get; set; }
+        int strength;
+        GameObject spot;
+        int attackSpeed;
+        public bool isDead;
+        public int range;
 
         void Start() {
-//            _grid = KRFacade.GetGrid();
-//            _unit = GetComponent<Unit>();
-//            _oldPos = Vec2.FromVector3(_unit.transform.position);
-//            _isAttacking = false;
-//            On("OnUnitDeath");
+//            _grid = KRFacade.GetMap();
+            _unit = GetComponent<Unit>();
+            _oldPos = Vec2.FromVector3(_unit.transform.position);
+            On("OnAttack");
+            On("OnUnitDeath");
+            spot = gameObject.GetComponentInChildren<Light>().gameObject;
+            spot.GetComponent<Light>().color = _unit.color;
+            spot.SetActive(false);
+            strength = 14;
+            isDead = false;
+            range = 1;
         }
 
-        public void OnAttack(int playerID, Vec3 modelPoint) {
-//            _unit.GetComponent<Movement>().Move(playerID, modelPoint);
-//            _target = _grid.GetGameObjectByPosition(new Vec2(modelPoint.X, modelPoint.Z));
-//            _isAttacking = true;
-//            _unit.ennemyTargeted = _target.GetComponent<Unit>();
-//            _unit.attacking = true;
+        private void OnAttack(int playerID, Vec3 modelPoint) {
+            Target = KRFacade.GetMap().Find(new Vec2(modelPoint.X, modelPoint.Z)).gameObject;
         }
 
         // TODO remove and replace _isAttacking by _unit.attacking
         public void UpdateGame() {
-//            if (_target == null) {
-//                _unit.attacking = false;
-//                _isAttacking = false;
-//            }
-//            Vec2 newPos = Vec2.FromVector3(_unit.transform.position);
-//            if (newPos == _oldPos && !_isAttacking) {
-//                List<GameObject> nearObjects = _grid.GetNearGameObjects(newPos, 6);
-//                if (nearObjects.Count > 0) {
-//                    foreach (var obj in nearObjects) {
-//                        if (obj.GetComponent<Unit>().playerId != _unit.playerId) {
-//                            OnAttack(_unit.playerId, Vec3.FromVector3(obj.transform.position));
-//                            break;
-//                        }
-//                    }
-//                }
-//            } else {
-//                if (!_isAttacking) {
-//                    _target = null;
-//                }
-//                _oldPos = newPos;
-//            }
+			Vec2 targetPos = Target.GetComponent<Unit>().Pos;
+			if (Vec2.Dist(targetPos, gameObject.GetComponent<Unit>().Pos) == 1) {
+                if (attackSpeed == 0) {
+                    spot.SetActive(true);
+                    Target.GetComponent<Unit>().OnDamageDone(_unit.AttackType, strength);
+                    attackSpeed = 8;
+                } else {
+                    --attackSpeed;
+                }
+            } else {
+                _unit.GetComponent<Movement>().Move(_unit.PlayerId, new Vec3(targetPos.X, 0, targetPos.Y));
+                attackSpeed = 8;
+                spot.SetActive(false);
+            }
         }
 
         void OnUnitDeath(GameObject go) {
-            if (go == _target) {
-                _unit.attacking = false;
-                _isAttacking = false;
+            if (go == Target) {
+                Target = null;
             }
         }
     }

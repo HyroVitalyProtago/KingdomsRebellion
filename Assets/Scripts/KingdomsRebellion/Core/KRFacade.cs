@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using KingdomsRebellion.Core.AI;
 using KingdomsRebellion.Inputs;
 using KingdomsRebellion.Core.Grid;
 using KingdomsRebellion.Core.Model;
@@ -30,15 +31,18 @@ namespace KingdomsRebellion.Core {
 		}
 
 		public static void UpdateGame() {
-		    foreach (Unit unit in Map) {
-		        unit.GetComponent<Movement>().UpdateGame();
-		        unit.GetComponent<Attack>().UpdateGame();
+			foreach (Unit unit in Map) {
+                unit.GetComponent<FiniteStateMachine>().UpdateGame();
 		    }
 		}
 
 		public static GameObject Find(Vec2 v) {
 			Unit u = Map.Find(v);
 			return (u == null) ? null : u.gameObject;
+		}
+
+		public static IEnumerable<GameObject> Around(Vec2 v, int maxDist) {
+			return Map.ToList().Where(u => u.Pos.Dist(v) <= maxDist).Select(u => u.gameObject);
 		}
 	}
 }
