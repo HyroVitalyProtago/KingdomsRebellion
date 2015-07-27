@@ -50,7 +50,7 @@ namespace KingdomsRebellion.Inputs {
 			if (Physics.Raycast(ray.origin, ray.direction, out hit)) {
 			    GameObject go = hit.collider.gameObject;
 				if (go.CompareTag("Selectable")) {
-					worldPosition = go.transform.position;
+                    worldPosition = go.transform.position;
 				    if (go.GetComponent<Unit>().PlayerId != NetworkAPI.PlayerId) {
 				        if (OnModelAttackDemand != null) {
 				            OnModelAttackDemand(Vec3.FromVector3(worldPosition));

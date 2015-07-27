@@ -9,7 +9,7 @@ namespace KingdomsRebellion.Core.Grid {
 	public class FlatGrid : AbstractGrid {
 
 		readonly GameObject[] _grid;
-	    Dictionary<Unit, int> _objects; 
+	    readonly Dictionary<Unit, int> _objects; 
 		int _xSquareNumber;
 		int _ySquareNumber;
 

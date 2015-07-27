@@ -35,12 +35,13 @@ namespace KingdomsRebellion.Core.Model {
 			life = 30;
 			defense = 10;
             if (color == Color.blue) {
-                Debug.Log("blue");
 				PlayerId = 0;
                 weakness = AttackTypeEnum.Sword;
                 AttackType = AttackTypeEnum.Arrow;
 			} else {
 				PlayerId = 1;
+                weakness = AttackTypeEnum.Sword;
+                AttackType = AttackTypeEnum.Sword;
 			}
 		    KRFacade.GetGrid().Add(gameObject, Vec2.FromVector3(transform.position));
 		}
@@ -58,6 +59,9 @@ namespace KingdomsRebellion.Core.Model {
 	            } else {
 	                life -= damage - defense;
 	            }
+	        if (life <= 0) {
+	            Destroy(gameObject);
+	        }
 	    }
 	}
 }

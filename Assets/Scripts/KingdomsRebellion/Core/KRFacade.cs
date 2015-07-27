@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using KingdomsRebellion.Core.AI;
 using KingdomsRebellion.Inputs;
 using KingdomsRebellion.Core.Grid;
 using KingdomsRebellion.Core.Model;
@@ -24,8 +25,9 @@ namespace KingdomsRebellion.Core {
 		public static void UpdateGame() {
             var units = new List<Unit>(Grid.GetGameObjects().Keys);
 		    foreach (var unit in units) {
-		        unit.GetComponent<Movement>().UpdateGame();
-		        unit.GetComponent<Attack>().UpdateGame();
+                //unit.GetComponent<Movement>().UpdateGame();
+                //unit.GetComponent<Attack>().UpdateGame();
+                unit.GetComponent<FiniteStateMachine>().UpdateGame();
 		    }
 		}
 	}

@@ -50,9 +50,10 @@ namespace KingdomsRebellion.Core.Math {
 		}
 		
 		public int Dist(Vec2 v) {
-			int x = X - v.X;
-			int y = Y - v.Y;
-			return (x * x) + (y * y);
+            //int x = X - v.X;
+            //int y = Y - v.Y;
+            //return (x * x) + (y * y);
+		    return Mathf.Max(Mathf.Abs(X - v.X), Mathf.Abs(Y - v.Y));
 		}
 
 		public override string ToString() {

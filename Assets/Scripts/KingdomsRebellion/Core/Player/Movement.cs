@@ -9,49 +9,48 @@ namespace KingdomsRebellion.Core.Player {
 
 		AbstractGrid _grid;
 		Unit _unit;
-		Vec2 _target;
-        Vec2 _pos;
+        public Vec2 Target { get; private set; }
+        public Vec2 Pos { get; private set; }
 
 		void Start() {
 			_unit = GetComponent<Unit>();
 			_grid = KRFacade.GetGrid();
-			_pos = _grid.GetPositionOf(gameObject);
-			_target = null;
+			Pos = _grid.GetPositionOf(gameObject);
+			Target = null;
 		}
 	
 		void Update() {
-			transform.position = _pos.ToVector3();
+			transform.position = Pos.ToVector3();
 		}
 
 		public void UpdateGame() {
-			if (_target == null || _pos == _target) { return; }
+			//if (Target == null || Pos == Target) { return; }
 
 			// TODO Calculate path
 
-			Vec2 nextPos = _pos;
-			int dx = _target.X - _pos.X;
-			int dy = _target.Y - _pos.Y;
+			Vec2 nextPos = Pos;
+			int dx = Target.X - Pos.X;
+			int dy = Target.Y - Pos.Y;
 			dx = dx == 0 ? 0 : dx > 0 ? 1 : -1;
 			dy = dy == 0 ? 0 : dy > 0 ? 1 : -1;
 			nextPos += new Vec2(dx, dy);
-			if (_grid.Move(gameObject, nextPos)) {
-				_pos = nextPos;
-			}
+		    if (_grid.Move(gameObject, nextPos)) {
+		        Pos = nextPos;
+		    } else {
+		        Target = null;
+		    }
 		}
 
 	    public void Move(int player, Vec3 targetv3) {
 			Vec2 target = targetv3.ToVec2();
-			if (_unit.PlayerId != player || _pos == target) {
+			if (_unit.PlayerId != player || Pos == target) {
 				return;
 			}
-
-			GameObject go = _grid.GetGameObjectByPosition(target);
-			Unit ennemy = (go == null) ? null : go.GetComponent<Unit>();
-			if (ennemy != null && ennemy.PlayerId != player) {
-				Debug.Log("@NotImplemented attack...");
-			} else {
-				_target = target;
-			}
+			Target = target;
 		}
+
+	    public void Follow(GameObject target) {
+	        Target = Vec2.FromVector3(target.transform.position);
+	    }
 	}
 }
