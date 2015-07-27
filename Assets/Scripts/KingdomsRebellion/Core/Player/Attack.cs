@@ -17,19 +17,19 @@ namespace KingdomsRebellion.Core.Player {
         bool _isAttacking;
 
         void Start() {
-            _grid = KRFacade.GetGrid();
-            _unit = GetComponent<Unit>();
-            _oldPos = Vec2.FromVector3(_unit.transform.position);
-            _isAttacking = false;
-            On("OnUnitDeath");
+//            _grid = KRFacade.GetGrid();
+//            _unit = GetComponent<Unit>();
+//            _oldPos = Vec2.FromVector3(_unit.transform.position);
+//            _isAttacking = false;
+//            On("OnUnitDeath");
         }
 
         public void OnAttack(int playerID, Vec3 modelPoint) {
-            _unit.GetComponent<Movement>().Move(playerID, modelPoint);
-            _target = _grid.GetGameObjectByPosition(new Vec2(modelPoint.X, modelPoint.Z));
-            _isAttacking = true;
-            _unit.ennemyTargeted = _target.GetComponent<Unit>();
-            _unit.attacking = true;
+//            _unit.GetComponent<Movement>().Move(playerID, modelPoint);
+//            _target = _grid.GetGameObjectByPosition(new Vec2(modelPoint.X, modelPoint.Z));
+//            _isAttacking = true;
+//            _unit.ennemyTargeted = _target.GetComponent<Unit>();
+//            _unit.attacking = true;
         }
 
         // TODO remove and replace _isAttacking by _unit.attacking

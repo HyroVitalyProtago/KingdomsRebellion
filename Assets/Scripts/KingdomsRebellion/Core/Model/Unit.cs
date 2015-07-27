@@ -2,12 +2,14 @@
 using System;
 using System.Collections;
 using KingdomsRebellion.Core.Math;
+using KingdomsRebellion.Core.Player;
+using KingdomsRebellion.Core.Interfaces;
 
 namespace KingdomsRebellion.Core.Model {
 
 //TODO: All attributes HAVE TO be private.
 //Create events to modify attributes when needed.
-	public class Unit : KRBehaviour {
+	public class Unit : KRBehaviour, IPos, HaveRadius {
 
 		public Color color;
 		public int playerId;
@@ -23,6 +25,9 @@ namespace KingdomsRebellion.Core.Model {
 		public Unit ennemyTargeted;
 //	    public Vec2 Position;
 		private GameObject spot;
+
+		public Vec2 Pos { get { return GetComponent<Movement>().Pos; } }
+		public int Radius { get { return 1; } }
 
 		//Events : 
 	    static event Action<GameObject> OnUnitDeath;
@@ -47,7 +52,8 @@ namespace KingdomsRebellion.Core.Model {
 			} else {
 				playerId = 1;
 			}
-		    KRFacade.GetGrid().Add(gameObject, Vec2.FromVector3(transform.position));
+
+		    KRFacade.GetMap().Add(this);
 		}
 	
 		// Update is called once per frame
@@ -83,8 +89,7 @@ namespace KingdomsRebellion.Core.Model {
 
 		void OnDestroy() {
             OnUnitDeath(gameObject);
-		    KRFacade.GetGrid().Remove(gameObject);
-            
+		    KRFacade.GetMap().Remove(this);
 		}
 	}
 }

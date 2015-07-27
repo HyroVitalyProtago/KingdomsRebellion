@@ -115,7 +115,7 @@ namespace KingdomsRebellion.Core.Player {
 		protected virtual void OnModelSelect(int player, Vec3 modelPosition) {
 			DeselectUnits(player);
 
-			GameObject go = KRFacade.GetGrid().GetGameObjectByPosition(new Vec2(modelPosition.X, modelPosition.Z));
+			GameObject go = KRFacade.Find(new Vec2(modelPosition.X, modelPosition.Z));
 			if (go != null) {
 				selectedObjects[player].Add(go);
 				ApplySelection(player);
@@ -125,7 +125,7 @@ namespace KingdomsRebellion.Core.Player {
 		protected virtual void OnModelMove(int player, Vec3 modelPosition) {
 			DeselectUnits(player);
 			
-			GameObject go = KRFacade.GetGrid().GetGameObjectByPosition(new Vec2(modelPosition.X, modelPosition.Z));
+			GameObject go = KRFacade.Find(new Vec2(modelPosition.X, modelPosition.Z));
 			if (go != null) {
 				selectedObjects[player].Add(go);
 				ApplySelection(player);

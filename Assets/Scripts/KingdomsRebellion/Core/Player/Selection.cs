@@ -86,9 +86,9 @@ namespace KingdomsRebellion.Core.Player {
 
 				// TEST add game objects in FlatGrid
 				if (child.position.x >= 0 && child.position.z >= 0) {
-					Vec2 modelPosition = Vec2.FromVector3(child.position);
-					Debug.Log("Add unit on (" + modelPosition.X + ", " + modelPosition.Y + ")");
-					KRFacade.GetGrid().Add(child.gameObject, modelPosition);
+//					Vec2 modelPosition = Vec2.FromVector3(child.position);
+//					Debug.Log("Add unit on (" + modelPosition.X + ", " + modelPosition.Y + ")");
+//					KRFacade.GetMap().Add(child.gameObject.GetComponent<Unit>());
 				}
 			}
 			timeLeftBeforeDragging = .15f;

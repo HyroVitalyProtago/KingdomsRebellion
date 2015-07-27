@@ -1,10 +1,29 @@
 ﻿
 using System;
+using System.Collections.Generic;
 
 namespace KingdomsRebellion.Core {
 	public abstract class KRObject {
 
 		// TODO refactor events conductor link with KRBehaviour
+
+		Dictionary<String, System.Object> _properties;
+		
+		protected KRObject() {
+			_properties = new Dictionary<String, System.Object>();
+		}
+		
+		public void SetProperty(String name, System.Object value) {
+			if (value == null) {
+				_properties.Remove(name);
+			} else {
+				_properties.Add(name, value);
+			}
+		}
+		
+		public T GetProperty<T>(String name) {
+			return (T) _properties[name];
+		}
 
 		void AbstractEventConductor(
 			string eventName,

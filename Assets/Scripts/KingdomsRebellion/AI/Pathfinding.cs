@@ -5,61 +5,55 @@ using System.Linq;
 using KingdomsRebellion.Core;
 using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Core.Grid;
+using KingdomsRebellion.Core.Map;
+using KingdomsRebellion.Core.Interfaces;
 
 namespace KingdomsRebellion.AI {
-	public class Pathfinding {
 
-		static AbstractGrid _grid;
+	public class Pathfinding<T> where T : IPos {
 
-		static Pathfinding() {
-			_grid = KRFacade.GetGrid();
-		}
-
-		public static IEnumerable<Node> FindPath(Vec2 startPos, Vec2 targetPos) {
-			Node startNode = _grid.NodeOf(startPos);
-			Node targetNode = _grid.NodeOf(targetPos);
-			
-			IList<Node> openSet = new List<Node>();
-			HashSet<Node> closedSet = new HashSet<Node>();
+		public static IEnumerable<AbstractNode<T>> FindPath(AbstractNode<T> startNode, AbstractNode<T> targetNode) {
+			IList<AbstractNode<T>> openSet = new List<AbstractNode<T>>();
+			HashSet<AbstractNode<T>> closedSet = new HashSet<AbstractNode<T>>();
 			openSet.Add(startNode);
-			startNode.GCost = 0;
+			startNode.PathCost = 0;
 			
 			while (openSet.Count > 0) {
-				Node currentNode = openSet.Min();
-				
+				AbstractNode<T> currentNode = openSet.Min();
+
 				if (currentNode == targetNode) {
-					return RetracePath(startNode,targetNode);
+					return RetracePath(startNode,currentNode);
 				}
 
 				openSet.Remove(currentNode);
 				closedSet.Add(currentNode);
 
-				foreach (Node neighbour in _grid.GetNeighbours(currentNode)) {
-					if (!neighbour.Walkable || closedSet.Contains(neighbour)) {
-						if (neighbour == targetNode) {
+				foreach (AbstractNode<T> neighbour in currentNode.Neighbours()) {
+					if (!neighbour.IsFree() || closedSet.Contains(neighbour)) {
+						if (neighbour == targetNode) { // abort if path can't join target
 							return RetracePath(startNode, currentNode);
 						}
 						continue;
 					}
 					
-					int newMovementCostToNeighbour = currentNode.GCost + GetDistance(currentNode, neighbour);
-					if (!openSet.Contains(neighbour) || newMovementCostToNeighbour < neighbour.GCost) {
-						neighbour.GCost = newMovementCostToNeighbour;
-						neighbour.HCost = GetDistance(neighbour, targetNode);
+					int newMovementCostToNeighbour = currentNode.PathCost + currentNode.GetDistance(neighbour);
+					if (!openSet.Contains(neighbour) || newMovementCostToNeighbour < neighbour.PathCost) {
+						neighbour.PathCost = newMovementCostToNeighbour;
+						neighbour.EstimatedCost = neighbour.GetDistance(targetNode);
 						neighbour.Parent = currentNode;
-						
+
 						if (!openSet.Contains(neighbour)) { openSet.Add(neighbour); }
 					}
 				}
 			}
 
-			return openSet; // empty IEnumerable
+			return null;
 		}
 		
-		static IEnumerable<Node> RetracePath(Node startNode, Node endNode) {
-			IList<Node> path = new List<Node>();
-			Node currentNode = endNode;
-			
+		static IEnumerable<AbstractNode<T>> RetracePath(AbstractNode<T> startNode, AbstractNode<T> endNode) {
+			IList<AbstractNode<T>> path = new List<AbstractNode<T>>();
+			AbstractNode<T> currentNode = endNode;
+
 			while (currentNode != startNode) {
 				path.Add(currentNode);
 				currentNode = currentNode.Parent;
@@ -67,21 +61,5 @@ namespace KingdomsRebellion.AI {
 
 			return path.Reverse();
 		}
-
-		// D = D2 = 1 : Chebyshev distance
-		static int D = 1; // D is the cost of moving horizontally or vertically
-		static int D2 = 1; // D2 is the cost of moving diagonally
-
-		// @see http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html
-		static int GetDistance(Node node, Node goal) {
-			int dx = Mathf.Abs(node.Pos.X - goal.Pos.X);
-			int dy = Mathf.Abs(node.Pos.Y - goal.Pos.Y);
-
-			if (dx > dy) { return 14*dy + 10*(dx-dy); }
-			return 14*dx + 10*(dy-dx);
-
-//			return D * (dx + dy) + (D2 - 2 * D) * Mathf.Min(dx, dy);
-		}
-
 	}
 }
