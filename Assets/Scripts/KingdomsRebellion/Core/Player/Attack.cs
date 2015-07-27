@@ -37,7 +37,8 @@ namespace KingdomsRebellion.Core.Player {
         }
 
         private void OnAttack(int playerID, Vec3 modelPoint) {
-            Target = KRFacade.GetMap().Find(new Vec2(modelPoint.X, modelPoint.Z)).gameObject;
+			Unit u = KRFacade.GetMap().Find(new Vec2(modelPoint.X, modelPoint.Z));
+			if (u != null) { Target = u.gameObject; }
         }
 
         // TODO remove and replace _isAttacking by _unit.attacking
