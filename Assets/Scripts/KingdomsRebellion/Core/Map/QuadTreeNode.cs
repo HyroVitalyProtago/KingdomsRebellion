@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using KingdomsRebellion.Core.Math;
-using KingdomsRebellion.Core.Interfaces;
-using UnityEngine;
 using System.Linq;
+using KingdomsRebellion.Core.Interfaces;
+using KingdomsRebellion.Core.Math;
 
 namespace KingdomsRebellion.Core.Map {
 

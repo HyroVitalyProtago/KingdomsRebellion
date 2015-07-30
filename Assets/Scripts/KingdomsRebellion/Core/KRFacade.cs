@@ -1,16 +1,12 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
-using KingdomsRebellion.Core.AI;
-using KingdomsRebellion.Inputs;
-using KingdomsRebellion.Core.Grid;
-using KingdomsRebellion.Core.Model;
-using KingdomsRebellion.Core.Player;
+using KingdomsRebellion.AI;
+using KingdomsRebellion.Core.FSM;
 using KingdomsRebellion.Core.Map;
 using KingdomsRebellion.Core.Math;
-using KingdomsRebellion.AI;
-using System;
+using KingdomsRebellion.Core.Model;
+using KingdomsRebellion.Inputs;
+using UnityEngine;
 
 namespace KingdomsRebellion.Core {
 	public class KRFacade : KRObject {

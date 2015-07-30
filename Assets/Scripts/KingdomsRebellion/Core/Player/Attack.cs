@@ -1,10 +1,7 @@
 ﻿using System;
-using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using KingdomsRebellion.Core.Grid;
 using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Core.Model;
+using UnityEngine;
 
 namespace KingdomsRebellion.Core.Player {
 

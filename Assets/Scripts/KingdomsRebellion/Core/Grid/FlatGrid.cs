@@ -1,9 +1,8 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using KingdomsRebellion.Core;
-using KingdomsRebellion.Core.Model;
 using KingdomsRebellion.Core.Math;
+using KingdomsRebellion.Core.Model;
+using UnityEngine;
 
 namespace KingdomsRebellion.Core.Grid {
 	public class FlatGrid : AbstractGrid {

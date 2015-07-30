@@ -1,7 +1,6 @@
-﻿using UnityEngine;
+﻿using KingdomsRebellion.Core.Model;
+using UnityEngine;
 using UnityEngine.UI;
-using KingdomsRebellion.Core.Model;
-using KingdomsRebellion.Network;
 
 namespace KingdomsRebellion.Core.Player {
 

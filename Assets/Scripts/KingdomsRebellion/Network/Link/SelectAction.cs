@@ -1,4 +1,3 @@
-using UnityEngine;
 using System;
 using System.IO;
 using KingdomsRebellion.Core.Math;

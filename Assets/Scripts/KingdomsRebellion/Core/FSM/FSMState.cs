@@ -1,6 +1,6 @@
 ﻿using KingdomsRebellion.Core.Grid;
 
-namespace KingdomsRebellion.Core.AI {
+namespace KingdomsRebellion.Core.FSM {
     public abstract class FSMState {
 
         protected FiniteStateMachine fsm;

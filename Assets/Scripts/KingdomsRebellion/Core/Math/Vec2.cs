@@ -80,7 +80,7 @@ namespace KingdomsRebellion.Core.Math {
 		}
 		
 		public Vector3 ToVector3() {
-			return new Vector3(this.X, 0, this.Y);
+			return new Vector3(X, 0, Y);
 		}
 		
 		public static Vec2 FromVector3(Vector3 vector3) {

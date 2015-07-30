@@ -2,10 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using KingdomsRebellion.Core.Math;
-using KingdomsRebellion.Core.Interfaces;
 using KingdomsRebellion.AI;
-using UnityEngine;
+using KingdomsRebellion.Core.Interfaces;
+using KingdomsRebellion.Core.Math;
 
 namespace KingdomsRebellion.Core.Map {
 	public class QuadTree<T> : IMap<QuadTreeNode<T>,T> where T : IPos, HaveRadius {

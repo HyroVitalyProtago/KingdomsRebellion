@@ -1,9 +1,8 @@
-﻿using UnityEngine;
-using System;
-using System.Collections;
+﻿using System;
+using KingdomsRebellion.Core.Interfaces;
 using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Core.Player;
-using KingdomsRebellion.Core.Interfaces;
+using UnityEngine;
 
 namespace KingdomsRebellion.Core.Model {
 

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Core.Model;
+using UnityEngine;
 
 namespace KingdomsRebellion.Core.Grid {
     

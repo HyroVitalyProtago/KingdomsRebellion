@@ -1,6 +1,6 @@
 ﻿using System;
-using UnityEngine;
 using KingdomsRebellion.Core.Math;
+using UnityEngine;
 
 namespace KingdomsRebellion.Core.Grid {
 

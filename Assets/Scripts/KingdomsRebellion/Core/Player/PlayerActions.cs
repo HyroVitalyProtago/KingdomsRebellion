@@ -1,9 +1,8 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
-using KingdomsRebellion.Core.AI;
-using KingdomsRebellion.Network;
-using KingdomsRebellion.Network.Link;
+﻿using System.Collections.Generic;
+using KingdomsRebellion.Core.FSM;
 using KingdomsRebellion.Core.Math;
+using KingdomsRebellion.Network;
+using UnityEngine;
 
 namespace KingdomsRebellion.Core.Player {
 	public class PlayerActions : KRBehaviour {

@@ -1,6 +1,6 @@
-﻿using UnityEngine;
-using System.Text;
+﻿using System.Text;
 using KingdomsRebellion.Core;
+using UnityEngine;
 
 namespace KingdomsRebellion.Network {
 

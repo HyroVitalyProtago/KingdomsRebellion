@@ -1,9 +1,9 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
 using KingdomsRebellion.Core;
 using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Core.Model;
 using KingdomsRebellion.Network;
+using UnityEngine;
 
 namespace KingdomsRebellion.Inputs {
 	public class InputNetworkAdapter : KRObject {

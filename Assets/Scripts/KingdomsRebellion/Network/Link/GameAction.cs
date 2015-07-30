@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using KingdomsRebellion.Attributes;
 
 namespace KingdomsRebellion.Network.Link {
 
