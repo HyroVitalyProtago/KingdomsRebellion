@@ -1,9 +1,8 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Core.Player;
 
-namespace KingdomsRebellion.Core.AI {
+namespace KingdomsRebellion.Core.FSM {
 
     public class FiniteStateMachine : KRBehaviour {
         private Stack<FSMState> _stack;

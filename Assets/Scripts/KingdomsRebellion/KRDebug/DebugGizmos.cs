@@ -1,9 +1,7 @@
-﻿using UnityEngine;
-using System.Collections;
-using KingdomsRebellion.Core;
+﻿using KingdomsRebellion.Core;
 using KingdomsRebellion.Core.Map;
 using KingdomsRebellion.Core.Model;
-using System.Collections.Generic;
+using UnityEngine;
 
 namespace KingdomsRebellion.KRDebug {
 

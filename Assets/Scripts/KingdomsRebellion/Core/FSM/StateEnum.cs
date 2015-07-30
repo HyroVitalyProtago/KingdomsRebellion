@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace KingdomsRebellion.Core.AI {
+﻿namespace KingdomsRebellion.Core.FSM {
     public enum StateEnum {
         MoveState,
         AttackState

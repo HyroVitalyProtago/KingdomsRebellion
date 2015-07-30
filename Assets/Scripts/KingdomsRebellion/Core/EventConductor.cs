@@ -1,9 +1,8 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Linq.Expressions;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace KingdomsRebellion.Core {
 
@@ -34,21 +33,21 @@ namespace KingdomsRebellion.Core {
 		/// <summary>
 		/// The static talkers correspond to classes who launch static events.
 		/// </summary>
-		static Dictionary<Type, Dictionary<String, MethodInfo[]>> StaticTalkers =
+		static readonly Dictionary<Type, Dictionary<String, MethodInfo[]>> StaticTalkers =
 			new Dictionary<Type, Dictionary<String, MethodInfo[]>>();
 
 		/// <summary>
 		/// The dynamic talkers correspond to classes who launch events which refer to them.
 		/// </summary>
-		static Dictionary<System.Object, Dictionary<String, MethodInfo[]>> DynamicTalkers =
-			new Dictionary<System.Object, Dictionary<String, MethodInfo[]>>();
+		static readonly Dictionary<Object, Dictionary<String, MethodInfo[]>> DynamicTalkers =
+			new Dictionary<Object, Dictionary<String, MethodInfo[]>>();
 
 		/// <summary>
 		/// The listeners correspond to classes who attend some events for fire callbacks.
 		/// There can be two kinds of listeners : Type (for static method) and Object (for instance method)
 		/// </summary>
-		static Dictionary<String, Dictionary<System.Object, Delegate>> Listeners =
-			new Dictionary<String, Dictionary<System.Object, Delegate>>();
+		static readonly Dictionary<String, Dictionary<Object, Delegate>> Listeners =
+			new Dictionary<String, Dictionary<Object, Delegate>>();
 
 		#region Talkers
 
@@ -70,7 +69,7 @@ namespace KingdomsRebellion.Core {
 				throw new EventNotFoundException();
 			}
 
-			System.Object invokedTalker = talker is Type ? null : talker as System.Object;
+			Object invokedTalker = talker is Type ? null : talker as Object;
 
 			// Connect all listeners
 			if (Listeners.ContainsKey(eventName)) {
@@ -103,7 +102,7 @@ namespace KingdomsRebellion.Core {
 				throw new EventNotRegisteredException();
 			}
 
-			System.Object invokedTalker = talker is Type ? null : talker as System.Object;
+			Object invokedTalker = talker is Type ? null : talker as Object;
 
 			// Disconnect all listeners
 			if (Listeners.ContainsKey(eventName)) {
@@ -123,19 +122,19 @@ namespace KingdomsRebellion.Core {
 			AbstractDenial<Type>(typ, eventName, StaticTalkers);
 		}
 
-		public static void Offer(System.Object self, string eventName) {
-			AbstractOffer<System.Object>(self, eventName, InstanceNonPublic, DynamicTalkers);
+		public static void Offer(Object self, string eventName) {
+			AbstractOffer<Object>(self, eventName, InstanceNonPublic, DynamicTalkers);
 		}
 
-		public static void Denial(System.Object self, string eventName) {
-			AbstractDenial<System.Object>(self, eventName, DynamicTalkers);
+		public static void Denial(Object self, string eventName) {
+			AbstractDenial<Object>(self, eventName, DynamicTalkers);
 		}
 
 		#endregion
 
 		#region Listeners
 
-		static void AbstractOn(System.Object self, String eventName, BindingFlags flags) {
+		static void AbstractOn(Object self, String eventName, BindingFlags flags) {
 			if (self == null || eventName == null) {
 				throw new ArgumentNullException();
 			}
@@ -172,12 +171,12 @@ namespace KingdomsRebellion.Core {
 			
 			// Add in listeners
 			if (!Listeners.ContainsKey(eventName)) {
-				Listeners[eventName] = new Dictionary<System.Object, Delegate>();
+				Listeners[eventName] = new Dictionary<Object, Delegate>();
 			}
 			Listeners[eventName].Add(self, callback);
 		}
 
-		static void AbstractOff(System.Object obj, String eventName) {
+		static void AbstractOff(Object obj, String eventName) {
 			if (obj == null || eventName == null) {
 				throw new ArgumentNullException();
 			}
@@ -209,11 +208,11 @@ namespace KingdomsRebellion.Core {
 			AbstractOff(typ, eventName);
 		}
 
-		public static void On(System.Object self, string eventName) {
+		public static void On(Object self, string eventName) {
 			AbstractOn(self, eventName, InstanceNonPublic);
 		}
 
-		public static void Off(System.Object self, string eventName) {
+		public static void Off(Object self, string eventName) {
 			AbstractOff(self, eventName);
 		}
 

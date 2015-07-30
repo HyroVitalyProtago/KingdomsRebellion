@@ -1,7 +1,6 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
 using KingdomsRebellion.Core;
-using KingdomsRebellion.Network;
+using UnityEngine;
 
 namespace KingdomsRebellion.Inputs {
 	public class Mouse : KRBehaviour {

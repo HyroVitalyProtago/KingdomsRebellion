@@ -1,9 +1,9 @@
 ﻿
-using System.Collections.Generic;
-using KingdomsRebellion.Core.Math;
-using KingdomsRebellion.AI;
 using System;
+using System.Collections.Generic;
+using KingdomsRebellion.AI;
 using KingdomsRebellion.Core.Interfaces;
+using KingdomsRebellion.Core.Math;
 
 namespace KingdomsRebellion.Core.Map {
 	public interface IMap<N,T> : IEnumerable<T> where T : IPos where N : IPos {

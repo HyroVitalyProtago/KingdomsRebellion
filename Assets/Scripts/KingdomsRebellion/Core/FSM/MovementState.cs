@@ -1,13 +1,11 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using KingdomsRebellion.Core.Model;
 using KingdomsRebellion.Core.Player;
-using KingdomsRebellion.Core.Model;
+using UnityEngine;
 
-namespace KingdomsRebellion.Core.AI {
+namespace KingdomsRebellion.Core.FSM {
 
     public class MovementState : FSMState {
-
-        Movement _movement;
+        readonly Movement _movement;
 
         public MovementState(FiniteStateMachine fsm) : base(fsm) {
             _movement = fsm.GetComponent<Movement>();

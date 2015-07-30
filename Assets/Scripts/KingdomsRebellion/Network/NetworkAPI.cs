@@ -1,8 +1,8 @@
-﻿using UnityEngine;
-using UnityEngine.Networking;
-using System;
+﻿using System;
 using KingdomsRebellion.Core;
 using KingdomsRebellion.Network.Link;
+using UnityEngine;
+using UnityEngine.Networking;
 
 namespace KingdomsRebellion.Network {
 

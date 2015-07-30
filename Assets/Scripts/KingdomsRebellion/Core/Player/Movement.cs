@@ -1,12 +1,11 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
-using KingdomsRebellion.Core.Model;
-using KingdomsRebellion.Core.Math;
-using KingdomsRebellion.Core.Grid;
-using KingdomsRebellion.AI;
+﻿using System.Collections.Generic;
 using System.Linq;
-using KingdomsRebellion.Core.Map;
+using KingdomsRebellion.AI;
 using KingdomsRebellion.Core.Interfaces;
+using KingdomsRebellion.Core.Map;
+using KingdomsRebellion.Core.Math;
+using KingdomsRebellion.Core.Model;
+using UnityEngine;
 
 namespace KingdomsRebellion.Core.Player {
 
@@ -66,7 +65,7 @@ namespace KingdomsRebellion.Core.Player {
 				QuadTreeNode<Unit> node;
 				Vec2 nextPos = Pos;
 
-				if (_waypoints.Count() == 0) {
+				if (!_waypoints.Any()) {
 					nextPos = Target;
 				} else {
 

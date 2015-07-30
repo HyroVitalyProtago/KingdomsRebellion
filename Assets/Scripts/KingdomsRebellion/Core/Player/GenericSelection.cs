@@ -1,11 +1,8 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Network;
-using KingdomsRebellion.Network.Link;
-using KingdomsRebellion.Inputs;
 using KingdomsRebellion.Tools.UI;
-using KingdomsRebellion.Core.Grid;
+using UnityEngine;
 
 namespace KingdomsRebellion.Core.Player {
 
