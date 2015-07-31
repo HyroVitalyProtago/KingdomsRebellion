@@ -17,7 +17,7 @@ namespace KingdomsRebellion.Core.Player {
 		private float initCameraSize;
 		private RectTransform rectTransform;
 		private Image image;
-
+        public bool IsSelected { get; private set; }
 		void OnMainCameraChange() {
 			healthContainer.GetComponentInParent<Canvas>().worldCamera = Camera.main;
 		}
@@ -34,11 +34,10 @@ namespace KingdomsRebellion.Core.Player {
 		    initCameraSize = 4f;
 			initWidth = healthBar.rect.width;
 			image.color = Color.green;
-			healthContainer.SetActive(false);
-			enabled = false;
 		}
 
 		void Update() {
+            Debug.Log("Update");
 			healthContainer.transform.position = transform.position + 2 * Vector3.up;
 			float lifePercent = (float)unitData.life / (float)unitData.lifeMax;
             var scale = rectTransform.localScale = Camera.main.orthographicSize / initCameraSize > 1.5f ? Vector3.one : 2 * (Vector3.one + (1 - Camera.main.orthographicSize / initCameraSize) * Vector3.one);
@@ -54,12 +53,14 @@ namespace KingdomsRebellion.Core.Player {
 
 		public void HideHealthBar() {
 			enabled = false;
+		    IsSelected = false;
 			healthContainer.SetActive(false);
 		}
 
 		public void ShowHealthBar() {
 			Update();
 			enabled = true;
+		    IsSelected = true;
 			healthContainer.SetActive(true);
 		}
 	}

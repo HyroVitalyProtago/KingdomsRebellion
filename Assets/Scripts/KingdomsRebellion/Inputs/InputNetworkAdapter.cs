@@ -2,6 +2,7 @@
 using KingdomsRebellion.Core;
 using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Core.Model;
+using KingdomsRebellion.Core.Player;
 using KingdomsRebellion.Network;
 using UnityEngine;
 
@@ -43,6 +44,8 @@ namespace KingdomsRebellion.Inputs {
 		}
 
 		void OnRightClick(Vector3 mousePosition) {
+		    if (!PlayerActions.IsMines()) return;
+
 			Vector3 worldPosition = new Vector3(-1, -1, -1);
 			
 			Ray ray = Camera.main.ScreenPointToRay(mousePosition);

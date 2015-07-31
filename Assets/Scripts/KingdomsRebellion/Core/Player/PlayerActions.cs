@@ -1,13 +1,15 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using KingdomsRebellion.Core.FSM;
 using KingdomsRebellion.Core.Math;
+using KingdomsRebellion.Core.Model;
 using KingdomsRebellion.Network;
 using UnityEngine;
 
 namespace KingdomsRebellion.Core.Player {
 	public class PlayerActions : KRBehaviour {
 
-		IList<GameObject>[] _selectedObjects;
+		static IList<GameObject>[] _selectedObjects;
 
 		void OnEnable() {
 			On("OnSelection");
@@ -42,6 +44,10 @@ namespace KingdomsRebellion.Core.Player {
             for (int i = 0; i < _selectedObjects[playerID].Count; ++i) {
                 _selectedObjects[playerID][i].GetComponent<FiniteStateMachine>().Attack(playerID, modelPoint);
             }
+	    }
+
+	    public static bool IsMines() {
+	        return _selectedObjects[NetworkAPI.PlayerId].Any(u => u.GetComponent<Unit>().PlayerId == NetworkAPI.PlayerId);
 	    }
 	}
 }
