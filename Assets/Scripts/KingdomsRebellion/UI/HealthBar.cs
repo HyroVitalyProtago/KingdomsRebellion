@@ -37,7 +37,6 @@ namespace KingdomsRebellion.Core.Player {
 		}
 
 		void Update() {
-            Debug.Log("Update");
 			healthContainer.transform.position = transform.position + 2 * Vector3.up;
 			float lifePercent = (float)unitData.life / (float)unitData.lifeMax;
             var scale = rectTransform.localScale = Camera.main.orthographicSize / initCameraSize > 1.5f ? Vector3.one : 2 * (Vector3.one + (1 - Camera.main.orthographicSize / initCameraSize) * Vector3.one);
