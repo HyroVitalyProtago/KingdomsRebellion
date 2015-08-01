@@ -1,12 +1,13 @@
 ﻿using System.IO;
 using UnityEngine;
+using System;
 
 namespace KingdomsRebellion.Core.Math {
 
 	/// <summary>
 	/// Light implementation of Vector2 with integers.
 	/// </summary>
-	public class Vec2 {
+	public class Vec2 : IComparable<Vec2> {
 
 		public static readonly Vec2 Zero = new Vec2(0,0);
 		public static readonly Vec2 One = new Vec2(1,1);
@@ -36,6 +37,10 @@ namespace KingdomsRebellion.Core.Math {
 		
 		public static Vec2 operator *(int scalar, Vec2 v) {
 			return new Vec2(v.X * scalar, v.Y * scalar);
+		}
+
+		public static Vec2 operator *(Vec2 v1, Vec2 v2) {
+			return new Vec2(v1.X * v2.Y, v1.Y * v2.Y);
 		}
 
 		public static bool operator ==(Vec2 v1, Vec2 v2) {
@@ -68,6 +73,13 @@ namespace KingdomsRebellion.Core.Math {
 
 		public override int GetHashCode() {
 			return X ^ Y;
+		}
+
+		public int CompareTo(Vec2 other) {
+			if (X != other.X) {
+				return X - other.X;
+			}
+			return Y - other.Y;
 		}
 
 		public void Serialize(BinaryWriter writer) {

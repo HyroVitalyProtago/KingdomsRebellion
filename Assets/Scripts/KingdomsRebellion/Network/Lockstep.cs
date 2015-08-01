@@ -66,6 +66,7 @@ namespace KingdomsRebellion.Network {
 			On("OnModelSelectDemand");
 			On("OnModelMoveDemand");
             On("OnModelAttackDemand");
+			On("OnModelDragDemand");
 		}
 
 		void OnDisable() {
@@ -75,6 +76,7 @@ namespace KingdomsRebellion.Network {
 			Off("OnModelSelectDemand");
 			Off("OnModelMoveDemand");
             Off("OnModelAttackDemand");
+			Off("OnModelDragDemand");
 		}
 
 		void OnAction(int playerID, GameAction action) {
@@ -287,6 +289,10 @@ namespace KingdomsRebellion.Network {
 	    void OnModelAttackDemand(Vec3 modelPosition) {
 	        actionQueue.Enqueue(new AttackAction(lockstepTurn, modelPosition));
 	    }
+
+		void OnModelDragDemand(Vec3 beginModelPosition, Vec3 endModelPosition, Vec3 z) {
+			actionQueue.Enqueue(new DragAction(lockstepTurn, beginModelPosition, endModelPosition, z));
+		}
 	}
 
 }

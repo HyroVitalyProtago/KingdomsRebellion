@@ -29,6 +29,7 @@ namespace KingdomsRebellion.Core.Player {
 			}
 		}
 
+		// used too to drag selectables
 		void OnSelection(int playerID, IList<GameObject> selectedObjects) {
 			_selectedObjects[playerID] = selectedObjects;
 		}

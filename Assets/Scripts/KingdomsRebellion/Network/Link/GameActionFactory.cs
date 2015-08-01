@@ -10,7 +10,7 @@ namespace KingdomsRebellion.Network.Link {
 			} else if (b == (byte) GameActionEnum.SelectAction) {
 				return SelectAction.FromBytes(data);
 			} else if (b == (byte) GameActionEnum.DragAction) {
-				// return DragAction.FromBytes(data);
+				 return DragAction.FromBytes(data);
 			} else if (b == (byte) GameActionEnum.MoveAction) {
 				return MoveAction.FromBytes(data);
             } else if (b == (byte) GameActionEnum.AttackAction) {
