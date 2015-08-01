@@ -6,28 +6,30 @@ using UnityEngine;
 
 namespace KingdomsRebellion.Core.Player {
 
-	// TODO: Make this class more generic.
 	// This class Select all selectable unit
 	public class GenericSelection : KRBehaviour {
 
 		Ray ray;
-		private RaycastHit hit;
+		RaycastHit hit;
+
 		protected IList<GameObject>[] selectedObjects;
-		// Don't forget to notify (SendMessage) when new Selectable object is created.
 		protected IList<GameObject> selectableObjects;
-		protected Vector3 originWorldMousePoint;
-		Camera originCamera;
-		protected bool isDragging;
-		protected float timeLeftBeforeDragging;
+		protected Vector3? originWorldMousePoint;
 
 		protected virtual void OnEnable() {
 			On("OnModelSelect");
-			On("OnModelMove");
+			On("OnModelDrag");
+
+			On("OnLeftClickDown");
+			On("OnLeftClickUp");
 		}
 
 		protected virtual void OnDisable() {
 			Off("OnModelSelect");
-			Off("OnModelMove");
+			Off("OnModelDrag");
+
+			Off("OnLeftClickDown");
+			Off("OnLeftClickUp");
 		}
 
 		protected virtual void Start() {
@@ -40,25 +42,33 @@ namespace KingdomsRebellion.Core.Player {
 			foreach (Transform child in transform) {
 				selectableObjects.Add(child.gameObject);
 			}
-			timeLeftBeforeDragging = .15f;
-			isDragging = false;
 		}
 
-		public void OnGUI() {
-			if (isDragging) {
-				Vector2 pos = new Vector2(Camera.main.WorldToScreenPoint(originWorldMousePoint).x, Screen.height - Camera.main.WorldToScreenPoint(originWorldMousePoint).y);
-				Vector2 size = new Vector2(Input.mousePosition.x - Camera.main.WorldToScreenPoint(originWorldMousePoint).x, Camera.main.WorldToScreenPoint(originWorldMousePoint).y - Input.mousePosition.y);
-				Rect rect = new Rect(pos, size);
-				BoxTools.DrawRect(rect, new Color(0.8f, 0.8f, 0.8f, 0.25f));
-				BoxTools.DrawRectBorder(rect, 1f, Color.blue);
-			}
+		static Color BoxColor = new Color(.8f, .8f, .8f, .25f);
+		void OnGUI() {
+			if (!originWorldMousePoint.HasValue) return;
+
+			Vector3 originScreenPoint = Camera.main.WorldToScreenPoint(originWorldMousePoint.Value);
+			Vector2 pos = new Vector2(originScreenPoint.x, Screen.height - originScreenPoint.y);
+			Vector2 size = new Vector2(Input.mousePosition.x - originScreenPoint.x, originScreenPoint.y - Input.mousePosition.y);
+			Rect rect = new Rect(pos, size);
+			BoxTools.DrawRect(rect, BoxColor);
+			BoxTools.DrawRectBorder(rect, 1f, Color.blue);
+		}
+
+		void Update() {
+			if (!originWorldMousePoint.HasValue) return;
+
+			// for each unit selected not in rect : deselect
+			// for each unit not selected in rect : select
+			// selectedObjects[NetworkAPI.playerID]
 		}
 
 		protected virtual void SelectUnits(int playerID, Vector3 originWorldPoint) {
 			foreach (var unit in selectableObjects) {
-				if (IsInRect(unit, originWorldPoint)) {
+//				if (IsInRect(unit, originWorldPoint)) {
 					selectedObjects[playerID].Add(unit);
-				}
+//				}
 			}
 			ApplySelection(playerID);
 		}
@@ -68,46 +78,15 @@ namespace KingdomsRebellion.Core.Player {
 			selectedObjects[playerID].Clear();
 		}
 
-		protected bool IsInRect(GameObject gameObject, Vector3 originWorldPoint) {
-			if (!isDragging) {
-				return false;
-			}
-			var originViewportPoint = originCamera.WorldToViewportPoint(originWorldPoint);
-			var camera = Camera.main;
-			var viewportBounds = BoxTools.GetViewportBounds(originViewportPoint, camera, Input.mousePosition);
-			return viewportBounds.Contains(camera.WorldToViewportPoint(gameObject.transform.position));
-		}
+//		protected bool IsInRect(GameObject gameObject, Vector3 originWorldPoint) {
+//			var originViewportPoint = originCamera.WorldToViewportPoint(originWorldPoint);
+//			var camera = Camera.main;
+//			var viewportBounds = BoxTools.GetViewportBounds(originViewportPoint, camera, Input.mousePosition);
+//			return viewportBounds.Contains(camera.WorldToViewportPoint(gameObject.transform.position));
+//		}
 
 		protected virtual void ApplySelection(int playerID) {}
-
 		protected virtual void ApplyDeselection(int playerID) {}
-
-		// TODO get unit on modelPoint position and select it
-		// if there is no unit on modelPoint, deselect current units
-		void OnSelect() {
-			ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-//			if (playerID == NetworkAPI.PlayerId) {
-//				this.originWorldMousePoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-//			}
-			if (Physics.Raycast(ray.origin, ray.direction, out hit)) {
-				originCamera = GetComponent<Camera>();
-				if (!Input.GetKey(KeyCode.LeftControl)) {
-					DeselectUnits(NetworkAPI.PlayerId);
-				}
-			}
-			if (hit.collider != null) {
-				var colliderGameObject = hit.collider.gameObject;
-				if (selectableObjects.Contains(colliderGameObject)) {
-					if (!selectedObjects[NetworkAPI.PlayerId].Contains(colliderGameObject)) {
-						selectedObjects[NetworkAPI.PlayerId].Add(colliderGameObject);
-						// ApplySelection(NetworkAPI.PlayerId);
-					} else {
-						// ApplyDeselection(NetworkAPI.PlayerId);
-						selectedObjects[NetworkAPI.PlayerId].Remove(colliderGameObject);
-					}
-				}
-			}
-		}
 
 		protected virtual void OnModelSelect(int player, Vec3 modelPosition) {
 			DeselectUnits(player);
@@ -119,29 +98,22 @@ namespace KingdomsRebellion.Core.Player {
 			}
 		}
 
-		protected virtual void OnModelMove(int player, Vec3 modelPosition) {
+		protected virtual void OnModelDrag(int player, Vec3 beginModelPosition, Vec3 endModelPosition, Vec3 z) {
 			DeselectUnits(player);
-			
-			GameObject go = KRFacade.Find(new Vec2(modelPosition.X, modelPosition.Z));
-			if (go != null) {
+
+			IEnumerable<GameObject> gos = KRFacade.Find(beginModelPosition.ToVec2(), endModelPosition.ToVec2(), z.ToVec2());
+			foreach (GameObject go in gos) {
 				selectedObjects[player].Add(go);
-				ApplySelection(player);
 			}
+			ApplySelection(player);
 		}
 
-		protected virtual void OnUpdateDrag(int playerId, Vector3 originWorldPoint, Camera currentCamera, Vector3 currentMousePousition) {
-			if (!isDragging) {
-				timeLeftBeforeDragging -= Time.deltaTime;
-			}
-			if (timeLeftBeforeDragging <= 0f) {
-				isDragging = true;
-			}
+		protected virtual void OnLeftClickDown(Vector3 mousePosition) {
+			originWorldMousePoint = Camera.main.ScreenToWorldPoint(mousePosition);
 		}
 
-		void OnDrag(int playerID, Vector3 originWorldPoint, Camera currentCamera, Vector3 currentMousePousition) {
-			SelectUnits(playerID, originWorldPoint);
-			isDragging = false;
-			timeLeftBeforeDragging = .15f;
+		protected virtual void OnLeftClickUp(Vector3 mousePosition) {
+			originWorldMousePoint = null;
 		}
 	}
 }

@@ -23,7 +23,7 @@ namespace KingdomsRebellion.AI {
 			}
 
 			int numerator = longest >> 1;
-			for (int i = 0; i <= longest; ++i) {
+			for (int i = 0; i < longest; ++i) {
 				numerator += shortest;
 				if (!(numerator < longest)) {
 					numerator -= longest;

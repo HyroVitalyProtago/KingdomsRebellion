@@ -9,11 +9,10 @@ namespace KingdomsRebellion.Core.Player {
 	
 	public class Selection : GenericSelection {
 
-		protected Color playerColor;
 		IList<GameObject> playerPreSelected;
 		IList<GameObject> ennemyPreSelected;
 
-		event Action< int, IList<GameObject> > OnSelection;
+		event Action<int, IList<GameObject>> OnSelection;
 
 		protected override void OnEnable() {
 			base.OnEnable();
@@ -27,7 +26,7 @@ namespace KingdomsRebellion.Core.Player {
 			if (unit == null)
 				return;
 
-            if (unit.color == playerColor) {
+            if (unit.PlayerId == NetworkAPI.PlayerId) {
 				if (!playerPreSelected.Contains(go)) {
 					playerPreSelected.Add(go);
 				}
@@ -38,39 +37,39 @@ namespace KingdomsRebellion.Core.Player {
 			}
 		}
 
-		protected override void OnUpdateDrag(int playerId, Vector3 originWorldPoint, Camera currentCamera, Vector3 currentMousePousition) {
-			if (!isDragging) {
-				timeLeftBeforeDragging -= Time.deltaTime;
-			} else {
-				for (int i = 0; i < selectableObjects.Count; ++i) {
-					if (IsInRect(selectableObjects[i], originWorldPoint)) {
-						PreSelected(selectableObjects[i]);
-					} else if (playerPreSelected.Remove(selectableObjects[i]) || ennemyPreSelected.Remove(selectableObjects[i])) {
-						selectableObjects[i].GetComponent<HealthBar>().HideHealthBar();
-					}
-				}
-				if (playerPreSelected.Count > 0) {
-					foreach (var unit in playerPreSelected) {
-						unit.GetComponent<HealthBar>().ShowHealthBar();
-					}
-					foreach (var unit in ennemyPreSelected) {
-						unit.GetComponent<HealthBar>().HideHealthBar();
-					}
-					ennemyPreSelected.Clear();
-				} else if (ennemyPreSelected.Count > 0) {
-					foreach (var unit in ennemyPreSelected) {
-						unit.GetComponent<HealthBar>().ShowHealthBar();
-					}
-					foreach (var unit in playerPreSelected) {
-						unit.GetComponent<HealthBar>().HideHealthBar();
-					}
-					playerPreSelected.Clear();
-				}
-			}
-			if (timeLeftBeforeDragging <= 0f) {
-				isDragging = true;
-			}
-		}
+//		protected override void OnUpdateDrag(int playerId, Vector3 originWorldPoint, Camera currentCamera, Vector3 currentMousePousition) {
+//			if (!isDragging) {
+//				timeLeftBeforeDragging -= Time.deltaTime;
+//			} else {
+//				for (int i = 0; i < selectableObjects.Count; ++i) {
+//					if (IsInRect(selectableObjects[i], originWorldPoint)) {
+//						PreSelected(selectableObjects[i]);
+//					} else if (playerPreSelected.Remove(selectableObjects[i]) || ennemyPreSelected.Remove(selectableObjects[i])) {
+//						selectableObjects[i].GetComponent<HealthBar>().HideHealthBar();
+//					}
+//				}
+//				if (playerPreSelected.Count > 0) {
+//					foreach (var unit in playerPreSelected) {
+//						unit.GetComponent<HealthBar>().ShowHealthBar();
+//					}
+//					foreach (var unit in ennemyPreSelected) {
+//						unit.GetComponent<HealthBar>().HideHealthBar();
+//					}
+//					ennemyPreSelected.Clear();
+//				} else if (ennemyPreSelected.Count > 0) {
+//					foreach (var unit in ennemyPreSelected) {
+//						unit.GetComponent<HealthBar>().ShowHealthBar();
+//					}
+//					foreach (var unit in playerPreSelected) {
+//						unit.GetComponent<HealthBar>().HideHealthBar();
+//					}
+//					playerPreSelected.Clear();
+//				}
+//			}
+//			if (timeLeftBeforeDragging <= 0f) {
+//				isDragging = true;
+//			}
+//		}
 
 		protected override void Start() {
 			selectedObjects = new List<GameObject>[NetworkAPI.maxConnection];
@@ -81,17 +80,7 @@ namespace KingdomsRebellion.Core.Player {
 			selectableObjects = new List<GameObject>();
 			foreach (Transform child in transform) {
 				selectableObjects.Add(child.gameObject);
-
-				// TEST add game objects in FlatGrid
-				if (child.position.x >= 0 && child.position.z >= 0) {
-//					Vec2 modelPosition = Vec2.FromVector3(child.position);
-//					Debug.Log("Add unit on (" + modelPosition.X + ", " + modelPosition.Y + ")");
-//					KRFacade.GetMap().Add(child.gameObject.GetComponent<Unit>());
-				}
 			}
-			timeLeftBeforeDragging = .15f;
-			isDragging = false;
-			playerColor = Color.blue;
 			playerPreSelected = new List<GameObject>();
 			ennemyPreSelected = new List<GameObject>();
 		}
@@ -102,18 +91,19 @@ namespace KingdomsRebellion.Core.Player {
 			} else if (ennemyPreSelected.Count > 0) {
 				selectedObjects[playerID] = ennemyPreSelected;
 			}
-			if (!isDragging) {
-				foreach (var unit in selectedObjects[playerID]) {
-					unit.GetComponent<HealthBar>().ShowHealthBar();
-				}
-			}
+//			if (!isDragging) {
+//				foreach (var unit in selectedObjects[playerID]) {
+//					unit.GetComponent<HealthBar>().ShowHealthBar();
+//				}
+//			}
 			ApplySelection(playerID);
 		}
 
 		protected override void ApplySelection(int playerID) {
-			if (playerID == NetworkAPI.PlayerId && selectedObjects[playerID].Count == 1) { // show healthbar for selection of one unit
-				selectedObjects[playerID][0].GetComponent<HealthBar>().ShowHealthBar();
-			}
+//			if (playerID == NetworkAPI.PlayerId && selectedObjects[playerID].Count == 1) { // show healthbar for selection of one unit
+//				selectedObjects[playerID][0].GetComponent<HealthBar>().ShowHealthBar();
+//			}
+			foreach (var o in selectedObjects[playerID]) { o.GetComponent<HealthBar>().ShowHealthBar(); }
 			if (OnSelection != null) {
 				OnSelection(playerID, selectedObjects[playerID]);
 			}
@@ -121,7 +111,6 @@ namespace KingdomsRebellion.Core.Player {
 
 		protected override void ApplyDeselection(int playerID) {
 			foreach (var go in selectedObjects[playerID]) {
-                // ATTENTION: if testing on one computer, selected units died only on one side.
 				go.GetComponent<HealthBar>().HideHealthBar();
 			}
 		}
@@ -135,12 +124,5 @@ namespace KingdomsRebellion.Core.Player {
 				ennemyPreSelected.Remove(go);
 			}
 		}
-
-
-		// TODO EventCondutor inheritance check
-		protected override void OnModelSelect(int player, Vec3 modelPosition) {
-			base.OnModelSelect(player, modelPosition);
-		}
-
 	}
 }

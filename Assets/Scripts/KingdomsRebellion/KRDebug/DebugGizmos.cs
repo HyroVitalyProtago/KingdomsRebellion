@@ -2,6 +2,8 @@
 using KingdomsRebellion.Core.Map;
 using KingdomsRebellion.Core.Model;
 using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace KingdomsRebellion.KRDebug {
 
@@ -12,6 +14,7 @@ namespace KingdomsRebellion.KRDebug {
 
 		void OnDrawGizmos() {
 			_map.Walk(DrawNode);
+			DrawWalkedNodes();
 		}
 
 		void DrawNode(QuadTreeNode<Unit> node) {
@@ -27,5 +30,16 @@ namespace KingdomsRebellion.KRDebug {
 			Gizmos.DrawLine(p1, p1 - new Vector3(.1f, 0, node.Height-.2f));
 		}
 
+		void DrawWalkedNodes() {
+			Gizmos.color = Color.magenta;
+			foreach (var x in KRFacade.walkedNode) {
+				Gizmos.DrawWireCube(x.ToVector3() + Vector3.one*.5f, Vector3.one);
+			}
+
+			Gizmos.color = Color.red;
+			foreach (var x in KRFacade.walkedFind) {
+				Gizmos.DrawWireCube(x.ToVector3() + Vector3.one*.5f, Vector3.one);
+			}
+		}
 	}
 }

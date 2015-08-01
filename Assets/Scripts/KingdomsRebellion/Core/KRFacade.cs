@@ -1,44 +1,134 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using KingdomsRebellion.AI;
-using KingdomsRebellion.Core.FSM;
+﻿using System.Linq;
+using UnityEngine;
+using System.Collections.Generic;
+using KingdomsRebellion.Inputs;
+using KingdomsRebellion.Core.Model;
 using KingdomsRebellion.Core.Map;
 using KingdomsRebellion.Core.Math;
-using KingdomsRebellion.Core.Model;
-using KingdomsRebellion.Inputs;
-using UnityEngine;
+using KingdomsRebellion.AI;
+using KingdomsRebellion.Core.FSM;
+using System;
+using System.Diagnostics;
 
 namespace KingdomsRebellion.Core {
 	public class KRFacade : KRObject {
 
-		static InputNetworkAdapter InputNetworkAdapter;
-		static IMap<QuadTreeNode<Unit>,Unit> Map;
+		static readonly InputNetworkAdapter _InputNetworkAdapter;
+		static readonly IMap<QuadTreeNode<Unit>,Unit> _Map;
 
 		static KRFacade() {
-			InputNetworkAdapter = new InputNetworkAdapter();
-			Map = new QuadTree<Unit>(256, 256) as IMap<QuadTreeNode<Unit>,Unit>;
+			_InputNetworkAdapter = new InputNetworkAdapter();
+			_Map = new QuadTree<Unit>(256, 256);
 		}
 
-		public static IMap<QuadTreeNode<Unit>,Unit> GetMap() { return Map; }
+		public static IMap<QuadTreeNode<Unit>,Unit> GetMap() { return _Map; }
 
 		public static IEnumerable<QuadTreeNode<Unit>> FindPath(Vec2 start, Vec2 target) {
-			return Pathfinding<QuadTreeNode<Unit>>.FindPath(Map.FindNode(start), Map.FindNode(target))
+			return Pathfinding<QuadTreeNode<Unit>>.FindPath(_Map.FindNode(start), _Map.FindNode(target))
 				.Select(abstractNode => abstractNode.WrappedNode());
 		}
 
 		public static void UpdateGame() {
-			foreach (Unit unit in Map) {
+			foreach (Unit unit in _Map) {
                 unit.GetComponent<FiniteStateMachine>().UpdateGame();
 		    }
 		}
 
 		public static GameObject Find(Vec2 v) {
-			Unit u = Map.Find(v);
+			Unit u = _Map.Find(v);
 			return (u == null) ? null : u.gameObject;
 		}
 
+		public static IList<Vec2> walkedNode = new List<Vec2>();
+		public static IList<Vec2> walkedFind = new List<Vec2>();
+		/// <summary>
+		/// Find all gameObjects in the rect define by v1 and v2 and v3.
+		/// </summary>
+		public static IEnumerable<GameObject> Find(Vec2 v1, Vec2 v2, Vec2 v3) {
+			Stopwatch stopwatch = new Stopwatch();
+			stopwatch.Start();
+
+			Vec2 v4 = v2 - (v3 - v1);
+			walkedFind.Clear();
+			walkedFind.Add(v1);
+			walkedFind.Add(v2);
+			walkedFind.Add(v3);
+			walkedFind.Add(v4);
+
+			// bottomLeft, bottomRight, topLeft, topRight
+			Vec2[] vecs = { v1,v2,v3,v4 };
+			Array.Sort<Vec2>(vecs);
+			Vec2[] verts = { vecs[3], vecs[1], vecs[2], vecs[0] };
+			Vec2 bottomLeft = vecs[0], bottomRight = vecs[2], topLeft = vecs[1], topRight = vecs[3];
+
+			// boundBottomLeft, boundBottomRight, boundTopLeft, boundTopRight
+			IEnumerable<int> xs = vecs.Select(v => v.X);
+			IEnumerable<int> ys = vecs.Select(v => v.Y);
+
+			int minXS = xs.Min();
+			int maxXS = xs.Max();
+			int minYS = ys.Min();
+			int maxYS = ys.Max();
+
+			walkedNode.Clear();
+
+			Func<Vec2,Vec2,IList<Vec2>> _getLine = delegate(Vec2 orig, Vec2 dest) {
+				IList<Vec2> d = new List<Vec2>();
+				d.Add(orig);
+				Bresenham.Line(orig.X, orig.Y, dest.X, dest.Y, delegate(int x, int y) {
+					d.Add(new Vec2(x, y));
+					return true;
+				});
+				return d;
+			};
+
+			IList<Vec2> bltp = _getLine(bottomLeft, topLeft);
+			IList<Vec2> tltr = _getLine(topLeft, topRight);
+			IList<Vec2> trbr = _getLine(topRight, bottomRight);
+			IList<Vec2> brbl = _getLine(bottomRight, bottomLeft);
+
+			UnityEngine.Debug.ClearDeveloperConsole();
+
+			// FIXME
+			Func<Vec2,bool> _in = delegate(Vec2 v) {
+				int x = v.X, y = v.Y;
+				int ax = bottomLeft.X, bx = topLeft.X, cx = topRight.X , dx = bottomRight.X;
+				int ay = bottomLeft.Y, by = topLeft.Y, cy = topRight.Y , dy = bottomRight.Y;
+				int ex=bx-ax, ey=by-ay, fx=dx-ax, fy=dy-ay;
+				
+				if ((x-ax) * ex + (y-ay) * ey < 0) return false;
+				if ((x-bx) * ex + (y-by) * ey > 0) return false;
+				if ((x-ax) * fx + (y-ay) * fy < 0) return false;
+				if ((x-dx) * fx + (y-dy) * fy > 0) return false;
+				
+				return true;
+			};
+			Func<Vec2,bool> _on = delegate(Vec2 v) {
+				return bltp.Contains(v) || tltr.Contains(v) || trbr.Contains(v) || brbl.Contains(v);
+			};
+
+			List<GameObject> gos = new List<GameObject>();
+
+			Unit u;
+			for (int x = minXS; x < maxXS; ++x) {
+				for (int y = minYS; y < maxYS; ++y) {
+					Vec2 c = new Vec2(x,y);
+					if (_in(c) || _on(c)) {
+						walkedNode.Add(c);
+						u = _Map.Find(c);
+						if (u != null) { gos.Add(u.gameObject); }
+					}
+				}
+			}
+
+			stopwatch.Stop();
+			UnityEngine.Debug.Log(String.Format("DragFind :: time elapsed: {0}", stopwatch.Elapsed));
+
+			return gos;
+		}
+
 		public static IEnumerable<GameObject> Around(Vec2 v, int maxDist) {
-			return Map.ToList().Where(u => u.Pos.Dist(v) <= maxDist).Select(u => u.gameObject);
+			return _Map.ToList().Where(u => u.Pos.Dist(v) <= maxDist).Select(u => u.gameObject);
 		}
 	}
 }
