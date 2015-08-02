@@ -15,18 +15,21 @@ namespace KingdomsRebellion.Core.Components {
 
 		public int __speed;
 		
-		public GameObject Follow { get; set; }
-		public Vec2 Target { get; set; }
+		public KRTransform Followee { get; private set; }
+		public Vec2 Target { get; private set; }
 		public int Speed { get; private set; }
 
 		KRTransform _krtransform;
 		IEnumerable<QuadTreeNode<KRGameObject>> _waypoints;
 		int _currentFrame;
 
+#if UNITY_EDITOR
+		IList<Vec2> __way = new List<Vec2>();
+		List<QuadTreeNode<KRGameObject>> __waynodes = new List<QuadTreeNode<KRGameObject>>();
+#endif
+
 		void Awake() {
 			_krtransform = GetComponent<KRTransform>();
-			Follow = null;
-			Target = null;
 			Speed = __speed;
 		}
 
@@ -34,8 +37,8 @@ namespace KingdomsRebellion.Core.Components {
 			_currentFrame = 0;
 		}
 
-		int _test;
 		public void UpdateGame() {
+			if (Followee != null) { Target = Followee.Pos; }
 			if (Target == null || _krtransform.Pos == Target) { return; }
 
 			if (_currentFrame > 0) {
@@ -46,7 +49,8 @@ namespace KingdomsRebellion.Core.Components {
 			}
 
 			_waypoints = KRFacade.FindPath(_krtransform.Pos, Target);
-			_waypoints.ToList().ForEach(delegate(QuadTreeNode<KRGameObject> w) { if (!test3.Contains(w)) test3.Add(w); });
+			__waynodes.AddRange(_waypoints.Where(w => !__waynodes.Contains(w)));
+
 			if (_waypoints == null) {
 				Target = null;
 			} else {
@@ -56,12 +60,8 @@ namespace KingdomsRebellion.Core.Components {
 				if (!_waypoints.Any()) {
 					nextPos = Target;
 				} else {
-
-					int guard = 1000;
-					// TEST
 					bool canTraceStraightLine = true;
 					do {
-						if (--guard < 0) { Debug.LogError("Infinite loop"); break; }
 						node = _waypoints.ElementAtOrDefault(1);
 						nextPos = (node == null) ? Target : node.Pos;
 						Bresenham.Line(_krtransform.Pos.X, _krtransform.Pos.Y, nextPos.X, nextPos.Y, delegate(int x, int y) {
@@ -83,7 +83,6 @@ namespace KingdomsRebellion.Core.Components {
 				}
 
 				var lt = new List<Vec2>();
-				test2.Add(lt);
 
 				Bresenham.Line(_krtransform.Pos.X, _krtransform.Pos.Y, nextPos.X, nextPos.Y, delegate(int x, int y) {
 					if (lt.Count == 0) {
@@ -96,34 +95,45 @@ namespace KingdomsRebellion.Core.Components {
 					KRFacade.GetMap().Remove(GetComponent<KRGameObject>());
 					_krtransform.Pos = nextPos;
 					KRFacade.GetMap().Add(GetComponent<KRGameObject>());
-					test.Add(_krtransform.Pos);
+#if UNITY_EDITOR
+					__way.Add(_krtransform.Pos);
+#endif
 				} else {
 					_waypoints = null;
 					Target = null;
-					Follow = null;
+					Followee = null;
 				}
 			}
 		}
 
-		IList<Vec2> test = new List<Vec2>();
-		List<List<Vec2>> test2 = new List<List<Vec2>>();
-		List<QuadTreeNode<KRGameObject>> test3 = new List<QuadTreeNode<KRGameObject>>();
-
-		public void Move(int player, Vec3 targetv3) {
-			Vec2 target = targetv3.ToVec2();
-
-			if (_krtransform.PlayerID != player || _krtransform.Pos == target) { return; }
-			if (Target == null) { _test = 8; }
-			Target = target;
-
-			test.Clear();
-			test.Add(_krtransform.Pos);
-			test2.Clear();
-			test3.Clear();
+		public bool HaveTarget() {
+			return Target != null;
 		}
 
+		public void Move(Vec2 target) {
+			if (_krtransform.Pos == target) { return; }
+			if (Target == null) { _currentFrame = Speed; }
+			Target = target;
+
+#if UNITY_EDITOR
+			__way.Clear();
+			__way.Add(_krtransform.Pos);
+			__waynodes.Clear();
+#endif
+		}
+
+		public void Follow(KRGameObject kgo) {
+			Follow(kgo.GetComponent<KRTransform>());
+		}
+
+		public void Follow(KRTransform kt) {
+			Followee = kt;
+			Move(kt.Pos);
+		}
+
+#if UNITY_EDITOR
 		void OnDrawGizmos() {
-			test3.ToList().ForEach(delegate(QuadTreeNode<KRGameObject> n) {
+			__waynodes.ToList().ForEach(delegate(QuadTreeNode<KRGameObject> n) {
 				Gizmos.color = new Color(((float)n.Width)/10f, .2f, ((float)n.Height)/10f);
 				if (n.Width == 1)
 					Gizmos.DrawCube((new Vector3(n.Pos.X,0,n.Pos.Y)).Adjusted(), new Vector3(n.Width,.01f,n.Height));
@@ -131,17 +141,11 @@ namespace KingdomsRebellion.Core.Components {
 					Gizmos.DrawCube(new Vector3(n.Pos.X,0,n.Pos.Y), new Vector3(n.Width,.01f,n.Height));
 			});
 
-			Gizmos.color = Color.gray;
-			test2.ToList().ForEach(delegate(List<Vec2> l) {
-				for (int i = 0; i < l.Count()-1; ++i) {
-					Gizmos.DrawLine(l[i].ToVector3().Adjusted(), l[i+1].ToVector3().Adjusted());
-				}
-			});
-
 			Gizmos.color = Color.red;
-			for (int i = 0; i < test.Count()-1; ++i)  {
-				Gizmos.DrawLine(test[i].ToVector3().Adjusted(), test[i+1].ToVector3().Adjusted());
+			for (int i = 0; i < __way.Count-1; ++i)  {
+				Gizmos.DrawLine(__way[i].ToVector3().Adjusted(), __way[i+1].ToVector3().Adjusted());
 			}
 		}
+#endif
 	}
 }

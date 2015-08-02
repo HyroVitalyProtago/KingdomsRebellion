@@ -12,6 +12,7 @@ using KingdomsRebellion.Inputs;
 namespace KingdomsRebellion.Core {
 	public static class KRFacade {
 
+		public static readonly Transform Dynamics;
 		static readonly InputNetworkAdapter _InputNetworkAdapter;
 		static readonly IMap<QuadTreeNode<KRGameObject>,KRGameObject> _Map;
 
@@ -23,6 +24,7 @@ namespace KingdomsRebellion.Core {
 		static KRFacade() {
 			_InputNetworkAdapter = new InputNetworkAdapter();
 			_Map = new QuadTree<KRGameObject>(256, 256);
+			Dynamics = GameObject.Find("/Dynamics/KRGameObjects").transform;
 
 #if !UNITY_EDITOR
 			EventConductor.On(typeof(KRFacade), "OnKRDrawGizmos");

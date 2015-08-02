@@ -24,6 +24,8 @@ namespace KingdomsRebellion.Core.Components {
 			PlayerID = __playerID;
 			Pos = Vec2.FromVector3(transform.position);
 			Size = new Vec2(__sizeX, __sizeY);
+
+			KRFacade.GetMap().Add(gameObject);
 		}
     }
 }
