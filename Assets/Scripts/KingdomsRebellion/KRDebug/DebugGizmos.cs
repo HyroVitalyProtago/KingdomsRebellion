@@ -1,45 +1,32 @@
-﻿using KingdomsRebellion.Core;
-using KingdomsRebellion.Core.Map;
-using KingdomsRebellion.Core.Model;
+﻿using System;
 using UnityEngine;
-using System.Collections.Generic;
-using System.Linq;
+using KingdomsRebellion.Core;
+using KingdomsRebellion.Core.Map;
 
 namespace KingdomsRebellion.KRDebug {
 
-	[ExecuteInEditMode]
 	public class DebugGizmos : KRBehaviour {
+
+		static event Action OnKRDrawGizmos;
 
         static IMap<QuadTreeNode<KRGameObject>, KRGameObject> _map = KRFacade.GetMap();
 
+        void Awake() {
+        	Offer("OnKRDrawGizmos");
+        }
+
 		void OnDrawGizmos() {
+			if (OnKRDrawGizmos != null) { OnKRDrawGizmos(); }
 			_map.Walk(DrawNode);
-			DrawWalkedNodes();
 		}
 
-        void DrawNode(QuadTreeNode<KRGameObject> node) {
-			if (node.IsFree()) {
-				Gizmos.color = Color.blue;
-			} else {
-				Gizmos.color = Color.green;
-			}
-			Vector3 p0 = node.BottomLeft.ToVector3(), p1 = node.TopRight.ToVector3();
-			Gizmos.DrawLine(p0, p0 + new Vector3(node.Width-.2f, 0, .1f));
-			Gizmos.DrawLine(p0, p0 + new Vector3(.1f, 0, node.Height-.2f));
-			Gizmos.DrawLine(p1, p1 - new Vector3(node.Width-.2f, 0, .1f));
-			Gizmos.DrawLine(p1, p1 - new Vector3(.1f, 0, node.Height-.2f));
-		}
-
-		void DrawWalkedNodes() {
-			Gizmos.color = Color.magenta;
-			foreach (var x in KRFacade.walkedNode) {
-				Gizmos.DrawWireCube(x.ToVector3() + Vector3.one*.5f, Vector3.one);
-			}
-
-			Gizmos.color = Color.red;
-			foreach (var x in KRFacade.walkedFind) {
-				Gizmos.DrawWireCube(x.ToVector3() + Vector3.one*.5f, Vector3.one);
-			}
+        void DrawNode(QuadTreeNode<KRGameObject> n) {
+			Gizmos.color = n.IsFree() ? Color.blue : Color.green;
+			Vector3 p0 = n.BottomLeft.ToVector3(), p1 = n.TopRight.ToVector3();
+			Gizmos.DrawLine(p0, p0 + new Vector3(n.Width-.2f, 0, .1f));
+			Gizmos.DrawLine(p0, p0 + new Vector3(.1f, 0, n.Height-.2f));
+			Gizmos.DrawLine(p1, p1 - new Vector3(n.Width-.2f, 0, .1f));
+			Gizmos.DrawLine(p1, p1 - new Vector3(.1f, 0, n.Height-.2f));
 		}
 	}
 }

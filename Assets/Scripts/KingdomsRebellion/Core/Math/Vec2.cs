@@ -1,6 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using UnityEngine;
-using System;
 
 namespace KingdomsRebellion.Core.Math {
 

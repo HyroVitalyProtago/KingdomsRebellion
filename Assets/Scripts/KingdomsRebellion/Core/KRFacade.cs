@@ -1,24 +1,32 @@
-﻿using System.Linq;
-using UnityEngine;
+﻿using System;
 using System.Collections.Generic;
-using KingdomsRebellion.Inputs;
-using KingdomsRebellion.Core.Model;
-using KingdomsRebellion.Core.Map;
-using KingdomsRebellion.Core.Math;
+using System.Diagnostics;
+using System.Linq;
+using UnityEngine;
 using KingdomsRebellion.AI;
 using KingdomsRebellion.Core.FSM;
-using System;
-using System.Diagnostics;
+using KingdomsRebellion.Core.Map;
+using KingdomsRebellion.Core.Math;
+using KingdomsRebellion.Inputs;
 
 namespace KingdomsRebellion.Core {
-	public class KRFacade : KRObject {
+	public static class KRFacade {
 
 		static readonly InputNetworkAdapter _InputNetworkAdapter;
 		static readonly IMap<QuadTreeNode<KRGameObject>,KRGameObject> _Map;
 
+#if !UNITY_EDITOR
+		static IList<Vec2> __walkedNode = new List<Vec2>();
+		static IList<Vec2> __walkedFind = new List<Vec2>();
+#endif
+
 		static KRFacade() {
 			_InputNetworkAdapter = new InputNetworkAdapter();
 			_Map = new QuadTree<KRGameObject>(256, 256);
+
+#if !UNITY_EDITOR
+			EventConductor.On(typeof(KRFacade), "OnKRDrawGizmos");
+#endif
 		}
 
 		public static IMap<QuadTreeNode<KRGameObject>,KRGameObject> GetMap() { return _Map; }
@@ -42,8 +50,6 @@ namespace KingdomsRebellion.Core {
 			return (u == null) ? null : u.gameObject;
 		}
 
-		public static IList<Vec2> walkedNode = new List<Vec2>();
-		public static IList<Vec2> walkedFind = new List<Vec2>();
 		/// <summary>
 		/// Find all gameObjects in the rect define by v1 and v2 and v3.
 		/// </summary>
@@ -52,11 +58,15 @@ namespace KingdomsRebellion.Core {
 			stopwatch.Start();
 
 			Vec2 v4 = v2 - (v3 - v1);
-			walkedFind.Clear();
-			walkedFind.Add(v1);
-			walkedFind.Add(v2);
-			walkedFind.Add(v3);
-			walkedFind.Add(v4);
+
+#if !UNITY_EDITOR
+			__walkedNode.Clear();
+			__walkedFind.Clear();
+			__walkedFind.Add(v1);
+			__walkedFind.Add(v2);
+			__walkedFind.Add(v3);
+			__walkedFind.Add(v4);
+#endif
 
 			// bottomLeft, bottomRight, topLeft, topRight
 			Vec2[] vecs = { v1,v2,v3,v4 };
@@ -73,8 +83,6 @@ namespace KingdomsRebellion.Core {
 			int minYS = ys.Min();
 			int maxYS = ys.Max();
 
-			walkedNode.Clear();
-
 			Func<Vec2,Vec2,IList<Vec2>> _getLine = delegate(Vec2 orig, Vec2 dest) {
 				IList<Vec2> d = new List<Vec2>();
 				d.Add(orig);
@@ -90,13 +98,11 @@ namespace KingdomsRebellion.Core {
 			IList<Vec2> trbr = _getLine(topRight, bottomRight);
 			IList<Vec2> brbl = _getLine(bottomRight, bottomLeft);
 
-			UnityEngine.Debug.ClearDeveloperConsole();
-
 			// FIXME
 			Func<Vec2,bool> _in = delegate(Vec2 v) {
 				int x = v.X, y = v.Y;
-				int ax = bottomLeft.X, bx = topLeft.X, cx = topRight.X , dx = bottomRight.X;
-				int ay = bottomLeft.Y, by = topLeft.Y, cy = topRight.Y , dy = bottomRight.Y;
+				int ax = bottomLeft.X, bx = topLeft.X, dx = bottomRight.X;
+				int ay = bottomLeft.Y, by = topLeft.Y, dy = bottomRight.Y;
 				int ex=bx-ax, ey=by-ay, fx=dx-ax, fy=dy-ay;
 				
 				if ((x-ax) * ex + (y-ay) * ey < 0) return false;
@@ -117,7 +123,9 @@ namespace KingdomsRebellion.Core {
 				for (int y = minYS; y < maxYS; ++y) {
 					Vec2 c = new Vec2(x,y);
 					if (_in(c) || _on(c)) {
-						walkedNode.Add(c);
+#if !UNITY_EDITOR
+						__walkedNode.Add(c);
+#endif
 						u = _Map.Find(c);
 						if (u != null) { gos.Add(u.gameObject); }
 					}
@@ -133,5 +141,19 @@ namespace KingdomsRebellion.Core {
 		public static IEnumerable<GameObject> Around(Vec2 v, int maxDist) {
 			return _Map.ToList().Where(u => u.Pos.Dist(v) <= maxDist).Select(u => u.gameObject);
 		}
+
+#if !UNITY_EDITOR
+		static void OnKRDrawGizmos() {
+			Gizmos.color = Color.magenta;
+			foreach (var x in __walkedNode) {
+				Gizmos.DrawWireCube(x.ToVector3() + Vector3.one*.5f, Vector3.one);
+			}
+
+			Gizmos.color = Color.red;
+			foreach (var x in __walkedFind) {
+				Gizmos.DrawWireCube(x.ToVector3() + Vector3.one*.5f, Vector3.one);
+			}
+		}
+#endif
 	}
 }

@@ -1,4 +1,4 @@
-﻿using KingdomsRebellion.Core.Model;
+﻿using System;
 using KingdomsRebellion.Core.Player;
 using UnityEngine;
 
@@ -15,15 +15,15 @@ namespace KingdomsRebellion.Core.FSM {
             Debug.Log("Encore du travail ?");
         }
 
-        public override void Execute() {
+        public override Type Execute() {
             Debug.Log(_movement.Target);
 			if (_movement._Follow) _movement.Target = _movement._Follow.GetComponent<KRGameObject>().Pos;
             if (_movement.Target == null || _movement.Pos == _movement.Target) {
-                fsm.PopState();
-                return;
+                return null;
             }
             Debug.Log("tiptap");
             _movement.UpdateGame();
+            return GetType();
         }
 
         public override void Exit() {

@@ -4,7 +4,7 @@ using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Core.Player;
 using UnityEngine;
 
-namespace KingdomsRebellion.Core.Model {
+namespace KingdomsRebellion.Core {
     public class KRGameObject : KRBehaviour, IPos, HaveRadius {
         public virtual Vec2 Pos { get; protected set; }
         public virtual int Radius { get; protected set; }

@@ -2,24 +2,22 @@
 
 namespace KingdomsRebellion.Core.Player {
 
-	//
-	// Navigation system for RTS
-	// @advice Attach on camera
-	//
-	// TODO: Block player in the map and zoom on the cursor position
+	/// <summary>
+	/// Camera navigation system for RTS
+	/// </summary>
 	public class CameraIso : KRBehaviour {
 
-		public static float ScrollWidth { get { return 1f; } }
-		public static float ScrollHeight { get { return 1f; } }
-		public static float ScrollFactor { get { return .4f; } }
-		public static float ScrollSpeed { get { return 4f; } }
-		public static float ScrollMaxSpeed { get { return 10f; } }
-		public static float RotateAmount { get { return 10f; } }
-		public static float RotateSpeed { get { return 100f; } }
-		public static float MinCameraZoom { get { return 3f; } }
-		public static float MaxCameraZoom { get { return 80f; } }
-		public static float MapWidth { get { return 1000f; } }
-		public static float MapHeigth { get { return 1000f; } }
+		public static float ScrollWidth 	{ get { return 1f; } }
+		public static float ScrollHeight 	{ get { return 1f; } }
+		public static float ScrollFactor 	{ get { return .4f; } }
+		public static float ScrollSpeed 	{ get { return 4f; } }
+		public static float ScrollMaxSpeed 	{ get { return 10f; } }
+		public static float RotateAmount 	{ get { return 10f; } }
+		public static float RotateSpeed 	{ get { return 100f; } }
+		public static float MinCameraZoom 	{ get { return 3f; } }
+		public static float MaxCameraZoom 	{ get { return 80f; } }
+		public static float MapWidth 		{ get { return 1000f; } }
+		public static float MapHeigth 		{ get { return 1000f; } }
 
 		void Start() {
 			Cursor.lockState = CursorLockMode.Confined;
@@ -73,7 +71,11 @@ namespace KingdomsRebellion.Core.Player {
 
 			// calculate desired camera position based on received input
 			Vector3 origin = Camera.main.transform.position;
-			Vector3 destination = new Vector3(Mathf.Clamp(origin.x + movement.x, -MapWidth / 2, MapWidth / 2), origin.y, Mathf.Clamp(origin.z + movement.z, -MapWidth / 2, MapWidth / 2));
+			Vector3 destination = new Vector3(
+				Mathf.Clamp(origin.x + movement.x, -MapWidth / 2, MapWidth / 2),
+				origin.y,
+				Mathf.Clamp(origin.z + movement.z, -MapWidth / 2, MapWidth / 2)
+			);
 
 			if (destination != origin) {
 				Camera.main.transform.position = Vector3.MoveTowards(origin, destination, Time.deltaTime * ScrollMaxSpeed);

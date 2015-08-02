@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Network;
-using KingdomsRebellion.Tools.UI;
+using KingdomsRebellion.UI;
 using UnityEngine;
 
 namespace KingdomsRebellion.Core.Player {
