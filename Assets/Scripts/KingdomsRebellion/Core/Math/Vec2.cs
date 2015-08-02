@@ -66,7 +66,7 @@ namespace KingdomsRebellion.Core.Math {
 		}
 
 		public override bool Equals(object obj) {
-			if ((object)obj == null || !(obj is Vec2)) return false;
+			if (obj == null || !(obj is Vec2)) return false;
 			Vec2 v = obj as Vec2;
 			return X == v.X && Y == v.Y;
 		}

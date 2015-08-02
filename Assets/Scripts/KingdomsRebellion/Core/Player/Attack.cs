@@ -34,17 +34,17 @@ namespace KingdomsRebellion.Core.Player {
         }
 
         private void OnAttack(int playerID, Vec3 modelPoint) {
-			Unit u = KRFacade.GetMap().Find(new Vec2(modelPoint.X, modelPoint.Z));
+            KRGameObject u = KRFacade.GetMap().Find(new Vec2(modelPoint.X, modelPoint.Z));
 			if (u != null) { Target = u.gameObject; }
         }
 
         // TODO remove and replace _isAttacking by _unit.attacking
         public void UpdateGame() {
-			Vec2 targetPos = Target.GetComponent<Unit>().Pos;
-			if (Vec2.Dist(targetPos, gameObject.GetComponent<Unit>().Pos) == 1) {
+            Vec2 targetPos = Target.GetComponent<KRGameObject>().Pos;
+            if (Vec2.Dist(targetPos, gameObject.GetComponent<KRGameObject>().Pos) == 1) {
                 if (attackSpeed == 0) {
                     spot.SetActive(true);
-                    Target.GetComponent<Unit>().OnDamageDone(_unit.AttackType, strength);
+                    Target.GetComponent<KRGameObject>().OnDamageDone(_unit.AttackType, strength);
                     attackSpeed = 8;
                 } else {
                     --attackSpeed;

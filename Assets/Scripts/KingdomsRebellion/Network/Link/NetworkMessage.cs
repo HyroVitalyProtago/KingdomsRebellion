@@ -10,12 +10,12 @@ namespace KingdomsRebellion.Network.Link {
 				return _lockstepTurn.Value; // throw InvalidStateException if null
 			}
 			set {
-				_lockstepTurn = (uint?) value;
+				_lockstepTurn = value;
 			}
 		}
 
 		protected NetworkMessage(uint lockstepTurn) {
-			_lockstepTurn = (uint?) lockstepTurn;
+			_lockstepTurn = lockstepTurn;
 		}
 
 		protected NetworkMessage() {}

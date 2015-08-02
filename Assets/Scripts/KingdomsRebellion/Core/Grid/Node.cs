@@ -37,8 +37,8 @@ namespace KingdomsRebellion.Core.Grid {
 			if (_self) {
 				_self.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Standard"));
 				_self.GetComponent<MeshRenderer>().material.color = new Color(
-				(float)_gCost*.01f,
-				(float)_hCost*.01f,
+				_gCost*.01f,
+				_hCost*.01f,
 				.5f
 			);
 			}

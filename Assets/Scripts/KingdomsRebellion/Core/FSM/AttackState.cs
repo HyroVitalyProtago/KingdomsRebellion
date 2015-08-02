@@ -9,10 +9,11 @@ namespace KingdomsRebellion.Core.FSM {
     public class AttackState : FSMState {
         readonly Attack _attack;
         readonly Unit _unit;
-
+        readonly Movement _movement;
         public AttackState(FiniteStateMachine fsm) : base(fsm) {
             _attack = fsm.GetComponent<Attack>();
             _unit = fsm.GetComponent<Unit>();
+            _movement = fsm.GetComponent<Movement>();
         }
 
         public override void Enter() {
@@ -23,7 +24,7 @@ namespace KingdomsRebellion.Core.FSM {
             if (_attack.Target == null) {
                 IEnumerable<GameObject> gameObjects = KRFacade.Around(_unit.Pos, 6);
                 foreach (var obj in gameObjects) {
-                    if (obj.GetComponent<Unit>().PlayerId != _unit.PlayerId) {
+                    if (obj.GetComponent<KRGameObject>().PlayerId != _unit.PlayerId) {
                         _attack.Target = obj;
                         return;
                     }
@@ -32,19 +33,24 @@ namespace KingdomsRebellion.Core.FSM {
                 return;
             }
 
-            if (_attack.Target.GetComponent<Unit>().PlayerId == _unit.PlayerId) {
+            if (_attack.Target.GetComponent<KRGameObject>().PlayerId == _unit.PlayerId) {
                 fsm.GetComponent<Movement>().Target = Vec2.FromVector3(_attack.Target.transform.position);
                 fsm.PopState();
                 fsm.PushState(new MovementState(fsm), false);
                 return;
             }
-            if (Vec2.Dist(_attack.Target.GetComponent<Unit>().Pos, _unit.Pos) ==
+            Debug.Log(_attack.Target);
+            if (Vec2.Dist(_attack.Target.GetComponent<KRGameObject>().Pos, _unit.Pos) ==
                 _attack.range) {
                 Debug.Log("FRAPPE !");
                 _attack.UpdateGame();
             } else {
-                fsm.GetComponent<Movement>().Follow(_attack.Target);
-                fsm.PushState(new MovementState(fsm), false);
+                if (_movement != null) {
+                    _movement.Follow(_attack.Target);
+                    fsm.PushState(new MovementState(fsm), false);
+                } else {
+                    fsm.PopState();
+                }
             }
         }
 

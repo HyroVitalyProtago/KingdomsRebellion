@@ -86,9 +86,6 @@ namespace KingdomsRebellion.Network {
 				if (turn <= 2 && actions[turn][playerID] == null) {
 					actions[turn][playerID] = action;
 					++numberOfPlayerWhoSendAction[turn];
-				} else {
-					// NetworkUI.Log("Action allready received for LockstepTurn " + action.LockStepTurn);
-					// NetworkUI.Log("Maybe my confirmation has not been received...");
 				}
 			}
 

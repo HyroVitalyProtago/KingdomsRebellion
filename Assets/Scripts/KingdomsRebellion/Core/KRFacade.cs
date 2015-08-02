@@ -14,28 +14,31 @@ namespace KingdomsRebellion.Core {
 	public class KRFacade : KRObject {
 
 		static readonly InputNetworkAdapter _InputNetworkAdapter;
-		static readonly IMap<QuadTreeNode<Unit>,Unit> _Map;
+		static readonly IMap<QuadTreeNode<KRGameObject>,KRGameObject> _Map;
 
 		static KRFacade() {
 			_InputNetworkAdapter = new InputNetworkAdapter();
-			_Map = new QuadTree<Unit>(256, 256);
+			_Map = new QuadTree<KRGameObject>(256, 256);
 		}
 
-		public static IMap<QuadTreeNode<Unit>,Unit> GetMap() { return _Map; }
+		public static IMap<QuadTreeNode<KRGameObject>,KRGameObject> GetMap() { return _Map; }
 
-		public static IEnumerable<QuadTreeNode<Unit>> FindPath(Vec2 start, Vec2 target) {
-			return Pathfinding<QuadTreeNode<Unit>>.FindPath(_Map.FindNode(start), _Map.FindNode(target))
+        public static IEnumerable<QuadTreeNode<KRGameObject>> FindPath(Vec2 start, Vec2 target) {
+            return Pathfinding<QuadTreeNode<KRGameObject>>.FindPath(_Map.FindNode(start), _Map.FindNode(target))
 				.Select(abstractNode => abstractNode.WrappedNode());
 		}
 
 		public static void UpdateGame() {
-			foreach (Unit unit in _Map) {
-                unit.GetComponent<FiniteStateMachine>().UpdateGame();
-		    }
+            foreach (KRGameObject unit in _Map) {
+                FiniteStateMachine fsm = unit.GetComponent<FiniteStateMachine>();
+                if (fsm != null) {
+                    fsm.UpdateGame();
+                }
+            }
 		}
 
 		public static GameObject Find(Vec2 v) {
-			Unit u = _Map.Find(v);
+            KRGameObject u = _Map.Find(v);
 			return (u == null) ? null : u.gameObject;
 		}
 
@@ -109,7 +112,7 @@ namespace KingdomsRebellion.Core {
 
 			List<GameObject> gos = new List<GameObject>();
 
-			Unit u;
+			KRGameObject u;
 			for (int x = minXS; x < maxXS; ++x) {
 				for (int y = minYS; y < maxYS; ++y) {
 					Vec2 c = new Vec2(x,y);

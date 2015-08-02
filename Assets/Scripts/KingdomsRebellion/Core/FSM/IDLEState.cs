@@ -19,7 +19,7 @@ namespace KingdomsRebellion.Core.FSM {
             // TODO IDLE by type of units, here is the code for soldier. Replace 6 by vision sight
 			IEnumerable<GameObject> gameObjects = KRFacade.Around(fsm.GetComponent<Unit>().Pos, 6);
             foreach (var obj in gameObjects) {
-                if (obj.GetComponent<Unit>().PlayerId != fsm.GetComponent<Unit>().PlayerId) {
+                if (obj.GetComponent<KRGameObject>().PlayerId != fsm.GetComponent<Unit>().PlayerId) {
                     fsm.GetComponent<Attack>().Target = obj;
                     fsm.PushState(new AttackState(fsm), false);
                     return;

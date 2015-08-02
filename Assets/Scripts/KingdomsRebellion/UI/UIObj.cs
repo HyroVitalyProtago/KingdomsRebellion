@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
-using KingdomsRebellion.Core.Player;
 using UnityEngine.UI;
 
 namespace KingdomsRebellion.Core.Player {
@@ -24,7 +22,6 @@ namespace KingdomsRebellion.Core.Player {
         }
 
         private void OnMouseExit() {
-            Debug.Log(!_healthBar.IsSelected);
             if (!_healthBar.IsSelected) {
                 _healthContainer.SetActive(false);
                 _healthBar.enabled = false;

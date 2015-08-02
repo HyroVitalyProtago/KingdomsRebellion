@@ -17,7 +17,7 @@ namespace KingdomsRebellion.Network.Link {
                 return AttackAction.FromBytes(data);
             }
 
-			throw new ArgumentException("GameActionFactory :: Get : data type don't correspond a known GameAction");
+		    throw new ArgumentException("GameActionFactory :: Get : data type don't correspond a known GameAction");
 		}
 	}
 }

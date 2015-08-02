@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Core.Player;
+using UnityEngine;
 
 namespace KingdomsRebellion.Core.FSM {
 
     public class FiniteStateMachine : KRBehaviour {
         private Stack<FSMState> _stack;
 
-        public void Start() {
+        public void Awake() {
             _stack = new Stack<FSMState>();
             _stack.Push(new IDLEState(this));
         }
