@@ -1,11 +1,10 @@
 ﻿using System;
-using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
+using KingdomsRebellion.Core.Components;
 using KingdomsRebellion.Core.FSM;
-using KingdomsRebellion.Core.Interfaces;
 using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Core.Player;
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace KingdomsRebellion.Core.Model {
@@ -15,6 +14,7 @@ namespace KingdomsRebellion.Core.Model {
         Vec2 _spawnPoint;
         Vec2 _rallyPoint;
         GameObject _mouse;
+        KRHealth _krHealth;
         public override Vec2 Pos { get; protected set; }
 
         public override int Radius {
@@ -33,11 +33,11 @@ namespace KingdomsRebellion.Core.Model {
             _spawnPoint = Pos + 2* Vec2.One;
             KRFacade.GetMap().Add(this);
             AddSpawnable("Prefabs/UnitBlue");
-            lifeMax = 100;
-            life = 100;
-            defense = 10;
-            AttackType = AttackTypeEnum.Arrow;
-            weakness = AttackTypeEnum.Sword;
+            _krHealth = GetComponent<KRHealth>();
+            _krHealth.LifeMax = 100;
+            _krHealth.Defense = 10;
+            //GetComponent<KRAttack>().AttackType = AttackTypeEnum.Arrow;
+            _krHealth.Weakness = AttackTypeEnum.Sword;
         }
 
         public void AddSpawnable(String path) {

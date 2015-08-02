@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-using KingdomsRebellion.Core;
-using KingdomsRebellion.Core.Math;
+﻿using KingdomsRebellion.Core.Math;
 
 namespace KingdomsRebellion.Core.Components {
 
