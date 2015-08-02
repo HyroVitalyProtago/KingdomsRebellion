@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Core.Player;
+using KingdomsRebellion.Core.Components;
 
 namespace KingdomsRebellion.Core.FSM {
 
@@ -54,12 +55,12 @@ namespace KingdomsRebellion.Core.FSM {
             }
         }
 
-        public void Move(int playerId, Vec3 modelPoint) {
-            GetComponent<Movement>().Move(playerId, modelPoint);
+        public void Move(int playerId, Vec2 modelPoint) {
+            GetComponent<KRMovement>().Move(modelPoint);
             PushState(new MovementState(this), true);
         }
 
-        public void Attack(int playerId, Vec3 modelPoint) {
+        public void Attack(int playerId, Vec2 modelPoint) { // TODO use modelPoint
             PushState(new AttackState(this), true);
         }
     }

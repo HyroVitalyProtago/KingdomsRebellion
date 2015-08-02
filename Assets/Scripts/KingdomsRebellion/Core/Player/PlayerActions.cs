@@ -4,6 +4,7 @@ using KingdomsRebellion.Core.FSM;
 using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Network;
 using UnityEngine;
+using KingdomsRebellion.Core.Components;
 
 namespace KingdomsRebellion.Core.Player {
 	public class PlayerActions : KRBehaviour {
@@ -34,20 +35,20 @@ namespace KingdomsRebellion.Core.Player {
 			_selectedObjects[playerID] = selectedObjects;
 		}
 
-		void OnMove(int playerID, Vec3 modelPoint) {
+		void OnMove(int playerID, Vec2 modelPoint) {
 			for (int i = 0; i < _selectedObjects[playerID].Count; ++i) {
 				_selectedObjects[playerID][i].GetComponent<FiniteStateMachine>().Move(playerID, modelPoint);
 			}
 		}
 
-	    void OnAttack(int playerID, Vec3 modelPoint) {
+	    void OnAttack(int playerID, Vec2 modelPoint) {
             for (int i = 0; i < _selectedObjects[playerID].Count; ++i) {
                 _selectedObjects[playerID][i].GetComponent<FiniteStateMachine>().Attack(playerID, modelPoint);
             }
 	    }
 
 	    public static bool IsMines() {
-	        return _selectedObjects[NetworkAPI.PlayerId].Any(u => u.GetComponent<KRGameObject>().PlayerId == NetworkAPI.PlayerId);
+			return _selectedObjects[NetworkAPI.PlayerId].Any(u => u.GetComponent<KRTransform>().PlayerID == NetworkAPI.PlayerId);
 	    }
 	}
 }

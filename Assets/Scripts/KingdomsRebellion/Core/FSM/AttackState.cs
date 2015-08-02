@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using KingdomsRebellion.Core.Components;
 using KingdomsRebellion.Core.Math;
-using KingdomsRebellion.Core.Model;
 using KingdomsRebellion.Core.Player;
 using UnityEngine;
 
@@ -11,13 +10,13 @@ namespace KingdomsRebellion.Core.FSM {
     public class AttackState : FSMState {
 
         readonly KRAttack _attack;
-        readonly Unit _unit;
-        readonly Movement _movement;
+		readonly KRTransform _krtransform;
+        readonly KRMovement _krmovement;
         
         public AttackState(FiniteStateMachine fsm) : base(fsm) {
             _attack = fsm.GetComponent<KRAttack>();
-            _unit = fsm.GetComponent<Unit>();
-            _movement = fsm.GetComponent<Movement>();
+			_krtransform = fsm.GetComponent<KRTransform>();
+			_krmovement = fsm.GetComponent<KRMovement>();
         }
 
         public override void Enter() {
@@ -26,9 +25,9 @@ namespace KingdomsRebellion.Core.FSM {
 
         public override Type Execute() {
             if (_attack.Target == null) {
-                IEnumerable<GameObject> gameObjects = KRFacade.Around(_unit.Pos, 6);
+				IEnumerable<GameObject> gameObjects = KRFacade.Around(_krtransform.Pos, 6);
                 foreach (var obj in gameObjects) {
-                    if (obj.GetComponent<KRGameObject>().PlayerId != _unit.PlayerId) {
+					if (obj.GetComponent<KRTransform>().PlayerID != _krtransform.PlayerID) {
                         _attack.Target = obj;
                         return null;
                     }
@@ -36,18 +35,18 @@ namespace KingdomsRebellion.Core.FSM {
                 return null;
             }
 
-            if (_attack.Target.GetComponent<KRGameObject>().PlayerId == _unit.PlayerId) {
-                _fsm.GetComponent<Movement>().Target = Vec2.FromVector3(_attack.Target.transform.position);
+			if (_attack.Target.GetComponent<KRTransform>().PlayerID == _krtransform.PlayerID) {
+				_fsm.GetComponent<KRMovement>().Move(_attack.Target.GetComponent<KRTransform>().Pos);
                 return typeof(MovementState);
             }
-            Debug.Log(_attack.Target);
-            if (Vec2.Dist(_attack.Target.GetComponent<KRGameObject>().Pos, _unit.Pos) ==
-                _attack.range) {
+
+			if (Vec2.Dist(_attack.Target.GetComponent<KRTransform>().Pos, _krtransform.Pos) ==
+                _attack.Range) {
                 Debug.Log("FRAPPE !");
                 _attack.UpdateGame();
             } else {
-                if (_movement != null) {
-                    _movement.Follow(_attack.Target);
+				if (_krmovement != null) {
+					_krmovement.Follow(_attack.Target);
                     return typeof(MovementState);
                 }
                 return null;

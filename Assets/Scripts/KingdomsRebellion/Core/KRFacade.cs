@@ -9,13 +9,13 @@ using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Inputs;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+using KingdomsRebellion.Core.Components;
 
 namespace KingdomsRebellion.Core {
 	public static class KRFacade {
 
-		public static readonly Transform Dynamics;
 		static readonly InputNetworkAdapter _InputNetworkAdapter;
-		static readonly IMap<QuadTreeNode<KRGameObject>,KRGameObject> _Map;
+		static readonly IMap<QuadTreeNode<KRTransform>,KRTransform> _Map;
 
 #if !UNITY_EDITOR
 		static IList<Vec2> __walkedNode = new List<Vec2>();
@@ -24,23 +24,22 @@ namespace KingdomsRebellion.Core {
 
 		static KRFacade() {
 			_InputNetworkAdapter = new InputNetworkAdapter();
-			_Map = new QuadTree<KRGameObject>(256, 256);
-			Dynamics = GameObject.Find("/Dynamics/KRGameObjects").transform;
+			_Map = new QuadTree<KRTransform>(256, 256);
 
 #if !UNITY_EDITOR
 			EventConductor.On(typeof(KRFacade), "OnKRDrawGizmos");
 #endif
 		}
 
-		public static IMap<QuadTreeNode<KRGameObject>,KRGameObject> GetMap() { return _Map; }
+		public static IMap<QuadTreeNode<KRTransform>,KRTransform> GetMap() { return _Map; }
 
-        public static IEnumerable<QuadTreeNode<KRGameObject>> FindPath(Vec2 start, Vec2 target) {
-            return Pathfinding<QuadTreeNode<KRGameObject>>.FindPath(_Map.FindNode(start), _Map.FindNode(target))
+		public static IEnumerable<QuadTreeNode<KRTransform>> FindPath(Vec2 start, Vec2 target) {
+			return Pathfinding<QuadTreeNode<KRTransform>>.FindPath(_Map.FindNode(start), _Map.FindNode(target))
 				.Select(abstractNode => abstractNode.WrappedNode());
 		}
 
 		public static void UpdateGame() {
-            foreach (KRGameObject unit in _Map) {
+            foreach (KRTransform unit in _Map) {
                 FiniteStateMachine fsm = unit.GetComponent<FiniteStateMachine>();
                 if (fsm != null) {
                     fsm.UpdateGame();
@@ -49,7 +48,7 @@ namespace KingdomsRebellion.Core {
 		}
 
 		public static GameObject Find(Vec2 v) {
-            KRGameObject u = _Map.Find(v);
+			KRTransform u = _Map.Find(v);
 			return (u == null) ? null : u.gameObject;
 		}
 
@@ -74,7 +73,6 @@ namespace KingdomsRebellion.Core {
 			// bottomLeft, bottomRight, topLeft, topRight
 			Vec2[] vecs = { v1,v2,v3,v4 };
 			Array.Sort<Vec2>(vecs);
-			Vec2[] verts = { vecs[3], vecs[1], vecs[2], vecs[0] };
 			Vec2 bottomLeft = vecs[0], bottomRight = vecs[2], topLeft = vecs[1], topRight = vecs[3];
 
 			// boundBottomLeft, boundBottomRight, boundTopLeft, boundTopRight
@@ -121,7 +119,7 @@ namespace KingdomsRebellion.Core {
 
 			List<GameObject> gos = new List<GameObject>();
 
-			KRGameObject u;
+			KRTransform u;
 			for (int x = minXS; x < maxXS; ++x) {
 				for (int y = minYS; y < maxYS; ++y) {
 					Vec2 c = new Vec2(x,y);

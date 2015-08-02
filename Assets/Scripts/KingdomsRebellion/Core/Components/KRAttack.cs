@@ -10,50 +10,58 @@ namespace KingdomsRebellion.Core.Components {
 
         event Action<GameObject, AttackTypeEnum, int> OnDamageDone;
 
+		public int __strength, __attackSpeed, __range;
+
+		public GameObject Target { get; set; }
+		public AttackTypeEnum AttackType { get; private set; }
+
+		public int Strength { get; private set; }
+		public int AttackSpeed { get; private set; }
+		public int Range { get; private set; }
+
         KRTransform _krTransform;
         KRMovement _krMovement;
-        Vec2 _oldPos;
-        public GameObject Target { get; set; }
-        public AttackTypeEnum AttackType { get; private set; }
-        int _strength;
         GameObject _spot;
-        int _attackSpeed;
-        public bool isDead;
-        public int range;
+		int _currentFrame;
+
+		void Awake() {
+			_krTransform = GetComponent<KRTransform>();
+			_krMovement = GetComponent<KRMovement>();
+			_spot = gameObject.GetComponentInChildren<Light>().gameObject;
+			_spot.SetActive(false);
+
+			On("OnAttack");
+			On("OnUnitDeath");
+
+			Strength = __strength;
+			AttackSpeed = __attackSpeed;
+			Range = __range;
+		}
 
         void Start() {
-            _krTransform = GetComponent<KRTransform>();
-            _krMovement = GetComponent<KRMovement>();
-            _oldPos = _krTransform.Pos;
-            On("OnAttack");
-            On("OnUnitDeath");
-            _spot = gameObject.GetComponentInChildren<Light>().gameObject;
-           // spot.GetComponent<Light>().color = _unit.color;
-            _spot.SetActive(false);
-            _strength = 14;
-            isDead = false;
-            range = 1;
             AttackType = _krTransform.PlayerID == 0 ? AttackTypeEnum.Arrow : AttackTypeEnum.Sword;
+
+			_currentFrame = 0;
         }
 
-        private void OnAttack(int playerID, Vec3 modelPoint) {
-            KRGameObject u = KRFacade.GetMap().Find(new Vec2(modelPoint.X, modelPoint.Z));
+        private void OnAttack(int playerID, Vec2 modelPoint) {
+			KRTransform u = KRFacade.GetMap().Find(modelPoint);
             if (u != null) { Target = u.gameObject; }
         }
 
         public void UpdateGame() {
             Vec2 targetPos = Target.GetComponent<KRTransform>().Pos;
             if (Vec2.Dist(targetPos, gameObject.GetComponent<KRTransform>().Pos) == 1) {
-                if (_attackSpeed == 0) {
+                if (AttackSpeed == 0) {
                     _spot.SetActive(true);
-                    Target.GetComponent<KRHealth>().OnDamageDone(AttackType, _strength);
-                    _attackSpeed = 8;
+                    Target.GetComponent<KRHealth>().OnDamageDone(AttackType, Strength);
+					_currentFrame = AttackSpeed;
                 } else {
-                    --_attackSpeed;
+					--_currentFrame;
                 }
             } else {
 				_krMovement.Move(targetPos);
-                _attackSpeed = 8;
+				_currentFrame = AttackSpeed;
                 _spot.SetActive(false);
             }
         }

@@ -271,21 +271,21 @@ namespace KingdomsRebellion.Network {
 			KRFacade.UpdateGame();
 		}
 
-		void OnModelSelectDemand(Vec3 modelPosition) {
+		void OnModelSelectDemand(Vec2 modelPosition) {
 			// TODO check if the last action is of the same type,
 			// if true, override the previous with it, else, enqueue it
 			actionQueue.Enqueue(new SelectAction(lockstepTurn, modelPosition));
 		}
 
-		void OnModelMoveDemand(Vec3 modelPosition) {
+		void OnModelMoveDemand(Vec2 modelPosition) {
 			actionQueue.Enqueue(new MoveAction(lockstepTurn, modelPosition));
 		}
 
-	    void OnModelAttackDemand(Vec3 modelPosition) {
+		void OnModelAttackDemand(Vec2 modelPosition) {
 	        actionQueue.Enqueue(new AttackAction(lockstepTurn, modelPosition));
 	    }
 
-		void OnModelDragDemand(Vec3 beginModelPosition, Vec3 endModelPosition, Vec3 z) {
+		void OnModelDragDemand(Vec2 beginModelPosition, Vec2 endModelPosition, Vec2 z) {
 			actionQueue.Enqueue(new DragAction(lockstepTurn, beginModelPosition, endModelPosition, z));
 		}
 	}

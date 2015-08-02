@@ -7,7 +7,7 @@ using KingdomsRebellion.Core.Interfaces;
 using KingdomsRebellion.Core.Math;
 
 namespace KingdomsRebellion.Core.Map {
-	public class QuadTree<T> : IMap<QuadTreeNode<T>,T> where T : IPos, HaveRadius {
+	public class QuadTree<T> : IMap<QuadTreeNode<T>,T> where T : IPos, ISize {
 
 		QuadTreeNode<T> _node;
 		IList<T> _objects;

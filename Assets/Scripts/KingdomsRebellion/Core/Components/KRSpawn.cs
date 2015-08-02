@@ -13,6 +13,7 @@ namespace KingdomsRebellion.Core.Components {
 	[RequireComponent(typeof(KRTransform))]
     public class KRSpawn : KRBehaviour {
 
+		Transform _dynamics;
 		KRTransform _krtransform;
 
         Vec2 _spawnPoint;
@@ -26,6 +27,10 @@ namespace KingdomsRebellion.Core.Components {
 		}
 
         void Start() {
+			GameObject go = GameObject.Find("KRGameObjects");
+			if (go == null) { throw new SystemException("KRGameObjects not found in scene"); }
+			_dynamics = go.transform;
+
 			_rallyPoint = _krtransform.Pos + 5 * Vec2.One;
 			_spawnPoint = _krtransform.Pos + 2 * Vec2.One;
         }
@@ -36,9 +41,9 @@ namespace KingdomsRebellion.Core.Components {
 
         public void CreateGameObject(int numObj) {
             if (numObj < _spawnableObjects.Count) {
-                GameObject kgo = Instantiate(_spawnableObjects[numObj], _spawnPoint.ToVector3(), Quaternion.identity) as GameObject;
-				kgo.transform.SetParent(KRFacade.Dynamics);   
-				kgo.GetComponent<FiniteStateMachine>().Move(_krtransform.PlayerID, new Vec3(_rallyPoint.X, 0, _rallyPoint.Y));
+                GameObject kgo = Instantiate(_spawnableObjects[numObj], _spawnPoint.ToVector3().Adjusted(), Quaternion.identity) as GameObject;
+				kgo.transform.SetParent(_dynamics);   
+				kgo.GetComponent<FiniteStateMachine>().Move(_krtransform.PlayerID, _rallyPoint);
             }
         }
 

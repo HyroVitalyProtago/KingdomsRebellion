@@ -1,29 +1,33 @@
 ﻿using KingdomsRebellion.Core.Math;
+using KingdomsRebellion.Core.Interfaces;
+using UnityEngine;
 
 namespace KingdomsRebellion.Core.Components {
 
-    public class KRTransform : KRBehaviour {
+	public class KRTransform : KRBehaviour, IPos, ISize {
     	public int __playerID, __sizeX, __sizeY; // just for Unity Editor
 
-		Vec2 _pos;
+		public int PlayerID { get; private set; }
 		public Vec2 Pos {
 			get {
 				return _pos;
 			}
 			set {
 				_pos = value;
-				transform.position = _pos.ToVector3().Adjusted();
+				Vector3 v = _pos.ToVector3().Adjusted();
+				transform.position = new Vector3(v.x, transform.position.y, v.z);
 			}
 		}
 		public Vec2 Size { get; private set; }
-		public int PlayerID { get; private set; }
+
+		Vec2 _pos;
 
 		void Awake() {
 			PlayerID = __playerID;
 			Pos = Vec2.FromVector3(transform.position);
 			Size = new Vec2(__sizeX, __sizeY);
 
-			KRFacade.GetMap().Add(gameObject);
+			KRFacade.GetMap().Add(this);
 		}
     }
 }

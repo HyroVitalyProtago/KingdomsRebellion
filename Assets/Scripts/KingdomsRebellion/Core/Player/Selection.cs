@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using KingdomsRebellion.Core.Components;
-using KingdomsRebellion.Core.Model;
 using KingdomsRebellion.Network;
 using UnityEngine;
 
@@ -20,7 +19,7 @@ namespace KingdomsRebellion.Core.Player {
 
 			Offer("OnSelection");
 		}
-
+/*
 		void PreSelected(GameObject go) {
 			var unit = go.GetComponent<Unit>();
 			if (unit == null)
@@ -36,7 +35,7 @@ namespace KingdomsRebellion.Core.Player {
 				}
 			}
 		}
-
+*/
 //		protected override void OnUpdateDrag(int playerId, Vector3 originWorldPoint, Camera currentCamera, Vector3 currentMousePousition) {
 //			if (!isDragging) {
 //				timeLeftBeforeDragging -= Time.deltaTime;

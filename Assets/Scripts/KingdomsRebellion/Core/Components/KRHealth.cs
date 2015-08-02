@@ -3,43 +3,50 @@ using UnityEngine;
 using KingdomsRebellion.Core.Player;
 
 namespace KingdomsRebellion.Core.Components {
-
+	
     [RequireComponent(typeof (KRMovement))]
     public class KRHealth : KRBehaviour {
 
+		static event Action<GameObject> OnUnitDeath;
+
+		public int __lifeMax, __defense;
+		public AttackTypeEnum __weakness;
+
         public int Life { get; private set; }
-        public int LifeMax { get; set; }
-        public int Defense { get; set; }
-        public AttackTypeEnum Weakness;
+        public int LifeMax { get; private set; }
+        public int Defense { get; private set; }
+		public AttackTypeEnum Weakness { get; private set; }
 
-        void Start() {
+		static KRHealth() {
+			EventConductor.Offer(typeof(KRHealth), "OnUnitDeath");
+		}
+
+        void Awake() {
+			LifeMax = __lifeMax;
             Life = LifeMax;
+			Defense = __defense;
+			Weakness = __weakness;
         }
-
-        void OnEnable() {
-            EventConductor.Offer(typeof(KRGameObject), "OnUnitDeath");
-        }
-        //Events : 
-        static event Action<GameObject> OnUnitDeath;
-
+        
         public void OnDamageDone(AttackTypeEnum type, int damage) {
             if (Weakness == type) {
                 Life -= Mathf.FloorToInt(1.3f * (damage - Defense));
             } else {
                 Life -= damage - Defense;
             }
-            if (Life <= 0) {
+
+			if (IsDead()) {
                 Destroy(gameObject);
             }
         }
 
+		public bool IsDead() {
+			return Life <= 0;
+		}
+
         void OnDestroy() {
-            KRAttack _attack = GetComponent<KRAttack>();
-            if (_attack != null) {
-                GetComponent<KRAttack>().isDead = true;
-            }
             OnUnitDeath(gameObject);
-            KRFacade.GetMap().Remove(this.GetComponent<KRGameObject>());
+            KRFacade.GetMap().Remove(GetComponent<KRTransform>());
         }
     }
 }
