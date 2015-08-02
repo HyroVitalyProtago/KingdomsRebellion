@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using KingdomsRebellion.UI;
+﻿using KingdomsRebellion.UI;
+using UnityEngine;
 
 namespace KingdomsRebellion.Core.Components {
 

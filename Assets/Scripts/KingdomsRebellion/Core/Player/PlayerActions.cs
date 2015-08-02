@@ -2,7 +2,6 @@
 using System.Linq;
 using KingdomsRebellion.Core.FSM;
 using KingdomsRebellion.Core.Math;
-using KingdomsRebellion.Core.Model;
 using KingdomsRebellion.Network;
 using UnityEngine;
 

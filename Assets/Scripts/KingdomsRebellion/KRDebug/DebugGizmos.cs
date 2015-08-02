@@ -1,7 +1,7 @@
 ﻿using System;
-using UnityEngine;
 using KingdomsRebellion.Core;
 using KingdomsRebellion.Core.Map;
+using UnityEngine;
 
 namespace KingdomsRebellion.KRDebug {
 

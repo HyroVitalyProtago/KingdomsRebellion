@@ -1,7 +1,6 @@
 ﻿using System;
 using KingdomsRebellion.Core;
 using KingdomsRebellion.Core.Math;
-using KingdomsRebellion.Core.Model;
 using KingdomsRebellion.Core.Player;
 using KingdomsRebellion.Network;
 using UnityEngine;

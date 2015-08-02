@@ -1,5 +1,4 @@
 ﻿using System;
-using KingdomsRebellion.Core.Interfaces;
 using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Core.Player;
 using UnityEngine;
@@ -27,17 +26,6 @@ namespace KingdomsRebellion.Core.Model {
 
         protected override void Start() {
             base.Start();
-			//   selected = false;
-			lifeMax = 30;
-			life = 30;
-			defense = 10;
-            if (PlayerId == 0) {
-                weakness = AttackTypeEnum.Sword;
-                AttackType = AttackTypeEnum.Arrow;
-			} else {
-                weakness = AttackTypeEnum.Sword;
-                AttackType = AttackTypeEnum.Sword;
-			}
 
 		    KRFacade.GetMap().Add(this);
 		}

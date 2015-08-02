@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using UnityEngine;
 using KingdomsRebellion.AI;
 using KingdomsRebellion.Core.FSM;
 using KingdomsRebellion.Core.Map;
 using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Inputs;
+using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace KingdomsRebellion.Core {
 	public static class KRFacade {
@@ -135,7 +136,7 @@ namespace KingdomsRebellion.Core {
 			}
 
 			stopwatch.Stop();
-			UnityEngine.Debug.Log(String.Format("DragFind :: time elapsed: {0}", stopwatch.Elapsed));
+			Debug.Log(String.Format("DragFind :: time elapsed: {0}", stopwatch.Elapsed));
 
 			return gos;
 		}

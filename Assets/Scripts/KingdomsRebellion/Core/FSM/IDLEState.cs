@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using KingdomsRebellion.Core.Components;
 using KingdomsRebellion.Core.Model;
-using KingdomsRebellion.Core.Player;
 using UnityEngine;
 
 namespace KingdomsRebellion.Core.FSM {
@@ -15,7 +15,7 @@ namespace KingdomsRebellion.Core.FSM {
 			IEnumerable<GameObject> gameObjects = KRFacade.Around(_fsm.GetComponent<Unit>().Pos, 6);
             foreach (var obj in gameObjects) {
                 if (obj.GetComponent<KRGameObject>().PlayerId != _fsm.GetComponent<Unit>().PlayerId) {
-                    _fsm.GetComponent<Attack>().Target = obj;
+                    _fsm.GetComponent<KRAttack>().Target = obj;
                     return typeof(AttackState);
                 }
             }
