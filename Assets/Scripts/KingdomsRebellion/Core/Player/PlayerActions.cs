@@ -47,7 +47,7 @@ namespace KingdomsRebellion.Core.Player {
 	    }
 
 	    public static bool IsMines() {
-	        return _selectedObjects[NetworkAPI.PlayerId].Any(u => u.GetComponent<Unit>().PlayerId == NetworkAPI.PlayerId);
+	        return _selectedObjects[NetworkAPI.PlayerId].Any(u => u.GetComponent<KRGameObject>().PlayerId == NetworkAPI.PlayerId);
 	    }
 	}
 }

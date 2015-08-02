@@ -8,13 +8,13 @@ namespace KingdomsRebellion.KRDebug {
 	[ExecuteInEditMode]
 	public class DebugGizmos : KRBehaviour {
 
-		static IMap<QuadTreeNode<Unit>,Unit> _map = KRFacade.GetMap();
+        static IMap<QuadTreeNode<KRGameObject>, KRGameObject> _map = KRFacade.GetMap();
 
 		void OnDrawGizmos() {
 			_map.Walk(DrawNode);
 		}
 
-		void DrawNode(QuadTreeNode<Unit> node) {
+        void DrawNode(QuadTreeNode<KRGameObject> node) {
 			if (node.IsFree()) {
 				Gizmos.color = Color.blue;
 			} else {

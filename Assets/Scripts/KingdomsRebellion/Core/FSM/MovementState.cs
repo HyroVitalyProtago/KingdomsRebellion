@@ -16,7 +16,8 @@ namespace KingdomsRebellion.Core.FSM {
         }
 
         public override void Execute() {
-			if (_movement._Follow) _movement.Target = _movement._Follow.GetComponent<Unit>().Pos;
+            Debug.Log(_movement.Target);
+			if (_movement._Follow) _movement.Target = _movement._Follow.GetComponent<KRGameObject>().Pos;
             if (_movement.Target == null || _movement.Pos == _movement.Target) {
                 fsm.PopState();
                 return;

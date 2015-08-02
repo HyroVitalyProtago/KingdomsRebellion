@@ -12,7 +12,7 @@ namespace KingdomsRebellion.Core.Player {
 
 		private GameObject healthContainer;
 		private RectTransform healthBar;
-		private Unit unitData;
+        private KRGameObject unitData;
 		private float initWidth;
 		private float initCameraSize;
 		private RectTransform rectTransform;
@@ -30,7 +30,7 @@ namespace KingdomsRebellion.Core.Player {
 			rectTransform = healthContainer.GetComponent<RectTransform>();
 			healthBar = healthContainer.transform.FindChild("HealthBar").GetComponent<RectTransform>();
 			image = healthBar.GetComponent<Image>();
-			unitData = transform.GetComponentInParent<Unit>();
+            unitData = transform.GetComponentInParent<KRGameObject>();
 		    initCameraSize = 4f;
 			initWidth = healthBar.rect.width;
 			image.color = Color.green;

@@ -33,14 +33,14 @@ namespace KingdomsRebellion.Core.Player {
 				transform.position = _pos.ToVector3().Adjusted();
 			}
 		}
-		IEnumerable<QuadTreeNode<Unit>> _waypoints;
+        IEnumerable<QuadTreeNode<KRGameObject>> _waypoints;
 
 		void Awake() {
-			Pos = Vec2.FromVector3(transform.position);
+            Pos = Vec2.FromVector3(transform.position);
+            _unit = GetComponent<Unit>();
 		}
 
 		void Start() {
-			_unit = GetComponent<Unit>();
 			Target = null;
 
 			_test = -1;
@@ -58,11 +58,11 @@ namespace KingdomsRebellion.Core.Player {
 			}
 
 			_waypoints = KRFacade.FindPath(Pos, Target);
-			_waypoints.ToList().ForEach(delegate(QuadTreeNode<Unit> w) { if (!test3.Contains(w)) test3.Add(w); });
+            _waypoints.ToList().ForEach(delegate(QuadTreeNode<KRGameObject> w) { if (!test3.Contains(w)) test3.Add(w); });
 			if (_waypoints == null) {
 				Target = null;
 			} else {
-				QuadTreeNode<Unit> node;
+                QuadTreeNode<KRGameObject> node;
 				Vec2 nextPos = Pos;
 
 				if (!_waypoints.Any()) {
@@ -105,9 +105,9 @@ namespace KingdomsRebellion.Core.Player {
 					return true;
 				});
 				if (nextPos != Pos && KRFacade.GetMap().IsEmpty(nextPos)) {
-					KRFacade.GetMap().Remove(GetComponent<Unit>());
+					KRFacade.GetMap().Remove(GetComponent<KRGameObject>());
 					Pos = nextPos;
-					KRFacade.GetMap().Add(GetComponent<Unit>());
+					KRFacade.GetMap().Add(GetComponent<KRGameObject>());
 					test.Add(Pos);
 				} else {
 					_waypoints = null;
@@ -119,11 +119,11 @@ namespace KingdomsRebellion.Core.Player {
 
 		IList<Vec2> test = new List<Vec2>();
 		List<List<Vec2>> test2 = new List<List<Vec2>>();
-		List<QuadTreeNode<Unit>> test3 = new List<QuadTreeNode<Unit>>();
+        List<QuadTreeNode<KRGameObject>> test3 = new List<QuadTreeNode<KRGameObject>>();
 
 	    public void Move(int player, Vec3 targetv3) {
 			Vec2 target = targetv3.ToVec2();
-
+            Debug.Log(Pos == target);
 			if (_unit.PlayerId != player || Pos == target) { return; }
 			if (Target == null) { _test = 8; }
 			Target = target;
@@ -136,7 +136,7 @@ namespace KingdomsRebellion.Core.Player {
 
 		[ExecuteInEditMode]
 		void OnDrawGizmos() {
-			test3.ToList().ForEach(delegate(QuadTreeNode<Unit> n) {
+            test3.ToList().ForEach(delegate(QuadTreeNode<KRGameObject> n) {
 				Gizmos.color = new Color(((float)n.Width)/10f, .2f, ((float)n.Height)/10f);
 				if (n.Width == 1)
 					Gizmos.DrawCube((new Vector3(n.Pos.X,0,n.Pos.Y)).Adjusted(), new Vector3(n.Width,.01f,n.Height));

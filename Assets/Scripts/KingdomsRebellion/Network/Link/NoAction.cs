@@ -12,7 +12,7 @@ namespace KingdomsRebellion.Network.Link {
 
 		public NoAction(uint lockStepTurn) : base(lockStepTurn) {}
 
-		private NoAction() : base() {}
+		private NoAction() {}
 
 		public override byte ActionType() {
 			return (byte) GameActionEnum.NoAction;

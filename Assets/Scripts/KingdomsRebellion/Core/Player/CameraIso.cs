@@ -109,7 +109,7 @@ namespace KingdomsRebellion.Core.Player {
 				if (destination != origin) {
 					Camera.main.transform.eulerAngles = Vector3.MoveTowards(origin, destination, Time.deltaTime * RotateSpeed);
 				}
-			} else if (!Cursor.visible) {
+			} else {
 				Cursor.lockState = CursorLockMode.Confined;
 				Cursor.visible = true;
 			}

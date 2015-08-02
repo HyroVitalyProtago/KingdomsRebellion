@@ -12,7 +12,7 @@ namespace KingdomsRebellion.Inputs {
 		event Action<Vec3> OnModelSelectDemand; // modelPosition
 		event Action<Vec3> OnModelMoveDemand; // modelPosition
         event Action<Vec3> OnModelAttackDemand; // modelPosition
-		static bool Instatiated = false;
+		static bool Instatiated;
 
 		public InputNetworkAdapter() {
 			Debug.Assert(!Instatiated);
@@ -54,7 +54,7 @@ namespace KingdomsRebellion.Inputs {
 			    GameObject go = hit.collider.gameObject;
 				if (go.CompareTag("Selectable")) {
                     worldPosition = go.transform.position;
-				    if (go.GetComponent<Unit>().PlayerId != NetworkAPI.PlayerId) {
+				    if (go.GetComponent<KRGameObject>().PlayerId != NetworkAPI.PlayerId) {
 				        if (OnModelAttackDemand != null) {
 				            OnModelAttackDemand(Vec3.FromVector3(worldPosition));
 				            return;
