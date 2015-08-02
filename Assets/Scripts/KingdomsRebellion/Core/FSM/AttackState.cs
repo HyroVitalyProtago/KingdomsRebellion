@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using KingdomsRebellion.Core.Components;
 using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Core.Model;
 using KingdomsRebellion.Core.Player;
@@ -9,12 +10,12 @@ namespace KingdomsRebellion.Core.FSM {
 
     public class AttackState : FSMState {
 
-        readonly Attack _attack;
+        readonly KRAttack _attack;
         readonly Unit _unit;
         readonly Movement _movement;
         
         public AttackState(FiniteStateMachine fsm) : base(fsm) {
-            _attack = fsm.GetComponent<Attack>();
+            _attack = fsm.GetComponent<KRAttack>();
             _unit = fsm.GetComponent<Unit>();
             _movement = fsm.GetComponent<Movement>();
         }
