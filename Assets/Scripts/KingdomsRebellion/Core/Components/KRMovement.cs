@@ -4,6 +4,7 @@ using KingdomsRebellion.AI;
 using KingdomsRebellion.Core.Map;
 using KingdomsRebellion.Core.Math;
 using UnityEngine;
+using System;
 
 namespace KingdomsRebellion.Core.Components {
 
@@ -36,7 +37,12 @@ namespace KingdomsRebellion.Core.Components {
 
 		public void UpdateGame() {
 			if (Followee != null) { Target = Followee.Pos; }
-			if (Target == null || _krtransform.Pos == Target) { return; }
+			if (Target == null) { return; }
+			if (_krtransform.Pos == Target) {
+				Target = null;
+				Followee = null; // TEST
+				return;
+			}
 
 			if (_currentFrame > 0) {
 				--_currentFrame;

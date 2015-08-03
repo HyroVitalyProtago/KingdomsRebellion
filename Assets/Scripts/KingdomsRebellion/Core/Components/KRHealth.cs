@@ -29,7 +29,7 @@ namespace KingdomsRebellion.Core.Components {
         }
         
         public void OnDamageDone(AttackTypeEnum type, int damage) {
-            if (Weakness == type) {
+			if (Weakness == type) {
                 Life -= Mathf.FloorToInt(1.3f * (damage - Defense));
             } else {
                 Life -= damage - Defense;

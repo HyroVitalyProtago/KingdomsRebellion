@@ -51,8 +51,8 @@ namespace KingdomsRebellion.Core.Components {
 
         public void UpdateGame() {
             Vec2 targetPos = Target.GetComponent<KRTransform>().Pos;
-            if (Vec2.Dist(targetPos, gameObject.GetComponent<KRTransform>().Pos) == 1) {
-                if (AttackSpeed == 0) {
+            if (Vec2.Dist(targetPos, gameObject.GetComponent<KRTransform>().Pos) == Range) {
+				if (_currentFrame == 0) {
                     _spot.SetActive(true);
                     Target.GetComponent<KRHealth>().OnDamageDone(AttackType, Strength);
 					_currentFrame = AttackSpeed;
