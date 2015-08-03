@@ -13,6 +13,7 @@ namespace KingdomsRebellion.Inputs {
 		event Action<Vec2, Vec2, Vec2> OnModelDragDemand; // begin:modelPosition, end:modelPosition
 		event Action<Vec2> OnModelMoveDemand; // modelPosition
         event Action<Vec2> OnModelAttackDemand; // modelPosition
+		event Action<KeyCode> OnModelSpawnDemand;
 
 		static bool Instatiated;
 
@@ -25,11 +26,13 @@ namespace KingdomsRebellion.Inputs {
 			On("OnLeftClickDown");
 			On("OnLeftClickUp");
 			On("OnRightClick");
+			On("OnKeyPress");
 
 			Offer("OnModelSelectDemand");
 			Offer("OnModelMoveDemand");
             Offer("OnModelAttackDemand");
 			Offer("OnModelDragDemand");
+			Offer("OnModelSpawnDemand");
 		}
 
 		Vector3 WorldPosition(Vector3 mousePosition) {
@@ -96,6 +99,15 @@ namespace KingdomsRebellion.Inputs {
 			
 			if (OnModelMoveDemand != null) {
 				OnModelMoveDemand(Vec2.FromVector3(worldPosition));
+			}
+		}
+
+		void OnKeyPress(KeyCode k) {
+			if (!PlayerActions.IsMines()) return;
+			if (!PlayerActions.IsBuilding()) return;
+
+			if (OnModelSpawnDemand != null) {
+				OnModelSpawnDemand(k);
 			}
 		}
 

@@ -31,25 +31,25 @@ namespace KingdomsRebellion.Core.Components {
 			if (go == null) { throw new SystemException("KRGameObjects not found in scene"); }
 			_dynamics = go.transform;
 
-			_rallyPoint = _krtransform.Pos + 5 * Vec2.One;
-			_spawnPoint = _krtransform.Pos + 2 * Vec2.One;
+			Vec2 toCenter = -(new Vec2(System.Math.Sign(_krtransform.Pos.X), System.Math.Sign(_krtransform.Pos.X)));
+
+			_rallyPoint = _krtransform.Pos + 5 * toCenter;
+			_spawnPoint = _krtransform.Pos + 2 * toCenter;
         }
 
         public void AddSpawnable(String path) {
             _spawnableObjects.Add(Resources.Load(path));
         }
 
-        public void CreateGameObject(int numObj) {
+        public void Spawn(int numObj) {
+			if (!KRFacade.GetMap().IsEmpty(_spawnPoint)) return;
+
+			Debug.Log("Spawn !");
+
             if (numObj < _spawnableObjects.Count) {
                 GameObject kgo = Instantiate(_spawnableObjects[numObj], _spawnPoint.ToVector3().Adjusted(), Quaternion.identity) as GameObject;
 				kgo.transform.SetParent(_dynamics);   
 				kgo.GetComponent<FiniteStateMachine>().Move(_krtransform.PlayerID, _rallyPoint);
-            }
-        }
-
-        void Update() {
-            if (Input.GetKeyDown(KeyCode.C)) {
-                CreateGameObject(0);
             }
         }
     }

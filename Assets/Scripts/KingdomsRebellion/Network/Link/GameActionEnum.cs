@@ -5,6 +5,7 @@ namespace KingdomsRebellion.Network.Link {
 		SelectAction,
 		DragAction,
 		MoveAction,
-        AttackAction
+        AttackAction,
+		SpawnAction
 	}
 }

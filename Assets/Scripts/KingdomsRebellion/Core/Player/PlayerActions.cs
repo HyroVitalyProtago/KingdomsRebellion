@@ -15,12 +15,14 @@ namespace KingdomsRebellion.Core.Player {
 			On("OnSelection");
 			On("OnMove");
 		    On("OnAttack");
+			On("OnSpawn");
 		}
 
 		void OnDisable() {
 			Off("OnSelection");
 			Off("OnMove");
 		    Off("OnAttack");
+			Off("OnSpawn");
 		}
 
 		void Start() {
@@ -47,8 +49,17 @@ namespace KingdomsRebellion.Core.Player {
             }
 	    }
 
+		// TODO
+		void OnSpawn(int playerID, KeyCode keyCode) {
+			_selectedObjects[playerID][0].GetComponent<KRSpawn>().Spawn(0);
+		}
+
 	    public static bool IsMines() {
 			return _selectedObjects[NetworkAPI.PlayerId].Any(u => u.GetComponent<KRTransform>().PlayerID == NetworkAPI.PlayerId);
 	    }
+
+		public static bool IsBuilding() {
+			return _selectedObjects[NetworkAPI.PlayerId].Any(u => u.GetComponent<KRSpawn>() != null);
+		}
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.IO;
 
 namespace KingdomsRebellion.Core {
 	public static class KRExtensions {
