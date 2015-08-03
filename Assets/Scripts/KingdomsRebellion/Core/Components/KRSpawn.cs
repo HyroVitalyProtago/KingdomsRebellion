@@ -20,10 +20,15 @@ namespace KingdomsRebellion.Core.Components {
         Vec2 _rallyPoint;
         List<Object> _spawnableObjects;
 
+		Material _sweetBlue, _sweetRed;
+
 		void Awake() {
 			_krtransform = GetComponent<KRTransform>();
 			_spawnableObjects = new List<Object>();
-			AddSpawnable("Prefabs/Unit Red");
+			AddSpawnable("Prefabs/Unit");
+
+			_sweetBlue = (Material) Resources.Load("Materials/SweetBlue", typeof(Material));
+			_sweetRed = (Material) Resources.Load("Materials/SweetRed", typeof(Material));
 		}
 
         void Start() {
@@ -44,11 +49,18 @@ namespace KingdomsRebellion.Core.Components {
         public void Spawn(int numObj) {
 			if (!KRFacade.GetMap().IsEmpty(_spawnPoint)) return;
 
-			Debug.Log("Spawn !");
-
             if (numObj < _spawnableObjects.Count) {
                 GameObject kgo = Instantiate(_spawnableObjects[numObj], _spawnPoint.ToVector3().Adjusted(), Quaternion.identity) as GameObject;
-				kgo.transform.SetParent(_dynamics);   
+
+				kgo.transform.SetParent(_dynamics);
+
+				kgo.GetComponent<KRTransform>().PlayerID = _krtransform.PlayerID;
+				if (_krtransform.PlayerID == 0) {
+					kgo.transform.Find("EthanBody").GetComponent<Renderer>().sharedMaterial = _sweetBlue;
+				} else {
+					kgo.transform.Find("EthanBody").GetComponent<Renderer>().sharedMaterial = _sweetRed;
+				}
+
 				kgo.GetComponent<FiniteStateMachine>().Move(_krtransform.PlayerID, _rallyPoint);
             }
         }

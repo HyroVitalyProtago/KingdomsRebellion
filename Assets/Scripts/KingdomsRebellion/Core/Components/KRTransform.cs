@@ -7,7 +7,7 @@ namespace KingdomsRebellion.Core.Components {
 	public class KRTransform : KRBehaviour, IPos, ISize {
     	public int __playerID, __sizeX, __sizeY; // just for Unity Editor
 
-		public int PlayerID { get; private set; }
+		public int PlayerID { get; set; }
 		public Vec2 Pos {
 			get {
 				return _pos;
