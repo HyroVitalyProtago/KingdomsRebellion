@@ -68,7 +68,7 @@ namespace KingdomsRebellion.Core.Components {
 						node = _waypoints.ElementAtOrDefault(1);
 						nextPos = (node == null) ? Target : node.Pos;
 						Bresenham.Line(_krtransform.Pos.X, _krtransform.Pos.Y, nextPos.X, nextPos.Y, delegate(int x, int y) {
-							if (!KRFacade.GetMap().IsEmpty(new Vec2(x,y))) {
+							if (!KRFacade.IsEmpty(new Vec2(x,y))) {
 								canTraceStraightLine = false;
 								if (nextPos == Target) { nextPos = _waypoints.First().Pos; }
 								return false;
@@ -94,10 +94,10 @@ namespace KingdomsRebellion.Core.Components {
 					lt.Add(new Vec2(x,y));
 					return true;
 				});
-				if (nextPos != _krtransform.Pos && KRFacade.GetMap().IsEmpty(nextPos)) {
-					KRFacade.GetMap().Remove(GetComponent<KRTransform>());
+				if (nextPos != _krtransform.Pos && KRFacade.IsEmpty(nextPos)) {
+					KRFacade.Remove(GetComponent<KRTransform>());
 					_krtransform.Pos = nextPos;
-					KRFacade.GetMap().Add(GetComponent<KRTransform>());
+					KRFacade.Add(GetComponent<KRTransform>());
 #if UNITY_EDITOR
 					__way.Add(_krtransform.Pos);
 #endif

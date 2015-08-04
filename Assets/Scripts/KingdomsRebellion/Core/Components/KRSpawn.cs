@@ -47,7 +47,7 @@ namespace KingdomsRebellion.Core.Components {
         }
 
         public void Spawn(int numObj) {
-			if (!KRFacade.GetMap().IsEmpty(_spawnPoint)) return;
+			if (!KRFacade.IsEmpty(_spawnPoint)) return;
 
             if (numObj < _spawnableObjects.Count) {
                 GameObject kgo = Instantiate(_spawnableObjects[numObj], _spawnPoint.ToVector3().Adjusted(), Quaternion.identity) as GameObject;
@@ -57,8 +57,10 @@ namespace KingdomsRebellion.Core.Components {
 				kgo.GetComponent<KRTransform>().PlayerID = _krtransform.PlayerID;
 				if (_krtransform.PlayerID == 0) {
 					kgo.transform.Find("EthanBody").GetComponent<Renderer>().sharedMaterial = _sweetBlue;
+					kgo.transform.Find("Spotlight").GetComponent<Light>().color = new Color(0f,.4f,1f);
 				} else {
 					kgo.transform.Find("EthanBody").GetComponent<Renderer>().sharedMaterial = _sweetRed;
+					kgo.transform.Find("Spotlight").GetComponent<Light>().color = new Color(.85f,.85f,.3f);
 				}
 
 				kgo.GetComponent<FiniteStateMachine>().Move(_krtransform.PlayerID, _rallyPoint);

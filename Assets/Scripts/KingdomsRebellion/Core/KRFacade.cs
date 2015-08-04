@@ -31,7 +31,7 @@ namespace KingdomsRebellion.Core {
 #endif
 		}
 
-		public static IMap<QuadTreeNode<KRTransform>,KRTransform> GetMap() { return _Map; }
+//		public static IMap<QuadTreeNode<KRTransform>,KRTransform> GetMap() { return _Map; }
 
 		public static IEnumerable<QuadTreeNode<KRTransform>> FindPath(Vec2 start, Vec2 target) {
 			return Pathfinding<QuadTreeNode<KRTransform>>.FindPath(_Map.FindNode(start), _Map.FindNode(target))
@@ -50,6 +50,18 @@ namespace KingdomsRebellion.Core {
 		public static GameObject Find(Vec2 v) {
 			KRTransform u = _Map.Find(v);
 			return (u == null) ? null : u.gameObject;
+		}
+
+		public static void Add(KRTransform t) {
+			_Map.Add(t);
+		}
+
+		public static void Remove(KRTransform t) {
+			_Map.Remove(t);
+		}
+
+		public static bool IsEmpty(Vec2 v) {
+			return _Map.IsEmpty(v);
 		}
 
 		/// <summary>
@@ -145,6 +157,8 @@ namespace KingdomsRebellion.Core {
 
 #if !UNITY_EDITOR
 		static void OnKRDrawGizmos() {
+			_Map.Walk(GizmosDrawNode);
+
 			Gizmos.color = Color.magenta;
 			foreach (var x in __walkedNode) {
 				Gizmos.DrawWireCube(x.ToVector3() + Vector3.one*.5f, Vector3.one);
@@ -154,6 +168,15 @@ namespace KingdomsRebellion.Core {
 			foreach (var x in __walkedFind) {
 				Gizmos.DrawWireCube(x.ToVector3() + Vector3.one*.5f, Vector3.one);
 			}
+		}
+
+		static void GizmosDrawNode(QuadTreeNode<KRTransform> n) {
+			Gizmos.color = n.IsFree() ? Color.blue : Color.green;
+			Vector3 p0 = n.BottomLeft.ToVector3(), p1 = n.TopRight.ToVector3();
+			Gizmos.DrawLine(p0, p0 + new Vector3(n.Width-.2f, 0, .1f));
+			Gizmos.DrawLine(p0, p0 + new Vector3(.1f, 0, n.Height-.2f));
+			Gizmos.DrawLine(p1, p1 - new Vector3(n.Width-.2f, 0, .1f));
+			Gizmos.DrawLine(p1, p1 - new Vector3(.1f, 0, n.Height-.2f));
 		}
 #endif
 	}

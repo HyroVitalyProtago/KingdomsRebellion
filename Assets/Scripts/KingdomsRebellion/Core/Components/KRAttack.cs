@@ -21,14 +21,14 @@ namespace KingdomsRebellion.Core.Components {
 
         KRTransform _krTransform;
         KRMovement _krMovement;
-        GameObject _spot;
+        Light _spot;
 		int _currentFrame;
 
 		void Awake() {
 			_krTransform = GetComponent<KRTransform>();
 			_krMovement = GetComponent<KRMovement>();
-			_spot = gameObject.GetComponentInChildren<Light>().gameObject;
-			_spot.SetActive(false);
+			_spot = gameObject.GetComponentInChildren<Light>();
+			_spot.enabled = false;
 
 			On("OnAttack");
 			On("OnUnitDeath");
@@ -45,24 +45,24 @@ namespace KingdomsRebellion.Core.Components {
         }
 
         private void OnAttack(int playerID, Vec2 modelPoint) {
-			KRTransform u = KRFacade.GetMap().Find(modelPoint);
-            if (u != null) { Target = u.gameObject; }
+			Target = KRFacade.Find(modelPoint);
         }
 
         public void UpdateGame() {
             Vec2 targetPos = Target.GetComponent<KRTransform>().Pos;
             if (Vec2.Dist(targetPos, gameObject.GetComponent<KRTransform>().Pos) == Range) {
 				if (_currentFrame == 0) {
-                    _spot.SetActive(true);
+					_spot.enabled = true;
                     Target.GetComponent<KRHealth>().OnDamageDone(AttackType, Strength);
 					_currentFrame = AttackSpeed;
                 } else {
+					_spot.enabled = false;
 					--_currentFrame;
                 }
             } else {
 				_krMovement.Move(targetPos);
 				_currentFrame = AttackSpeed;
-                _spot.SetActive(false);
+				_spot.enabled = false;
             }
         }
 
