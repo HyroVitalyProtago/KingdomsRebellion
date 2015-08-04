@@ -3,7 +3,6 @@ using System.IO;
 
 namespace KingdomsRebellion.Network.Link {
 
-	// [StaticFactory("FromBytes", Parameters = new Type[] { typeof(byte[]) })]
 	public abstract class GameAction : NetworkMessage {
 
 		// Template for GameAction static builder
@@ -11,7 +10,7 @@ namespace KingdomsRebellion.Network.Link {
 		//	return new GameAction().GetFromBytes(data) as GameAction;
 		// }
 
-		protected GameAction(uint lockStepTurn) : base(lockStepTurn) {}
+		protected GameAction(uint lockstepTurn) : base(lockstepTurn) {}
 
 		protected GameAction() {}
 

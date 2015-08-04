@@ -18,7 +18,7 @@ namespace KingdomsRebellion.Network.Link {
 			return new SpawnAction().GetFromBytes(data) as SpawnAction;
 		}
 		
-		public SpawnAction(uint lockStepTurn, KeyCode keyCode) : base(lockStepTurn) {
+		public SpawnAction(KeyCode keyCode) {
 			_keyCode = keyCode;
 		}
 		

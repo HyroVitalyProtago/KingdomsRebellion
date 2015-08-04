@@ -60,23 +60,13 @@ namespace KingdomsRebellion.Network {
 		void OnEnable() {
 			On("OnAction");
 			On("OnConfirmation");
-
-			On("OnModelSelectDemand");
-			On("OnModelMoveDemand");
-            On("OnModelAttackDemand");
-			On("OnModelDragDemand");
-			On("OnModelSpawnDemand");
+			On("OnDemand");
 		}
 
 		void OnDisable() {
 			Off("OnAction");
 			Off("OnConfirmation");
-
-			Off("OnModelSelectDemand");
-			Off("OnModelMoveDemand");
-            Off("OnModelAttackDemand");
-			Off("OnModelDragDemand");
-			Off("OnModelSpawnDemand");
+			Off("OnDemand");
 		}
 
 		void OnAction(int playerID, GameAction action) {
@@ -273,26 +263,10 @@ namespace KingdomsRebellion.Network {
 			KRFacade.UpdateGame();
 		}
 
-		void OnModelSelectDemand(Vec2 modelPosition) {
-			// TODO check if the last action is of the same type,
-			// if true, override the previous with it, else, enqueue it
-			actionQueue.Enqueue(new SelectAction(lockstepTurn, modelPosition));
-		}
-
-		void OnModelMoveDemand(Vec2 modelPosition) {
-			actionQueue.Enqueue(new MoveAction(lockstepTurn, modelPosition));
-		}
-
-		void OnModelAttackDemand(Vec2 modelPosition) {
-	        actionQueue.Enqueue(new AttackAction(lockstepTurn, modelPosition));
-	    }
-
-		void OnModelDragDemand(Vec2 beginModelPosition, Vec2 endModelPosition, Vec2 z) {
-			actionQueue.Enqueue(new DragAction(lockstepTurn, beginModelPosition, endModelPosition, z));
-		}
-
-		void OnModelSpawnDemand(KeyCode k) {
-			actionQueue.Enqueue(new SpawnAction(lockstepTurn, k));
+		// TODO check if the last action is of the same type,
+		// if true, override the previous with it, else, enqueue it
+		void OnDemand(GameAction ga) {
+			actionQueue.Enqueue(ga);
 		}
 	}
 

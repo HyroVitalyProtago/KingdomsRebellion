@@ -14,7 +14,7 @@ namespace KingdomsRebellion.Network.Link {
 			return new MoveAction().GetFromBytes(data) as MoveAction;
 		}
 
-		public MoveAction(uint lockStepTurn, Vec2 modelPoint) : base(lockStepTurn, modelPoint) {}
+		public MoveAction(Vec2 modelPoint) : base(modelPoint) {}
 	
 		protected MoveAction() {}
 

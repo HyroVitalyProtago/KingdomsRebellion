@@ -19,7 +19,7 @@ namespace KingdomsRebellion.Network.Link {
 			return new DragAction().GetFromBytes(data) as DragAction;
 		}
 		
-		public DragAction(uint lockStepTurn, Vec2 beginModelPoint, Vec2 endModelPoint, Vec2 z) : base(lockStepTurn) {
+		public DragAction(Vec2 beginModelPoint, Vec2 endModelPoint, Vec2 z) {
 			_beginModelPoint = beginModelPoint;
 			_endModelPoint = endModelPoint;
 			_z = z;
