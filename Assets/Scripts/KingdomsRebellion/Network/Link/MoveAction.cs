@@ -14,7 +14,7 @@ namespace KingdomsRebellion.Network.Link {
 
 		protected Vec2 _modelPoint;
 
-		public static new MoveAction FromBytes(byte[] data) {
+		public static MoveAction FromBytes(byte[] data) {
 			return new MoveAction().GetFromBytes(data) as MoveAction;
 		}
 

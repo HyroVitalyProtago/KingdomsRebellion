@@ -14,7 +14,7 @@ namespace KingdomsRebellion.Core.FSM {
 			IEnumerable<GameObject> gameObjects = KRFacade.Around(_fsm.GetComponent<KRTransform>().Pos, 6);
             foreach (var obj in gameObjects) {
 				if (obj.GetComponent<KRTransform>().PlayerID != _fsm.GetComponent<KRTransform>().PlayerID) {
-                    _fsm.GetComponent<KRAttack>().Target = obj;
+                    _fsm.GetComponent<KRAttack>().Attack(obj);
                     return typeof(AttackState);
                 }
             }

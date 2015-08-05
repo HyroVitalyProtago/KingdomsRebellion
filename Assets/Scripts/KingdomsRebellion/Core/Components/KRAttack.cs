@@ -13,25 +13,21 @@ namespace KingdomsRebellion.Core.Components {
 		public int __strength, __attackSpeed, __range;
 		public AttackTypeEnum __attackType;
 
-		public GameObject Target { get; set; }
+		public GameObject Target { get; private set; }
 		public AttackTypeEnum AttackType { get; private set; }
 
 		public int Strength { get; private set; }
 		public int AttackSpeed { get; private set; }
 		public int Range { get; private set; }
 
-        KRTransform _krTransform;
         KRMovement _krMovement;
         Light _spot;
 		int _currentFrame;
 
 		void Awake() {
-			_krTransform = GetComponent<KRTransform>();
 			_krMovement = GetComponent<KRMovement>();
 			_spot = gameObject.GetComponentInChildren<Light>();
 			_spot.enabled = false;
-
-			On("OnUnitDeath");
 
 			Strength = __strength;
 			AttackSpeed = __attackSpeed;
@@ -43,9 +39,29 @@ namespace KingdomsRebellion.Core.Components {
 			_currentFrame = 0;
         }
 
+		void BeforeAttack() {
+			if (Target != null) {
+				Target.GetComponent<KRHealth>().OnDeath -= OnTargetDeath;
+			}
+		}
+
+		void AfterAttack() {
+			if (Target != null) {
+				Target.GetComponent<KRHealth>().OnDeath += OnTargetDeath;
+			}
+		}
+
         public void Attack(Vec2 modelPoint) {
+			BeforeAttack();
 			Target = KRFacade.Find(modelPoint);
+			AfterAttack();
         }
+
+		public void Attack(GameObject go) {
+			BeforeAttack();
+			Target = go;
+			AfterAttack();
+		}
 
         public void UpdateGame() {
             Vec2 targetPos = Target.GetComponent<KRTransform>().Pos;
@@ -65,10 +81,8 @@ namespace KingdomsRebellion.Core.Components {
             }
         }
 
-        void OnUnitDeath(GameObject go) {
-            if (go == Target) {
-                Target = null;
-            }
+        void OnTargetDeath(GameObject go) {
+            Target = null;
         }
     }
 }

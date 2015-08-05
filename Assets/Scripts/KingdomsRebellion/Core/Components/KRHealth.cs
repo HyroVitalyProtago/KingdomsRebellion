@@ -7,7 +7,7 @@ namespace KingdomsRebellion.Core.Components {
     [RequireComponent(typeof (KRMovement))]
     public class KRHealth : KRBehaviour {
 
-		static event Action<GameObject> OnUnitDeath;
+		public event Action<GameObject> OnDeath;
 
 		public int __lifeMax, __defense;
 		public AttackTypeEnum __weakness;
@@ -17,9 +17,9 @@ namespace KingdomsRebellion.Core.Components {
         public int Defense { get; private set; }
 		public AttackTypeEnum Weakness { get; private set; }
 
-		static KRHealth() {
-			EventConductor.Offer(typeof(KRHealth), "OnUnitDeath");
-		}
+//		static KRHealth() {
+//			EventConductor.Offer(typeof(KRHealth), "OnUnitDeath");
+//		}
 
         void Awake() {
 			LifeMax = __lifeMax;
@@ -45,7 +45,7 @@ namespace KingdomsRebellion.Core.Components {
 		}
 
         void OnDestroy() {
-            OnUnitDeath(gameObject);
+            OnDeath(gameObject);
             KRFacade.Remove(GetComponent<KRTransform>());
         }
     }

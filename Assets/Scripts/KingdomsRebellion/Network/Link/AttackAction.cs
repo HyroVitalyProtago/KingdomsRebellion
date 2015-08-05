@@ -13,7 +13,7 @@ namespace KingdomsRebellion.Network.Link {
 
 		protected Vec2 _modelPoint;
 
-		public static new AttackAction FromBytes(byte[] data) {
+		public static AttackAction FromBytes(byte[] data) {
             return new AttackAction().GetFromBytes(data) as AttackAction;
 		}
 
