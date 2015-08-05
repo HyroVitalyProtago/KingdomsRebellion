@@ -17,10 +17,6 @@ namespace KingdomsRebellion.Core.Components {
         public int Defense { get; private set; }
 		public AttackTypeEnum Weakness { get; private set; }
 
-//		static KRHealth() {
-//			EventConductor.Offer(typeof(KRHealth), "OnUnitDeath");
-//		}
-
         void Awake() {
 			LifeMax = __lifeMax;
             Life = LifeMax;
@@ -45,7 +41,7 @@ namespace KingdomsRebellion.Core.Components {
 		}
 
         void OnDestroy() {
-            OnDeath(gameObject);
+			if (OnDeath!= null) { OnDeath(gameObject); }
             KRFacade.Remove(GetComponent<KRTransform>());
         }
     }
