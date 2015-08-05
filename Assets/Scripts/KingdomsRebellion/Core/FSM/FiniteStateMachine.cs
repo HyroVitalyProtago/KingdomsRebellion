@@ -55,12 +55,13 @@ namespace KingdomsRebellion.Core.FSM {
             }
         }
 
-        public void Move(int playerId, Vec2 modelPoint) {
+        public void Move(Vec2 modelPoint) {
             GetComponent<KRMovement>().Move(modelPoint);
             PushState(new MovementState(this), true);
         }
 
-        public void Attack(int playerId, Vec2 modelPoint) { // TODO use modelPoint
+        public void Attack(Vec2 modelPoint) {
+			GetComponent<KRAttack>().Attack(modelPoint);
             PushState(new AttackState(this), true);
         }
     }

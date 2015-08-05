@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using KingdomsRebellion.Core;
+using UnityEngine;
 
 namespace KingdomsRebellion.Network.Link {
 
@@ -10,11 +12,25 @@ namespace KingdomsRebellion.Network.Link {
 		//	return new GameAction().GetFromBytes(data) as GameAction;
 		// }
 
+		protected static event Action<int, Action<GameObject>> OnGameAction;
+
+		static GameAction() {
+			EventConductor.Offer(typeof(GameAction), "OnGameAction");
+		}
+
 		protected GameAction(uint lockstepTurn) : base(lockstepTurn) {}
 
 		protected GameAction() {}
 
-		public virtual void Process(int playerID) {}
+		public virtual void Process(int playerID) {
+			if (OnGameAction != null) {
+				OnGameAction(playerID, GetAction());
+			}
+		}
+
+		public virtual Action<GameObject> GetAction() {
+			return null;
+		}
 
 		public abstract byte ActionType();
 

@@ -17,6 +17,8 @@ namespace KingdomsRebellion.Network.Link {
 		public override byte ActionType() {
 			return (byte) GameActionEnum.NoAction;
 		}
+
+		public override void Process(int playerID) {}
 	}
 
 }

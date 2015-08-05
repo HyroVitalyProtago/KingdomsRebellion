@@ -63,7 +63,7 @@ namespace KingdomsRebellion.Core.Components {
 					kgo.transform.Find("Spotlight").GetComponent<Light>().color = new Color(.85f,.85f,.3f);
 				}
 
-				kgo.GetComponent<FiniteStateMachine>().Move(_krtransform.PlayerID, _rallyPoint);
+				kgo.GetComponent<FiniteStateMachine>().Move(_rallyPoint);
             }
         }
     }

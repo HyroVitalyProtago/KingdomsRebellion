@@ -11,6 +11,7 @@ namespace KingdomsRebellion.Core.Components {
         event Action<GameObject, AttackTypeEnum, int> OnDamageDone;
 
 		public int __strength, __attackSpeed, __range;
+		public AttackTypeEnum __attackType;
 
 		public GameObject Target { get; set; }
 		public AttackTypeEnum AttackType { get; private set; }
@@ -30,21 +31,19 @@ namespace KingdomsRebellion.Core.Components {
 			_spot = gameObject.GetComponentInChildren<Light>();
 			_spot.enabled = false;
 
-			On("OnAttack");
 			On("OnUnitDeath");
 
 			Strength = __strength;
 			AttackSpeed = __attackSpeed;
 			Range = __range;
+			AttackType = __attackType;
 		}
 
         void Start() {
-            AttackType = _krTransform.PlayerID == 0 ? AttackTypeEnum.Arrow : AttackTypeEnum.Sword;
-
 			_currentFrame = 0;
         }
 
-        private void OnAttack(int playerID, Vec2 modelPoint) {
+        public void Attack(Vec2 modelPoint) {
 			Target = KRFacade.Find(modelPoint);
         }
 

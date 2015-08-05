@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace KingdomsRebellion.Network.Link {
 	public static class GameActionFactory {

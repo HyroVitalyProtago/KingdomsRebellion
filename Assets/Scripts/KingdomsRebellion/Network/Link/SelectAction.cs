@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using KingdomsRebellion.Core.Math;
+using KingdomsRebellion.Core;
 
 namespace KingdomsRebellion.Network.Link {
 
@@ -9,7 +10,11 @@ namespace KingdomsRebellion.Network.Link {
 	/// </summary>
 	public class SelectAction : GameAction {
 
-		event Action<int, Vec2> OnModelSelect;
+		static event Action<int, Vec2> OnModelSelect;
+
+		static SelectAction() {
+			EventConductor.Offer(typeof(SelectAction), "OnModelSelect");
+		}
 
 		protected Vec2 _modelPoint;
 
@@ -24,11 +29,9 @@ namespace KingdomsRebellion.Network.Link {
 		protected SelectAction() {}
 
 		public override void Process(int playerID) {
-			Offer("OnModelSelect");
 			if (OnModelSelect != null) {
 				OnModelSelect(playerID, _modelPoint);
 			}
-			Denial("OnModelSelect");
 		}
 
 		public override byte ActionType() {

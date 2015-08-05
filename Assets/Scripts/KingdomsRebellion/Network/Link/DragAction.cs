@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using KingdomsRebellion.Core.Math;
+using KingdomsRebellion.Core;
 
 namespace KingdomsRebellion.Network.Link {
 	
@@ -9,7 +10,11 @@ namespace KingdomsRebellion.Network.Link {
 	/// </summary>
 	public class DragAction : GameAction {
 		
-		event Action<int, Vec2, Vec2, Vec2> OnModelDrag;
+		static event Action<int, Vec2, Vec2, Vec2> OnModelDrag;
+
+		static DragAction() {
+			EventConductor.Offer(typeof(DragAction), "OnModelDrag");
+		}
 		
 		protected Vec2 _beginModelPoint;
 		protected Vec2 _endModelPoint;
@@ -28,11 +33,9 @@ namespace KingdomsRebellion.Network.Link {
 		protected DragAction() {}
 		
 		public override void Process(int playerID) {
-			Offer("OnModelDrag");
 			if (OnModelDrag != null) {
 				OnModelDrag(playerID, _beginModelPoint, _endModelPoint, _z);
 			}
-			Denial("OnModelDrag");
 		}
 		
 		public override byte ActionType() {

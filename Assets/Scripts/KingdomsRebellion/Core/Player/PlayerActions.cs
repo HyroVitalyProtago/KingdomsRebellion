@@ -5,6 +5,8 @@ using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Network;
 using UnityEngine;
 using KingdomsRebellion.Core.Components;
+using KingdomsRebellion.Network.Link;
+using System;
 
 namespace KingdomsRebellion.Core.Player {
 	public class PlayerActions : KRBehaviour {
@@ -12,17 +14,13 @@ namespace KingdomsRebellion.Core.Player {
 		static IList<GameObject>[] _selectedObjects;
 
 		void OnEnable() {
+			On("OnGameAction");
 			On("OnSelection");
-			On("OnMove");
-		    On("OnAttack");
-			On("OnSpawn");
 		}
 
 		void OnDisable() {
+			Off("OnGameAction");
 			Off("OnSelection");
-			Off("OnMove");
-		    Off("OnAttack");
-			Off("OnSpawn");
 		}
 
 		void Start() {
@@ -37,21 +35,10 @@ namespace KingdomsRebellion.Core.Player {
 			_selectedObjects[playerID] = selectedObjects;
 		}
 
-		void OnMove(int playerID, Vec2 modelPoint) {
+		void OnGameAction(int playerID, Action<GameObject> f) {
 			for (int i = 0; i < _selectedObjects[playerID].Count; ++i) {
-				_selectedObjects[playerID][i].GetComponent<FiniteStateMachine>().Move(playerID, modelPoint);
+				f(_selectedObjects[playerID][i]);
 			}
-		}
-
-	    void OnAttack(int playerID, Vec2 modelPoint) {
-            for (int i = 0; i < _selectedObjects[playerID].Count; ++i) {
-                _selectedObjects[playerID][i].GetComponent<FiniteStateMachine>().Attack(playerID, modelPoint);
-            }
-	    }
-
-		// TODO
-		void OnSpawn(int playerID, KeyCode keyCode) {
-			_selectedObjects[playerID][0].GetComponent<KRSpawn>().Spawn(0);
 		}
 
 	    public static bool IsMines() {
@@ -59,7 +46,7 @@ namespace KingdomsRebellion.Core.Player {
 	    }
 
 		public static bool IsBuilding() {
-			return _selectedObjects[NetworkAPI.PlayerId].Any(u => u.GetComponent<KRSpawn>() != null);
+			return _selectedObjects[NetworkAPI.PlayerId].All(u => u.GetComponent<KRSpawn>() != null);
 		}
 	}
 }

@@ -2,6 +2,8 @@
 using System.IO;
 using KingdomsRebellion.Core.Math;
 using UnityEngine;
+using KingdomsRebellion.Core;
+using KingdomsRebellion.Core.Components;
 
 namespace KingdomsRebellion.Network.Link {
 	
@@ -9,8 +11,6 @@ namespace KingdomsRebellion.Network.Link {
 	/// Action send over the network for select units.
 	/// </summary>
 	public class SpawnAction : GameAction {
-		
-		event Action<int, KeyCode> OnSpawn;
 		
 		protected KeyCode _keyCode;
 		
@@ -24,12 +24,10 @@ namespace KingdomsRebellion.Network.Link {
 		
 		protected SpawnAction() {}
 		
-		public override void Process(int playerID) {
-			Offer("OnSpawn");
-			if (OnSpawn != null) {
-				OnSpawn(playerID, _keyCode);
-			}
-			Denial("OnSpawn");
+		public override Action<GameObject> GetAction() {
+			return delegate(GameObject go) {
+				go.GetComponent<KRSpawn>().Spawn(0); // TODO
+			};
 		}
 		
 		public override byte ActionType() {
