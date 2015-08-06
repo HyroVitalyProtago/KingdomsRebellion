@@ -1,10 +1,8 @@
-﻿using UnityEngine;
-using System;
-using System.Collections.Generic;
-using KingdomsRebellion.Network.Link;
-using KingdomsRebellion.Inputs;
+﻿using System.Collections.Generic;
 using KingdomsRebellion.Core;
 using KingdomsRebellion.Core.Math;
+using KingdomsRebellion.Network.Link;
+using UnityEngine;
 
 namespace KingdomsRebellion.Network {
 
@@ -62,19 +60,13 @@ namespace KingdomsRebellion.Network {
 		void OnEnable() {
 			On("OnAction");
 			On("OnConfirmation");
-
-			On("OnModelSelectDemand");
-			On("OnModelMoveDemand");
-            On("OnModelAttackDemand");
+			On("OnDemand");
 		}
 
 		void OnDisable() {
 			Off("OnAction");
 			Off("OnConfirmation");
-
-			Off("OnModelSelectDemand");
-			Off("OnModelMoveDemand");
-            Off("OnModelAttackDemand");
+			Off("OnDemand");
 		}
 
 		void OnAction(int playerID, GameAction action) {
@@ -86,9 +78,6 @@ namespace KingdomsRebellion.Network {
 				if (turn <= 2 && actions[turn][playerID] == null) {
 					actions[turn][playerID] = action;
 					++numberOfPlayerWhoSendAction[turn];
-				} else {
-					// NetworkUI.Log("Action allready received for LockstepTurn " + action.LockStepTurn);
-					// NetworkUI.Log("Maybe my confirmation has not been received...");
 				}
 			}
 
@@ -274,19 +263,11 @@ namespace KingdomsRebellion.Network {
 			KRFacade.UpdateGame();
 		}
 
-		void OnModelSelectDemand(Vec3 modelPosition) {
-			// TODO check if the last action is of the same type,
-			// if true, override the previous with it, else, enqueue it
-			actionQueue.Enqueue(new SelectAction(lockstepTurn, modelPosition));
+		// TODO check if the last action is of the same type,
+		// if true, override the previous with it, else, enqueue it
+		void OnDemand(GameAction ga) {
+			actionQueue.Enqueue(ga);
 		}
-
-		void OnModelMoveDemand(Vec3 modelPosition) {
-			actionQueue.Enqueue(new MoveAction(lockstepTurn, modelPosition));
-		}
-
-	    void OnModelAttackDemand(Vec3 modelPosition) {
-	        actionQueue.Enqueue(new AttackAction(lockstepTurn, modelPosition));
-	    }
 	}
 
 }

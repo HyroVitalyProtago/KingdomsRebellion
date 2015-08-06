@@ -1,25 +1,24 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Linq.Expressions;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace KingdomsRebellion.Core {
 
 	/// <summary>
 	/// Event conductor is useful for abstract event links between objects.
-	/// Because an object generally don't need to know who declench the event,
+	/// Because an object generally don't need to know who activate the event,
 	/// this class play the role of middleman for attach and detach events.
 	/// </summary>
 	public static class EventConductor {
 
 		public class EventNotFoundException : Exception {}
 		public class EventNotRegisteredException : Exception {}
-		public class EventAllreadyOffered : Exception {} // TODO
+		public class EventAlreadyOfferedException : Exception {} // TODO
 		public class CallbackNotFoundException : Exception {}
 		public class CallbackBadTypeException : Exception {}
-		public class CallbackAllreadyConnected : Exception {} // TODO
+		public class CallbackAlreadyConnectedException : Exception {} // TODO
 		public class CallbackNotRegisteredException : Exception {}
 		public class EventNotMatchCallbackException : Exception {}
 
@@ -34,21 +33,21 @@ namespace KingdomsRebellion.Core {
 		/// <summary>
 		/// The static talkers correspond to classes who launch static events.
 		/// </summary>
-		static Dictionary<Type, Dictionary<String, MethodInfo[]>> StaticTalkers =
+		static readonly Dictionary<Type, Dictionary<String, MethodInfo[]>> StaticTalkers =
 			new Dictionary<Type, Dictionary<String, MethodInfo[]>>();
 
 		/// <summary>
 		/// The dynamic talkers correspond to classes who launch events which refer to them.
 		/// </summary>
-		static Dictionary<System.Object, Dictionary<String, MethodInfo[]>> DynamicTalkers =
-			new Dictionary<System.Object, Dictionary<String, MethodInfo[]>>();
+		static readonly Dictionary<Object, Dictionary<String, MethodInfo[]>> DynamicTalkers =
+			new Dictionary<Object, Dictionary<String, MethodInfo[]>>();
 
 		/// <summary>
 		/// The listeners correspond to classes who attend some events for fire callbacks.
 		/// There can be two kinds of listeners : Type (for static method) and Object (for instance method)
 		/// </summary>
-		static Dictionary<String, Dictionary<System.Object, Delegate>> Listeners =
-			new Dictionary<String, Dictionary<System.Object, Delegate>>();
+		static readonly Dictionary<String, Dictionary<Object, Delegate>> Listeners =
+			new Dictionary<String, Dictionary<Object, Delegate>>();
 
 		#region Talkers
 
@@ -56,7 +55,7 @@ namespace KingdomsRebellion.Core {
 			T talker,
 			String eventName,
 			BindingFlags flags,
-			Dictionary<T, Dictionary<String, MethodInfo[]>> talkers
+			IDictionary<T, Dictionary<string, MethodInfo[]>> talkers
 		) {
 			if (talker == null || eventName == null) {
 				throw new ArgumentNullException();
@@ -70,10 +69,9 @@ namespace KingdomsRebellion.Core {
 				throw new EventNotFoundException();
 			}
 
-			System.Object invokedTalker = talker is Type ? null : talker as System.Object;
-
 			// Connect all listeners
 			if (Listeners.ContainsKey(eventName)) {
+                Object invokedTalker = talker is Type ? null : talker as Object;
 				foreach (var pair in Listeners[eventName]) {
 					try {
 						eventAdd.Invoke(invokedTalker, new object[] { pair.Value });
@@ -87,13 +85,13 @@ namespace KingdomsRebellion.Core {
 			if (!talkers.ContainsKey(talker)) {
 				talkers[talker] = new Dictionary<String, MethodInfo[]>();
 			}
-			talkers[talker].Add(eventName, new MethodInfo[]{ eventAdd, eventRemove });
+			talkers[talker].Add(eventName, new[]{ eventAdd, eventRemove });
 		}
 
 		static void AbstractDenial<T>(
 			T talker,
 			string eventName,
-			Dictionary<T, Dictionary<String, MethodInfo[]>> talkers
+			IDictionary<T, Dictionary<String, MethodInfo[]>> talkers
 		) {
 			if (talker == null || eventName == null) {
 				throw new ArgumentNullException();
@@ -103,10 +101,9 @@ namespace KingdomsRebellion.Core {
 				throw new EventNotRegisteredException();
 			}
 
-			System.Object invokedTalker = talker is Type ? null : talker as System.Object;
-
 			// Disconnect all listeners
 			if (Listeners.ContainsKey(eventName)) {
+                Object invokedTalker = talker is Type ? null : talker as Object;
 				foreach (var pair in Listeners[eventName]) {
 					talkers[talker][eventName][EventRemoveID].Invoke(invokedTalker, new object[] { pair.Value });
 				}
@@ -116,26 +113,26 @@ namespace KingdomsRebellion.Core {
 		}
 
 		public static void Offer(Type typ, String eventName) {
-			AbstractOffer<Type>(typ, eventName, StaticNonPublic, StaticTalkers);
+			AbstractOffer(typ, eventName, StaticNonPublic, StaticTalkers);
 		}
 
 		public static void Denial(Type typ, string eventName) {
-			AbstractDenial<Type>(typ, eventName, StaticTalkers);
+			AbstractDenial(typ, eventName, StaticTalkers);
 		}
 
-		public static void Offer(System.Object self, string eventName) {
-			AbstractOffer<System.Object>(self, eventName, InstanceNonPublic, DynamicTalkers);
+		public static void Offer(Object self, string eventName) {
+			AbstractOffer(self, eventName, InstanceNonPublic, DynamicTalkers);
 		}
 
-		public static void Denial(System.Object self, string eventName) {
-			AbstractDenial<System.Object>(self, eventName, DynamicTalkers);
+		public static void Denial(Object self, string eventName) {
+			AbstractDenial(self, eventName, DynamicTalkers);
 		}
 
 		#endregion
 
 		#region Listeners
 
-		static void AbstractOn(System.Object self, String eventName, BindingFlags flags) {
+		static void AbstractOn(Object self, String eventName, BindingFlags flags) {
 			if (self == null || eventName == null) {
 				throw new ArgumentNullException();
 			}
@@ -172,12 +169,12 @@ namespace KingdomsRebellion.Core {
 			
 			// Add in listeners
 			if (!Listeners.ContainsKey(eventName)) {
-				Listeners[eventName] = new Dictionary<System.Object, Delegate>();
+				Listeners[eventName] = new Dictionary<Object, Delegate>();
 			}
 			Listeners[eventName].Add(self, callback);
 		}
 
-		static void AbstractOff(System.Object obj, String eventName) {
+		static void AbstractOff(Object obj, String eventName) {
 			if (obj == null || eventName == null) {
 				throw new ArgumentNullException();
 			}
@@ -209,11 +206,11 @@ namespace KingdomsRebellion.Core {
 			AbstractOff(typ, eventName);
 		}
 
-		public static void On(System.Object self, string eventName) {
+		public static void On(Object self, string eventName) {
 			AbstractOn(self, eventName, InstanceNonPublic);
 		}
 
-		public static void Off(System.Object self, string eventName) {
+		public static void Off(Object self, string eventName) {
 			AbstractOff(self, eventName);
 		}
 
@@ -223,10 +220,9 @@ namespace KingdomsRebellion.Core {
 			List<Type> args = new List<Type>(method.GetParameters().Select(p => p.ParameterType));
 			if (method.ReturnType == typeof(void)) {
 				return Expression.GetActionType(args.ToArray());
-			} else {
-				args.Add(method.ReturnType);
-				return Expression.GetFuncType(args.ToArray());
 			}
+		    args.Add(method.ReturnType);
+		    return Expression.GetFuncType(args.ToArray());
 		}
 	}
 

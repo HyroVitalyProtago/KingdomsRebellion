@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using UnityEngine;
 
 namespace KingdomsRebellion.Core.Math {
@@ -6,11 +7,12 @@ namespace KingdomsRebellion.Core.Math {
 	/// <summary>
 	/// Light implementation of Vector2 with integers.
 	/// </summary>
-	public class Vec2 {
+	public class Vec2 : IComparable<Vec2> {
 
 		public static readonly Vec2 Zero = new Vec2(0,0);
 		public static readonly Vec2 One = new Vec2(1,1);
-
+        public static readonly Vec2 Up = new Vec2(0,1);
+        public static readonly Vec2 Right = new Vec2(1,0);
 		public readonly int X, Y;
 		
 		public Vec2(int x, int y) {
@@ -38,6 +40,10 @@ namespace KingdomsRebellion.Core.Math {
 			return new Vec2(v.X * scalar, v.Y * scalar);
 		}
 
+		public static Vec2 operator *(Vec2 v1, Vec2 v2) {
+			return new Vec2(v1.X * v2.Y, v1.Y * v2.Y);
+		}
+
 		public static bool operator ==(Vec2 v1, Vec2 v2) {
 			if ((object)v1 == null && (object)v2 == null) return true;
 			if ((object)v1 == null || (object)v2 == null) return false;
@@ -61,13 +67,20 @@ namespace KingdomsRebellion.Core.Math {
 		}
 
 		public override bool Equals(object obj) {
-			if ((object)obj == null || !(obj is Vec2)) return false;
+			if (obj == null || !(obj is Vec2)) return false;
 			Vec2 v = obj as Vec2;
 			return X == v.X && Y == v.Y;
 		}
 
 		public override int GetHashCode() {
 			return X ^ Y;
+		}
+
+		public int CompareTo(Vec2 other) {
+			if (X != other.X) {
+				return X - other.X;
+			}
+			return Y - other.Y;
 		}
 
 		public void Serialize(BinaryWriter writer) {
@@ -80,7 +93,7 @@ namespace KingdomsRebellion.Core.Math {
 		}
 		
 		public Vector3 ToVector3() {
-			return new Vector3(this.X, 0, this.Y);
+			return new Vector3(X, 0, Y);
 		}
 		
 		public static Vec2 FromVector3(Vector3 vector3) {

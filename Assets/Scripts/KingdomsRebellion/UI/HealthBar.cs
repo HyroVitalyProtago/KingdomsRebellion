@@ -1,67 +1,79 @@
-﻿using UnityEngine;
+﻿using KingdomsRebellion.Core;
+using KingdomsRebellion.Core.Components;
+using UnityEngine;
 using UnityEngine.UI;
-using KingdomsRebellion.Core.Model;
-using KingdomsRebellion.Network;
 
-namespace KingdomsRebellion.Core.Player {
+namespace KingdomsRebellion.UI {
 
-	//TODO Call SetActive only one time by creating an event.
-	//
-	// Display a HealthBar on GameObject which have a Canvas containing an Image which contains another name HealthBar. 
-	//
+	/// <summary>
+	/// Display a HealthBar on GameObject which have a Canvas containing an Image which contains another name HealthBar. 
+	/// </summary>
 	public class HealthBar : KRBehaviour {
 
-		private GameObject healthContainer;
-		private RectTransform healthBar;
-		private Unit unitData;
-		private float initWidth;
-		private float initCameraSize;
-		private RectTransform rectTransform;
-		private Image image;
+		GameObject _healthContainer;
+		RectTransform _healthBar;
+        KRHealth _krHealth;
+		float _initWidth;
+		float _initCameraSize;
+		RectTransform _rectTransform;
+		Image _image;
 
-		void OnMainCameraChange() {
-			healthContainer.GetComponentInParent<Canvas>().worldCamera = Camera.main;
-		}
+        void Awake() {
+        	On("OnMainCameraChange");
+
+        	_healthContainer = GetComponentInChildren<Image>().gameObject;
+			_healthContainer.GetComponentInParent<Canvas>().worldCamera = Camera.main;
+			_rectTransform = _healthContainer.GetComponent<RectTransform>();
+			_healthBar = _healthContainer.transform.FindChild("HealthBar").GetComponent<RectTransform>();
+			_image = _healthBar.GetComponent<Image>();
+            _krHealth = transform.GetComponentInParent<KRHealth>();
+        }
 
 		void Start() {
-			On("OnMainCameraChange");
+		    _initCameraSize = 4f;
+			_initWidth = _healthBar.rect.width;
+			_image.color = Color.green;
 
-			healthContainer = GetComponentInChildren<Image>().gameObject;
-			healthContainer.GetComponentInParent<Canvas>().worldCamera = Camera.main;
-			rectTransform = healthContainer.GetComponent<RectTransform>();
-			healthBar = healthContainer.transform.FindChild("HealthBar").GetComponent<RectTransform>();
-			image = healthBar.GetComponent<Image>();
-			unitData = transform.GetComponentInParent<Unit>();
-			initCameraSize = Camera.main.orthographicSize; // Set a value by default to have the same for all units without depending on initial zoom.
-			initWidth = healthBar.rect.width;
-			image.color = Color.green;
-			healthContainer.SetActive(false);
-			enabled = false;
+			Hide();
 		}
 
 		void Update() {
-			healthContainer.transform.position = transform.position + 2 * Vector3.up;
-			float lifePercent = (float)unitData.life / (float)unitData.lifeMax;
-			var scale = rectTransform.localScale = Vector3.one + (1 - Camera.main.orthographicSize / initCameraSize) * Vector3.one;
-			healthBar.sizeDelta = new Vector2(initWidth * lifePercent, healthBar.rect.height);
-			if (lifePercent <= 0.66f && lifePercent > 0.33f) {
-				image.color = Color.yellow;
-			} else if (lifePercent <= 0.33f) {
-				image.color = Color.red;
+			_healthContainer.transform.position = transform.position + 2 * Vector3.up;
+			if (Camera.main.orthographicSize / _initCameraSize > 1.5f) {
+				_rectTransform.localScale = Vector3.one;
 			} else {
-				image.color = Color.green;
+				_rectTransform.localScale = 2 * (Vector3.one + (1 - Camera.main.orthographicSize / _initCameraSize) * Vector3.one);
+			}
+
+			// TODO update color or size only when something change with listener/event system (OnHealthChange)
+			OnHealthChange();
+		}
+
+		void OnHealthChange() {
+            float lifePercent = (float)_krHealth.Life / (float)_krHealth.LifeMax;
+			_healthBar.sizeDelta = new Vector2(_initWidth * lifePercent, _healthBar.rect.height);
+			if (lifePercent <= 0.66f && lifePercent > 0.33f) {
+				_image.color = Color.yellow;
+			} else if (lifePercent <= 0.33f) {
+				_image.color = Color.red;
+			} else {
+				_image.color = Color.green;
 			}
 		}
 
-		public void HideHealthBar() {
-			enabled = false;
-			healthContainer.SetActive(false);
+		void OnMainCameraChange() {
+			_healthContainer.GetComponentInParent<Canvas>().worldCamera = Camera.main;
 		}
 
-		public void ShowHealthBar() {
-			Update();
+		public void Show() {
 			enabled = true;
-			healthContainer.SetActive(true);
+			Update(); // for better display
+			_healthContainer.SetActive(true);
+		}
+
+		public void Hide() {
+			enabled = false;
+			_healthContainer.SetActive(false);
 		}
 	}
 }

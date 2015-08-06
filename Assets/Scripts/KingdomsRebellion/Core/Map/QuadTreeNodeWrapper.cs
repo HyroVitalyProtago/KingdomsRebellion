@@ -1,14 +1,11 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using KingdomsRebellion.AI;
-using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Core.Interfaces;
-using System;
+using KingdomsRebellion.Core.Math;
 
 namespace KingdomsRebellion.Core.Map {
-	public class QuadTreeNodeWrapper<T> : AbstractNode<QuadTreeNode<T>>, IPos where T : IPos, HaveRadius {
+	public class QuadTreeNodeWrapper<T> : AbstractNode<QuadTreeNode<T>>, IPos where T : IPos, ISize {
 		QuadTreeNode<T> _node;
 
 		public Vec2 Pos { get { return _node.Pos; } }

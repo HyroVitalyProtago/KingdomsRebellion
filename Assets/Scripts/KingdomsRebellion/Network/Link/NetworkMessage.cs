@@ -1,7 +1,5 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using KingdomsRebellion.Core;
-using KingdomsRebellion.Network;
 
 namespace KingdomsRebellion.Network.Link {
 	public abstract class NetworkMessage : KRObject {
@@ -12,12 +10,12 @@ namespace KingdomsRebellion.Network.Link {
 				return _lockstepTurn.Value; // throw InvalidStateException if null
 			}
 			set {
-				_lockstepTurn = (uint?) value;
+				_lockstepTurn = value;
 			}
 		}
 
 		protected NetworkMessage(uint lockstepTurn) {
-			_lockstepTurn = (uint?) lockstepTurn;
+			_lockstepTurn = lockstepTurn;
 		}
 
 		protected NetworkMessage() {}

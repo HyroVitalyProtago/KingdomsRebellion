@@ -1,6 +1,6 @@
-﻿using UnityEngine;
-using System.Text;
+﻿using System.Text;
 using KingdomsRebellion.Core;
+using UnityEngine;
 
 namespace KingdomsRebellion.Network {
 
@@ -8,7 +8,7 @@ namespace KingdomsRebellion.Network {
 	public class NetworkUI : KRBehaviour {
 
 		static StringBuilder Builder = new StringBuilder().AppendLine("Console :");
-		static int BuilderNbLines = 0;
+		static int BuilderNbLines;
 		static string Console = "Console :";
 		static bool IsSetup, IsConnected, IsLaunched;
 		string ip, port;

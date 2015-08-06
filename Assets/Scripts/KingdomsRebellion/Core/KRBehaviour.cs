@@ -1,7 +1,7 @@
-﻿using UnityEngine;
-using System;
-using System.Reflection;
+﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
+using Object = System.Object;
 
 namespace KingdomsRebellion.Core {
 
@@ -11,13 +11,13 @@ namespace KingdomsRebellion.Core {
 	/// </summary>
 	public class KRBehaviour : MonoBehaviour {
 
-		Dictionary<String, System.Object> _properties;
+		Dictionary<String, Object> _properties;
 
 		protected KRBehaviour() {
-			_properties = new Dictionary<String, System.Object>();
+			_properties = new Dictionary<String, Object>();
 		}
 
-		public void SetProperty(String name, System.Object value) {
+		public void SetProperty(String name, Object value) {
 			if (value == null) {
 				_properties.Remove(name);
 			} else {
@@ -32,7 +32,7 @@ namespace KingdomsRebellion.Core {
 		void AbstractEventConductor(
 			string eventName,
 			Action<Type, String> f1,
-			Action<System.Object, String> f2,
+			Action<Object, String> f2,
 			Type catchException
 		) {
 			// try on static property
@@ -40,7 +40,10 @@ namespace KingdomsRebellion.Core {
 				f1(GetType(), eventName);
 				return;
 			} catch (Exception e) {
-				if (!catchException.IsInstanceOfType(e)) throw e;
+				if (!catchException.IsInstanceOfType(e)) {
+					Debug.LogError(GetType());
+					throw e;
+				}
 			}
 			
 			// try on instance property

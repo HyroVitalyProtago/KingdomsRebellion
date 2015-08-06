@@ -1,20 +1,26 @@
 using System;
 using KingdomsRebellion.Core.Math;
+using KingdomsRebellion.Core;
+using UnityEngine;
+using KingdomsRebellion.Core.FSM;
+using System.IO;
 
 namespace KingdomsRebellion.Network.Link {
 
 	/// <summary>
 	/// Action send over the network for move units.
 	/// </summary>
-	public class MoveAction : SelectAction {
+	public class MoveAction : GameAction {
 
-		event Action<int, Vec3> OnMove;
+		protected Vec2 _modelPoint;
 
-		public static new MoveAction FromBytes(byte[] data) {
+		public static MoveAction FromBytes(byte[] data) {
 			return new MoveAction().GetFromBytes(data) as MoveAction;
 		}
 
-		public MoveAction(uint lockStepTurn, Vec3 modelPoint) : base(lockStepTurn, modelPoint) {}
+		public MoveAction(Vec2 modelPoint) {
+			_modelPoint = modelPoint;
+		}
 	
 		protected MoveAction() {}
 
@@ -22,12 +28,20 @@ namespace KingdomsRebellion.Network.Link {
 			return (byte) GameActionEnum.MoveAction;
 		}
 
-		public override void Process(int playerID) {
-			Offer("OnMove");
-			if (OnMove != null) {
-				OnMove(playerID, _modelPoint);
-			}
-			Denial("OnMove");
+		public override Action<GameObject> GetAction() {
+			return delegate(GameObject go) {
+				go.GetComponent<FiniteStateMachine>().Move(_modelPoint);
+			};
+		}
+
+		protected override void Serialize(BinaryWriter writer) {
+			base.Serialize(writer);
+			_modelPoint.Serialize(writer);
+		}
+		
+		protected override void Deserialize(BinaryReader reader) {
+			base.Deserialize(reader);
+			_modelPoint = Vec2.Deserialize(reader);
 		}
 	}
 

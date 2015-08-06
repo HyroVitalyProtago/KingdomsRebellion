@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using KingdomsRebellion.Core.Math;
-using KingdomsRebellion.Core.Interfaces;
-using UnityEngine;
 using System.Linq;
+using KingdomsRebellion.Core.Interfaces;
+using KingdomsRebellion.Core.Math;
 
 namespace KingdomsRebellion.Core.Map {
 
-	public class QuadTreeNode<T> : KRObject, IPos where T : IPos, HaveRadius {
+	public class QuadTreeNode<T> : KRObject, IPos where T : IPos, ISize {
 
 		enum ESide { NORTH, EAST, SOUTH, WEST }
 		enum EQuadrant { NORTHWEST, NORTHEAST, SOUTHWEST, SOUTHEAST }

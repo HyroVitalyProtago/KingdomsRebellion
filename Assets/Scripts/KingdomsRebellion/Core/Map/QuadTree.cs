@@ -2,13 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using KingdomsRebellion.Core.Math;
-using KingdomsRebellion.Core.Interfaces;
 using KingdomsRebellion.AI;
-using UnityEngine;
+using KingdomsRebellion.Core.Interfaces;
+using KingdomsRebellion.Core.Math;
 
 namespace KingdomsRebellion.Core.Map {
-	public class QuadTree<T> : IMap<QuadTreeNode<T>,T> where T : IPos, HaveRadius {
+	public class QuadTree<T> : IMap<QuadTreeNode<T>,T> where T : IPos, ISize {
 
 		QuadTreeNode<T> _node;
 		IList<T> _objects;
@@ -41,7 +40,7 @@ namespace KingdomsRebellion.Core.Map {
 			if (!IsInBounds(pos)) {
 				return null;
 			}
-			return QuadTreeNodeWrapper<T>.Wrap(_node.Find(pos)) as AbstractNode<QuadTreeNode<T>>;
+			return QuadTreeNodeWrapper<T>.Wrap(_node.Find(pos));
 		}
 
 		public T Find(Vec2 pos) {
@@ -55,6 +54,6 @@ namespace KingdomsRebellion.Core.Map {
 		public bool IsEmpty(Vec2 target) { return _node.IsEmpty(target); }
 		public void Walk(Action<QuadTreeNode<T>> f) { _node.Walk(f); }
 		public IEnumerator<T> GetEnumerator() { return _objects.ToList().GetEnumerator(); }
-		IEnumerator IEnumerable.GetEnumerator() { return _objects.ToList().GetEnumerator() as IEnumerator; }
+		IEnumerator IEnumerable.GetEnumerator() { return _objects.ToList().GetEnumerator(); }
 	}
 }

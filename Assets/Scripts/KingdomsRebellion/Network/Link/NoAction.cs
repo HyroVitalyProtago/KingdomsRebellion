@@ -10,13 +10,15 @@ namespace KingdomsRebellion.Network.Link {
 			return new NoAction().GetFromBytes(data) as NoAction;
 		}
 
-		public NoAction(uint lockStepTurn) : base(lockStepTurn) {}
+		public NoAction(uint lockstepTurn) : base(lockstepTurn) {}
 
-		private NoAction() : base() {}
+		private NoAction() {}
 
 		public override byte ActionType() {
 			return (byte) GameActionEnum.NoAction;
 		}
+
+		public override void Process(int playerID) {}
 	}
 
 }

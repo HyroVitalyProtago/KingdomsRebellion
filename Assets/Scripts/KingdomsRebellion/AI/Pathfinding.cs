@@ -1,11 +1,5 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using KingdomsRebellion.Core;
-using KingdomsRebellion.Core.Math;
-using KingdomsRebellion.Core.Grid;
-using KingdomsRebellion.Core.Map;
 using KingdomsRebellion.Core.Interfaces;
 
 namespace KingdomsRebellion.AI {

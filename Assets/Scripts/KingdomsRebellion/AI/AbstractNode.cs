@@ -1,8 +1,8 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Core.Interfaces;
+using UnityEngine;
+using Object = System.Object;
 
 namespace KingdomsRebellion.AI {
 	public abstract class AbstractNode<T> : IComparable where T : IPos {
@@ -65,11 +65,11 @@ namespace KingdomsRebellion.AI {
 		public static bool operator ==(AbstractNode<T> a, AbstractNode<T> b) {
 			if (((object)a == null) && ((object)b == null)) { return true; }
 			if (((object)a == null) || ((object)b == null)) { return false; }
-			return System.Object.ReferenceEquals(a.WrappedNode(), b.WrappedNode());
+			return ReferenceEquals(a.WrappedNode(), b.WrappedNode());
 		}
 		public static bool operator !=(AbstractNode<T> a, AbstractNode<T> b) { return !(a == b); }
 
-		public override bool Equals(System.Object obj) {
+		public override bool Equals(Object obj) {
 			AbstractNode<T> p = obj as AbstractNode<T>;
 			if ((object)p == null) { return false; }
 			return this == p;

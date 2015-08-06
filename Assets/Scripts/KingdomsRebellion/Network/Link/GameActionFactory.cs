@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace KingdomsRebellion.Network.Link {
 	public static class GameActionFactory {
@@ -10,14 +11,16 @@ namespace KingdomsRebellion.Network.Link {
 			} else if (b == (byte) GameActionEnum.SelectAction) {
 				return SelectAction.FromBytes(data);
 			} else if (b == (byte) GameActionEnum.DragAction) {
-				// return DragAction.FromBytes(data);
+				 return DragAction.FromBytes(data);
 			} else if (b == (byte) GameActionEnum.MoveAction) {
 				return MoveAction.FromBytes(data);
             } else if (b == (byte) GameActionEnum.AttackAction) {
                 return AttackAction.FromBytes(data);
-            }
+			} else if (b == (byte) GameActionEnum.SpawnAction) {
+				return SpawnAction.FromBytes(data);
+			}
 
-			throw new ArgumentException("GameActionFactory :: Get : data type don't correspond a known GameAction");
+		    throw new ArgumentException("GameActionFactory :: Get : data type don't correspond a known GameAction");
 		}
 	}
 }
