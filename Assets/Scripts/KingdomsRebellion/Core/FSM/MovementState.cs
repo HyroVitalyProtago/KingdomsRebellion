@@ -13,20 +13,20 @@ namespace KingdomsRebellion.Core.FSM {
         }
 
         public override void Enter() {
-            Debug.Log("Encore du travail ?");
+//            Debug.Log("Encore du travail ?");
         }
 
         public override Type Execute() {
             if (!_movement.HaveTarget()) { return null; }
             
-			Debug.Log("tiptap");
+//			Debug.Log("tiptap");
             _movement.UpdateGame();
 
             return GetType();
         }
 
         public override void Exit() {
-            Debug.Log("Je m'arrête !");
+//            Debug.Log("Je m'arrête !");
         }
     }
 }

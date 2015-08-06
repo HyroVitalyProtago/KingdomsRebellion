@@ -20,7 +20,7 @@ namespace KingdomsRebellion.Core.FSM {
         }
 
         public override void Enter() {
-            Debug.Log("A L'ATTAAAAQUE !!!");
+//            Debug.Log("A L'ATTAAAAQUE !!!");
         }
 
         public override Type Execute() {
@@ -42,7 +42,7 @@ namespace KingdomsRebellion.Core.FSM {
 
 			if (Vec2.Dist(_attack.Target.GetComponent<KRTransform>().Pos, _krtransform.Pos) ==
                 _attack.Range) {
-                Debug.Log("FRAPPE !");
+//                Debug.Log("FRAPPE !");
                 _attack.UpdateGame();
             } else {
 				if (_krmovement != null) {
@@ -56,7 +56,7 @@ namespace KingdomsRebellion.Core.FSM {
         }
 
         public override void Exit() {
-            Debug.Log("Y a plus rien à attaquer :( !");
+//            Debug.Log("Y a plus rien à attaquer :( !");
         }
     }
 }

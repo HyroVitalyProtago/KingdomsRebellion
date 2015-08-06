@@ -1,11 +1,14 @@
 ﻿using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Core.Interfaces;
 using UnityEngine;
+using System;
 
 namespace KingdomsRebellion.Core.Components {
 
 	public class KRTransform : KRBehaviour, IPos, ISize {
     	public int __playerID, __sizeX, __sizeY; // just for Unity Editor
+
+		event Action<GameObject> OnBirth;
 
 		public int PlayerID { get; set; }
 		public Vec2 Pos {
@@ -28,6 +31,11 @@ namespace KingdomsRebellion.Core.Components {
 			Size = new Vec2(__sizeX, __sizeY);
 
 			KRFacade.Add(this);
+			Offer("OnBirth");
+		}
+
+		void Start() {
+			if (OnBirth != null) { OnBirth(gameObject); }
 		}
     }
 }

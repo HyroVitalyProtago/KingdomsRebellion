@@ -16,6 +16,8 @@ namespace KingdomsRebellion.Inputs {
 
 		static Vec2 beginDrag;
 
+		public static Vec2 BeginDrag { get { return beginDrag; } }
+
 		public InputNetworkAdapter() {
 			Debug.Assert(!Instatiated);
 			Instatiated = true;
@@ -28,13 +30,13 @@ namespace KingdomsRebellion.Inputs {
 			Offer("OnDemand");
 		}
 
-		static Vector3 WorldPosition(Vector3 mousePosition) {
+		public static Vector3 WorldPosition(Vector3 mousePosition) {
 			Vector3 worldPosition = new Vector3(-1, -1, -1);
 			
 			Ray ray = Camera.main.ScreenPointToRay(mousePosition);
 			RaycastHit hit;
 			if (Physics.Raycast(ray.origin, ray.direction, out hit)) {
-				if (hit.collider.gameObject.tag == "Selectable") {
+				if (hit.collider.gameObject.CompareTag("Selectable")) {
 					worldPosition = hit.collider.gameObject.transform.position;
 				} else {
 					worldPosition = hit.point;
@@ -72,6 +74,7 @@ namespace KingdomsRebellion.Inputs {
 		    if (!PlayerActions.IsMines()) return;
 
 			Vector3 worldPosition = new Vector3(-1, -1, -1);
+			Vec2 pos = new Vec2(-1,-1);
 			
 			Ray ray = Camera.main.ScreenPointToRay(mousePosition);
 			RaycastHit hit;
@@ -79,19 +82,25 @@ namespace KingdomsRebellion.Inputs {
 			    GameObject go = hit.collider.gameObject;
 				if (go.CompareTag("Selectable")) {
                     worldPosition = go.transform.position;
+					pos = Vec2.FromVector3(worldPosition);
+					if (!KRFacade.IsInBounds(pos)) return;
 					if (go.GetComponent<KRTransform>().PlayerID != NetworkAPI.PlayerId) {
 						if (OnDemand != null) {
-							OnDemand(new AttackAction(Vec2.FromVector3(worldPosition)));
+							OnDemand(new AttackAction(pos));
 				            return;
 				        }
 				    }
 				} else {
 					worldPosition = hit.point;
+					pos = Vec2.FromVector3(worldPosition);
+					if (!KRFacade.IsInBounds(pos)) return;
 				}
+			} else {
+				return;
 			}
 			
 			if (OnDemand != null) {
-				OnDemand(new MoveAction(Vec2.FromVector3(worldPosition)));
+				OnDemand(new MoveAction(pos));
 			}
 		}
 

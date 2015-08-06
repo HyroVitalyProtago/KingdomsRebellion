@@ -31,8 +31,6 @@ namespace KingdomsRebellion.Core {
 #endif
 		}
 
-//		public static IMap<QuadTreeNode<KRTransform>,KRTransform> GetMap() { return _Map; }
-
 		public static IEnumerable<QuadTreeNode<KRTransform>> FindPath(Vec2 start, Vec2 target) {
 			return Pathfinding<QuadTreeNode<KRTransform>>.FindPath(_Map.FindNode(start), _Map.FindNode(target))
 				.Select(abstractNode => abstractNode.WrappedNode());
@@ -52,17 +50,10 @@ namespace KingdomsRebellion.Core {
 			return (u == null) ? null : u.gameObject;
 		}
 
-		public static void Add(KRTransform t) {
-			_Map.Add(t);
-		}
-
-		public static void Remove(KRTransform t) {
-			_Map.Remove(t);
-		}
-
-		public static bool IsEmpty(Vec2 v) {
-			return _Map.IsEmpty(v);
-		}
+		public static void Add(KRTransform t) { _Map.Add(t); }
+		public static void Remove(KRTransform t) { _Map.Remove(t); }
+		public static bool IsEmpty(Vec2 v) { return _Map.IsEmpty(v); }
+		public static bool IsInBounds(Vec2 v) { return _Map.IsInBounds(v); }
 
 		/// <summary>
 		/// Find all gameObjects in the rect define by v1 and v2 and v3.

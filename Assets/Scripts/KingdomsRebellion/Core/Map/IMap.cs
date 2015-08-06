@@ -11,6 +11,7 @@ namespace KingdomsRebellion.Core.Map {
 		bool Remove(T u);
 		T Find(Vec2 pos);
 		bool IsEmpty(Vec2 pos);
+		bool IsInBounds(Vec2 pos);
 		AbstractNode<N> FindNode(Vec2 pos);
 		void Walk(Action<N> f);
 	}

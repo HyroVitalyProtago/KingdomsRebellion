@@ -5,7 +5,7 @@ namespace KingdomsRebellion.Core.Components {
 
 	[RequireComponent(typeof(HealthBar))] // TODO inverse dependency
 	public class KRSelection : KRBehaviour {
-		
+
 		public bool IsSelected { get; private set; }
 		
 		HealthBar _healthBar;
