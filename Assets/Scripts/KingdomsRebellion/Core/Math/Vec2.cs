@@ -11,7 +11,8 @@ namespace KingdomsRebellion.Core.Math {
 
 		public static readonly Vec2 Zero = new Vec2(0,0);
 		public static readonly Vec2 One = new Vec2(1,1);
-
+        public static readonly Vec2 Up = new Vec2(0,1);
+        public static readonly Vec2 Right = new Vec2(1,0);
 		public readonly int X, Y;
 		
 		public Vec2(int x, int y) {

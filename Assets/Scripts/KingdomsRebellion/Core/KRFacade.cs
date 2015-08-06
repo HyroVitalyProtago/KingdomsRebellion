@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -143,6 +144,52 @@ namespace KingdomsRebellion.Core {
 			return _Map.ToList().Where(u => u.Pos.Dist(v) <= maxDist).Select(u => u.gameObject);
 		}
 
+	    public static Vec2 NearSquareAt(Vec2 v1, Vec2 v2, int dist) {
+	        if (dist <= 0) return null;
+	        Vec2 dir = v1 - v2;
+	        Vec2 leftB, leftT;
+	        Vec2 res;
+	        if (dir.X > 0) {
+	            res = v2 + new Vec2(dist, 0);
+	            leftB = v2 + new Vec2(dist, dist);
+	            leftT = v2 + new Vec2(dist, -dist);
+	        } else if (dir.X < 0) {
+                res = v2 + new Vec2(-dist, 0);
+                leftB = v2 + new Vec2(-dist, -dist);
+                leftT = v2 + new Vec2(-dist, dist);
+	        } else {
+	            if (dir.Y < 0) {
+                    res = v2 + new Vec2(0, -dist);
+                    leftB = v2 + new Vec2(-dist, dist);
+                    leftT = v2 + new Vec2(dist, dist);
+	            } else {
+                    res = v2 + new Vec2(0, dist);
+                    leftB = v2 + new Vec2(dist, -dist);
+                    leftT = v2 + new Vec2(-dist, -dist);
+	            }
+	        }
+	        if (_Map.IsEmpty(res)) return res;
+	        Vec2 left = new Vec2(res.X, res.Y);
+            Vec2 right = new Vec2(res.X, res.Y);
+	        bool onBottom = false;
+            bool onTop = false;
+	        while (!_Map.IsEmpty(left) || !_Map.IsEmpty(right)) {
+	            if (!onBottom) {
+	                left -= Vec2.Right;
+                    right += Vec2.Right;
+                } else if (!onTop) {
+                    left += Vec2.Up;
+                    right += Vec2.Up;
+                } else {
+                    left += Vec2.Right;
+                    right -= Vec2.Right;
+                }
+	            if (left == leftB) onBottom = true;
+	            if (left == leftT) onTop = true;
+	            if (left == right && !_Map.IsEmpty(left)) return null;
+	        }
+	        return _Map.IsEmpty(left) ? left : right;
+	    }
 #if !UNITY_EDITOR
 		static void OnKRDrawGizmos() {
 			Gizmos.color = Color.magenta;

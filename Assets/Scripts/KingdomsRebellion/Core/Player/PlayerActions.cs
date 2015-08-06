@@ -51,7 +51,16 @@ namespace KingdomsRebellion.Core.Player {
 
 		// TODO
 		void OnSpawn(int playerID, KeyCode keyCode) {
-			_selectedObjects[playerID][0].GetComponent<KRSpawn>().Spawn(0);
+		    switch (keyCode) {
+		        case KeyCode.C : 
+                    _selectedObjects[playerID][0].GetComponent<KRSpawn>().Spawn("Infantry");
+		            break;
+                case KeyCode.V :
+                    Debug.Log("archer");
+                    _selectedObjects[playerID][0].GetComponent<KRSpawn>().Spawn("Archer");
+		            break;
+		    }
+		   
 		}
 
 	    public static bool IsMines() {

@@ -12,21 +12,12 @@ namespace KingdomsRebellion.Core.FSM {
 			_movement = fsm.GetComponent<KRMovement>();
         }
 
-        public override void Enter() {
-            Debug.Log("Encore du travail ?");
-        }
-
         public override Type Execute() {
             if (!_movement.HaveTarget()) { return null; }
             
-			Debug.Log("tiptap");
             _movement.UpdateGame();
 
             return GetType();
-        }
-
-        public override void Exit() {
-            Debug.Log("Je m'arrête !");
         }
     }
 }
