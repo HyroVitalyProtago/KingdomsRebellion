@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using KingdomsRebellion.Core.Math;
-using KingdomsRebellion.Core.Model;
 using UnityEngine;
 
 namespace KingdomsRebellion.Core.Grid {
-    
+/*
     public abstract class AbstractGrid {
 
         public abstract void Add(GameObject go, Vec2 position);
@@ -47,4 +46,5 @@ namespace KingdomsRebellion.Core.Grid {
 		public abstract Node NodeOf(Vec2 v);
 		public abstract IEnumerable<Node> GetNeighbours(Node n);
     }
+*/
 }

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Network;
-using KingdomsRebellion.Tools.UI;
+using KingdomsRebellion.UI;
 using UnityEngine;
 
 namespace KingdomsRebellion.Core.Player {
@@ -88,20 +88,20 @@ namespace KingdomsRebellion.Core.Player {
 		protected virtual void ApplySelection(int playerID) {}
 		protected virtual void ApplyDeselection(int playerID) {}
 
-		protected virtual void OnModelSelect(int player, Vec3 modelPosition) {
+		protected virtual void OnModelSelect(int player, Vec2 modelPosition) {
 			DeselectUnits(player);
 
-			GameObject go = KRFacade.Find(new Vec2(modelPosition.X, modelPosition.Z));
+			GameObject go = KRFacade.Find(modelPosition);
 			if (go != null) {
 				selectedObjects[player].Add(go);
 				ApplySelection(player);
 			}
 		}
 
-		protected virtual void OnModelDrag(int player, Vec3 beginModelPosition, Vec3 endModelPosition, Vec3 z) {
+		protected virtual void OnModelDrag(int player, Vec2 beginModelPosition, Vec2 endModelPosition, Vec2 z) {
 			DeselectUnits(player);
 
-			IEnumerable<GameObject> gos = KRFacade.Find(beginModelPosition.ToVec2(), endModelPosition.ToVec2(), z.ToVec2());
+			IEnumerable<GameObject> gos = KRFacade.Find(beginModelPosition, endModelPosition, z);
 			foreach (GameObject go in gos) {
 				selectedObjects[player].Add(go);
 			}

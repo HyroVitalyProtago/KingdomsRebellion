@@ -1,19 +1,15 @@
-﻿using KingdomsRebellion.Core.Grid;
+﻿using System;
 
 namespace KingdomsRebellion.Core.FSM {
     public abstract class FSMState {
 
-        protected FiniteStateMachine fsm;
-        AbstractGrid _grid;
+        protected FiniteStateMachine _fsm;
 
-        protected FSMState(FiniteStateMachine fsm) {
-            this.fsm = fsm;
-        }
+        protected FSMState(FiniteStateMachine fsm) { _fsm = fsm; }
 
-
-        public abstract void Enter();
-        public abstract void Execute();
-        public abstract void Exit();
+        public virtual void Enter() {}
+        public abstract Type Execute();
+        public virtual void Exit() {}
 
     }
 }

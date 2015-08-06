@@ -1,32 +1,23 @@
-﻿using KingdomsRebellion.Core.Model;
+﻿using System;
 using KingdomsRebellion.Core.Player;
 using UnityEngine;
+using KingdomsRebellion.Core.Components;
 
 namespace KingdomsRebellion.Core.FSM {
 
     public class MovementState : FSMState {
-        readonly Movement _movement;
+        readonly KRMovement _movement;
 
         public MovementState(FiniteStateMachine fsm) : base(fsm) {
-            _movement = fsm.GetComponent<Movement>();
+			_movement = fsm.GetComponent<KRMovement>();
         }
 
-        public override void Enter() {
-            Debug.Log("Encore du travail ?");
-        }
-
-        public override void Execute() {
-			if (_movement._Follow) _movement.Target = _movement._Follow.GetComponent<Unit>().Pos;
-            if (_movement.Target == null || _movement.Pos == _movement.Target) {
-                fsm.PopState();
-                return;
-            }
-            Debug.Log("tiptap");
+        public override Type Execute() {
+            if (!_movement.HaveTarget()) { return null; }
+            
             _movement.UpdateGame();
-        }
 
-        public override void Exit() {
-            Debug.Log("Je m'arrête ! ");
+            return GetType();
         }
     }
 }

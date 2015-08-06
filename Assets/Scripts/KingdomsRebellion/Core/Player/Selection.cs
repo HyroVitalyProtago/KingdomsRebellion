@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using KingdomsRebellion.Core.Math;
-using KingdomsRebellion.Core.Model;
+using KingdomsRebellion.Core.Components;
 using KingdomsRebellion.Network;
 using UnityEngine;
 
@@ -20,7 +19,7 @@ namespace KingdomsRebellion.Core.Player {
 
 			Offer("OnSelection");
 		}
-
+/*
 		void PreSelected(GameObject go) {
 			var unit = go.GetComponent<Unit>();
 			if (unit == null)
@@ -36,7 +35,7 @@ namespace KingdomsRebellion.Core.Player {
 				}
 			}
 		}
-
+*/
 //		protected override void OnUpdateDrag(int playerId, Vector3 originWorldPoint, Camera currentCamera, Vector3 currentMousePousition) {
 //			if (!isDragging) {
 //				timeLeftBeforeDragging -= Time.deltaTime;
@@ -103,7 +102,7 @@ namespace KingdomsRebellion.Core.Player {
 //			if (playerID == NetworkAPI.PlayerId && selectedObjects[playerID].Count == 1) { // show healthbar for selection of one unit
 //				selectedObjects[playerID][0].GetComponent<HealthBar>().ShowHealthBar();
 //			}
-			foreach (var o in selectedObjects[playerID]) { o.GetComponent<HealthBar>().ShowHealthBar(); }
+			foreach (var o in selectedObjects[playerID]) { o.GetComponent<KRSelection>().Select(); }
 			if (OnSelection != null) {
 				OnSelection(playerID, selectedObjects[playerID]);
 			}
@@ -111,7 +110,7 @@ namespace KingdomsRebellion.Core.Player {
 
 		protected override void ApplyDeselection(int playerID) {
 			foreach (var go in selectedObjects[playerID]) {
-				go.GetComponent<HealthBar>().HideHealthBar();
+				go.GetComponent<KRSelection>().Deselect();
 			}
 		}
 

@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
 using System.IO;
 using KingdomsRebellion.Core.Math;
 
@@ -10,17 +9,17 @@ namespace KingdomsRebellion.Network.Link {
 	/// </summary>
 	public class DragAction : GameAction {
 		
-		event Action<int, Vec3, Vec3, Vec3> OnModelDrag;
+		event Action<int, Vec2, Vec2, Vec2> OnModelDrag;
 		
-		protected Vec3 _beginModelPoint;
-		protected Vec3 _endModelPoint;
-		protected Vec3 _z;
+		protected Vec2 _beginModelPoint;
+		protected Vec2 _endModelPoint;
+		protected Vec2 _z;
 		
 		public static DragAction FromBytes(byte[] data) {
 			return new DragAction().GetFromBytes(data) as DragAction;
 		}
 		
-		public DragAction(uint lockStepTurn, Vec3 beginModelPoint, Vec3 endModelPoint, Vec3 z) : base(lockStepTurn) {
+		public DragAction(uint lockStepTurn, Vec2 beginModelPoint, Vec2 endModelPoint, Vec2 z) : base(lockStepTurn) {
 			_beginModelPoint = beginModelPoint;
 			_endModelPoint = endModelPoint;
 			_z = z;
@@ -49,9 +48,9 @@ namespace KingdomsRebellion.Network.Link {
 		
 		protected override void Deserialize(BinaryReader reader) {
 			base.Deserialize(reader);
-			_beginModelPoint = Vec3.Deserialize(reader);
-			_endModelPoint = Vec3.Deserialize(reader);
-			_z = Vec3.Deserialize(reader);
+			_beginModelPoint = Vec2.Deserialize(reader);
+			_endModelPoint = Vec2.Deserialize(reader);
+			_z = Vec2.Deserialize(reader);
 		}
 		
 	}

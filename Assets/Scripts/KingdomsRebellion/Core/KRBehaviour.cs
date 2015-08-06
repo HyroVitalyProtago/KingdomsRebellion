@@ -40,7 +40,10 @@ namespace KingdomsRebellion.Core {
 				f1(GetType(), eventName);
 				return;
 			} catch (Exception e) {
-				if (!catchException.IsInstanceOfType(e)) throw e;
+				if (!catchException.IsInstanceOfType(e)) {
+					Debug.LogError(GetType());
+					throw e;
+				}
 			}
 			
 			// try on instance property

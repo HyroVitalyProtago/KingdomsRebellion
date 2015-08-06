@@ -1,32 +1,25 @@
-﻿using System.Collections.Generic;
-using KingdomsRebellion.Core.Model;
-using KingdomsRebellion.Core.Player;
+﻿using System;
+using System.Collections.Generic;
+using KingdomsRebellion.Core.Components;
 using UnityEngine;
 
 namespace KingdomsRebellion.Core.FSM {
 
     public class IDLEState : FSMState {
 
-        
-        // Use this for initialization
-        private void Start() {}
-
         public IDLEState(FiniteStateMachine fsm) : base(fsm) {}
 
-        public override void Enter() {}
-
-        public override void Execute() {
-            // TODO IDLE by type of units, here is the code for soldier. Replace 6 by vision sight
-			IEnumerable<GameObject> gameObjects = KRFacade.Around(fsm.GetComponent<Unit>().Pos, 6);
+        // TODO IDLE by type of units, here is the code for soldier. Replace 6 by vision sight
+        public override Type Execute() {
+			IEnumerable<GameObject> gameObjects = KRFacade.Around(_fsm.GetComponent<KRTransform>().Pos, 6);
             foreach (var obj in gameObjects) {
-                if (obj.GetComponent<Unit>().PlayerId != fsm.GetComponent<Unit>().PlayerId) {
-                    fsm.GetComponent<Attack>().Target = obj;
-                    fsm.PushState(new AttackState(fsm), false);
-                    return;
+                KRTransform objTransform = obj.GetComponent<KRTransform>();
+                if (objTransform.PlayerID != _fsm.GetComponent<KRTransform>().PlayerID) {
+                    _fsm.GetComponent<KRAttack>().Target = objTransform;
+                    return typeof(AttackState);
                 }
             }
+            return GetType();
         }
-
-        public override void Exit() {}
     }
 }

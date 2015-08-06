@@ -8,13 +8,13 @@ namespace KingdomsRebellion.Network.Link {
     /// </summary>
     public class AttackAction : SelectAction {
 
-		event Action<int, Vec3> OnAttack;
+		event Action<int, Vec2> OnAttack;
 
 		public static new AttackAction FromBytes(byte[] data) {
             return new AttackAction().GetFromBytes(data) as AttackAction;
 		}
 
-		public AttackAction(uint lockStepTurn, Vec3 modelPoint) : base(lockStepTurn, modelPoint) {}
+		public AttackAction(uint lockStepTurn, Vec2 modelPoint) : base(lockStepTurn, modelPoint) {}
 
         protected AttackAction() { }
 

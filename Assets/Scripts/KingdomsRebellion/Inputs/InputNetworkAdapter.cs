@@ -1,22 +1,23 @@
 ﻿using System;
 using KingdomsRebellion.Core;
 using KingdomsRebellion.Core.Math;
-using KingdomsRebellion.Core.Model;
 using KingdomsRebellion.Core.Player;
 using KingdomsRebellion.Network;
 using UnityEngine;
+using KingdomsRebellion.Core.Components;
 
 namespace KingdomsRebellion.Inputs {
 	public class InputNetworkAdapter : KRObject {
 
-		event Action<Vec3> OnModelSelectDemand; // modelPosition
-		event Action<Vec3, Vec3, Vec3> OnModelDragDemand; // begin:modelPosition, end:modelPosition
-		event Action<Vec3> OnModelMoveDemand; // modelPosition
-        event Action<Vec3> OnModelAttackDemand; // modelPosition
+		event Action<Vec2> OnModelSelectDemand; // modelPosition
+		event Action<Vec2, Vec2, Vec2> OnModelDragDemand; // begin:modelPosition, end:modelPosition
+		event Action<Vec2> OnModelMoveDemand; // modelPosition
+        event Action<Vec2> OnModelAttackDemand; // modelPosition
+		event Action<KeyCode> OnModelSpawnDemand;
 
-		static bool Instatiated = false;
+		static bool Instatiated;
 
-		Vec3 beginDrag;
+		Vec2 beginDrag;
 
 		public InputNetworkAdapter() {
 			Debug.Assert(!Instatiated);
@@ -25,11 +26,13 @@ namespace KingdomsRebellion.Inputs {
 			On("OnLeftClickDown");
 			On("OnLeftClickUp");
 			On("OnRightClick");
+			On("OnKeyPress");
 
 			Offer("OnModelSelectDemand");
 			Offer("OnModelMoveDemand");
             Offer("OnModelAttackDemand");
 			Offer("OnModelDragDemand");
+			Offer("OnModelSpawnDemand");
 		}
 
 		Vector3 WorldPosition(Vector3 mousePosition) {
@@ -49,12 +52,12 @@ namespace KingdomsRebellion.Inputs {
 		}
 
 		void OnLeftClickDown(Vector3 mousePosition) {
-			beginDrag = Vec3.FromVector3(WorldPosition(mousePosition));
+			beginDrag = Vec2.FromVector3(WorldPosition(mousePosition));
 		}
 
 		void OnLeftClickUp(Vector3 mousePosition) {
 			Vector3 worldPosition = WorldPosition(mousePosition);
-			Vec3 modelPoint = Vec3.FromVector3(worldPosition);
+			Vec2 modelPoint = Vec2.FromVector3(worldPosition);
 
 			if (beginDrag.Dist(modelPoint) < 1) {
 				if (OnModelSelectDemand != null) {
@@ -62,7 +65,7 @@ namespace KingdomsRebellion.Inputs {
 				}
 			} else {
 				if (OnModelDragDemand != null) {
-					Vec3 additionalPoint = Vec3.FromVector3(
+					Vec2 additionalPoint = Vec2.FromVector3(
 						WorldPosition(
 						new Vector3(mousePosition.x, Camera.main.WorldToScreenPoint(beginDrag.ToVector3()).y, mousePosition.z)
 						)
@@ -83,9 +86,9 @@ namespace KingdomsRebellion.Inputs {
 			    GameObject go = hit.collider.gameObject;
 				if (go.CompareTag("Selectable")) {
                     worldPosition = go.transform.position;
-				    if (go.GetComponent<Unit>().PlayerId != NetworkAPI.PlayerId) {
+					if (go.GetComponent<KRTransform>().PlayerID != NetworkAPI.PlayerId) {
 				        if (OnModelAttackDemand != null) {
-				            OnModelAttackDemand(Vec3.FromVector3(worldPosition));
+							OnModelAttackDemand(Vec2.FromVector3(worldPosition));
 				            return;
 				        }
 				    }
@@ -95,7 +98,16 @@ namespace KingdomsRebellion.Inputs {
 			}
 			
 			if (OnModelMoveDemand != null) {
-				OnModelMoveDemand(Vec3.FromVector3(worldPosition));
+				OnModelMoveDemand(Vec2.FromVector3(worldPosition));
+			}
+		}
+
+		void OnKeyPress(KeyCode k) {
+			if (!PlayerActions.IsMines()) return;
+			if (!PlayerActions.IsBuilding()) return;
+
+			if (OnModelSpawnDemand != null) {
+				OnModelSpawnDemand(k);
 			}
 		}
 

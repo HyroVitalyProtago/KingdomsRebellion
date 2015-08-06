@@ -8,6 +8,7 @@ namespace KingdomsRebellion.Inputs {
 		event Action<Vector3> OnLeftClickDown; // mousePosition
 		event Action<Vector3> OnLeftClickUp; // mousePosition
 		event Action<Vector3> OnRightClick; // mousePosition
+		event Action<KeyCode> OnKeyPress; // keycode
 
 		bool clickDown = false;
 
@@ -15,6 +16,7 @@ namespace KingdomsRebellion.Inputs {
 			Offer("OnLeftClickDown");
 			Offer("OnLeftClickUp");
 			Offer("OnRightClick");
+			Offer("OnKeyPress");
 		}
 
 		void Update() {
@@ -33,6 +35,17 @@ namespace KingdomsRebellion.Inputs {
 					OnRightClick(Input.mousePosition);
 				}
 			}
+
+			// TODO clean
+			if (Input.GetKeyUp(KeyCode.C)) {
+				if (OnKeyPress != null) {
+					OnKeyPress(KeyCode.C);
+				}
+            } else if (Input.GetKeyUp(KeyCode.V)) {
+                if (OnKeyPress != null) {
+                    OnKeyPress(KeyCode.V);
+                }
+            }
 		}
 	}
 }

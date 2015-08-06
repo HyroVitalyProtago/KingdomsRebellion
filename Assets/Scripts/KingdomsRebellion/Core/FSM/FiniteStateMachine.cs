@@ -1,27 +1,33 @@
-﻿using System.Collections.Generic;
+﻿
+using System;
+using System.Collections.Generic;
 using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Core.Player;
+using KingdomsRebellion.Core.Components;
 
 namespace KingdomsRebellion.Core.FSM {
 
     public class FiniteStateMachine : KRBehaviour {
-        private Stack<FSMState> _stack;
 
-        public void Start() {
+        Stack<FSMState> _stack;
+        object[] self;
+
+        void Awake() {
             _stack = new Stack<FSMState>();
             _stack.Push(new IDLEState(this));
+            self = new object[]{ this };
         }
 
-        public void PopState() {
+        void PopState() {
             GetCurrentState().Exit();
             _stack.Pop();
             if (GetCurrentState() == null) {
-                PushState(new IDLEState(this), false);
+                PushState(new IDLEState(this));
             }
             GetCurrentState().Enter();
         }
 
-        public void PushState(FSMState state, bool isHumanOrder) {
+        void PushState(FSMState state, bool isHumanOrder = false) {
             if (isHumanOrder) {
                 _stack.Clear();
                 _stack.Push(new IDLEState(this));
@@ -33,23 +39,28 @@ namespace KingdomsRebellion.Core.FSM {
             }
         }
 
-        public FSMState GetCurrentState() {
+        FSMState GetCurrentState() {
             return _stack.Count > 0 ?_stack.Peek() : null;
         }
 
         public void UpdateGame() {
             FSMState state = GetCurrentState();
             if (state != null) {
-                state.Execute();
+                Type t = state.Execute();
+                if (t == null) {
+                    PopState();
+                } else if (state.GetType() != t) {
+                    PushState(Activator.CreateInstance(t, self) as FSMState);
+                }
             }
         }
 
-        public void Move(int playerId, Vec3 modelPoint) {
-            GetComponent<Movement>().Move(playerId, modelPoint);
+        public void Move(int playerId, Vec2 modelPoint) {
+            GetComponent<KRMovement>().Move(modelPoint);
             PushState(new MovementState(this), true);
         }
 
-        public void Attack(int playerId, Vec3 modelPoint) {
+        public void Attack(int playerId, Vec2 modelPoint) { // TODO use modelPoint
             PushState(new AttackState(this), true);
         }
     }

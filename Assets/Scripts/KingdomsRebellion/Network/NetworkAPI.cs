@@ -87,11 +87,19 @@ namespace KingdomsRebellion.Network {
 		}
 	
 		public static void SetupClient(string ip, string port) {
-			PlayerId = 1; // TEST set player id to 1 for client
+            PlayerId = 1; // TEST set player id to 1 for client
 
-			GameObject realMainCamera = GameObject.Find("Cameras/Camera (" + PlayerId + ")");
-			realMainCamera.GetComponent<Camera>().enabled = true;
-			Camera.main.enabled = false; // Camera.main is now equal to realMainCamera.GetComponent<Camera>()
+			Camera.main.transform.localPosition = new Vector3(
+				-Camera.main.transform.localPosition.x,
+				Camera.main.transform.localPosition.y,
+				-Camera.main.transform.localPosition.z
+			);
+
+			Camera.main.transform.localEulerAngles = new Vector3(
+				Camera.main.transform.localEulerAngles.x,
+				Camera.main.transform.localEulerAngles.y+180,
+				Camera.main.transform.localEulerAngles.z
+			);
 
 			if (OnMainCameraChange != null)
 				OnMainCameraChange();

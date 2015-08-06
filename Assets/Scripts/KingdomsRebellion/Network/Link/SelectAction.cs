@@ -9,15 +9,15 @@ namespace KingdomsRebellion.Network.Link {
 	/// </summary>
 	public class SelectAction : GameAction {
 
-		event Action<int, Vec3> OnModelSelect;
+		event Action<int, Vec2> OnModelSelect;
 
-		protected Vec3 _modelPoint;
+		protected Vec2 _modelPoint;
 
 		public static SelectAction FromBytes(byte[] data) {
 			return new SelectAction().GetFromBytes(data) as SelectAction;
 		}
 	
-		public SelectAction(uint lockStepTurn, Vec3 modelPoint) : base(lockStepTurn) {
+		public SelectAction(uint lockStepTurn, Vec2 modelPoint) : base(lockStepTurn) {
 			_modelPoint = modelPoint;
 		}
 
@@ -42,7 +42,7 @@ namespace KingdomsRebellion.Network.Link {
 	
 		protected override void Deserialize(BinaryReader reader) {
 			base.Deserialize(reader);
-			_modelPoint = Vec3.Deserialize(reader);
+			_modelPoint = Vec2.Deserialize(reader);
 		}
 
 	}

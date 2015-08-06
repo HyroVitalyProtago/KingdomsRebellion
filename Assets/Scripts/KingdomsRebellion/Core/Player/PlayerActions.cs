@@ -2,9 +2,9 @@
 using System.Linq;
 using KingdomsRebellion.Core.FSM;
 using KingdomsRebellion.Core.Math;
-using KingdomsRebellion.Core.Model;
 using KingdomsRebellion.Network;
 using UnityEngine;
+using KingdomsRebellion.Core.Components;
 
 namespace KingdomsRebellion.Core.Player {
 	public class PlayerActions : KRBehaviour {
@@ -15,12 +15,14 @@ namespace KingdomsRebellion.Core.Player {
 			On("OnSelection");
 			On("OnMove");
 		    On("OnAttack");
+			On("OnSpawn");
 		}
 
 		void OnDisable() {
 			Off("OnSelection");
 			Off("OnMove");
 		    Off("OnAttack");
+			Off("OnSpawn");
 		}
 
 		void Start() {
@@ -35,20 +37,38 @@ namespace KingdomsRebellion.Core.Player {
 			_selectedObjects[playerID] = selectedObjects;
 		}
 
-		void OnMove(int playerID, Vec3 modelPoint) {
+		void OnMove(int playerID, Vec2 modelPoint) {
 			for (int i = 0; i < _selectedObjects[playerID].Count; ++i) {
 				_selectedObjects[playerID][i].GetComponent<FiniteStateMachine>().Move(playerID, modelPoint);
 			}
 		}
 
-	    void OnAttack(int playerID, Vec3 modelPoint) {
+	    void OnAttack(int playerID, Vec2 modelPoint) {
             for (int i = 0; i < _selectedObjects[playerID].Count; ++i) {
                 _selectedObjects[playerID][i].GetComponent<FiniteStateMachine>().Attack(playerID, modelPoint);
             }
 	    }
 
+		// TODO
+		void OnSpawn(int playerID, KeyCode keyCode) {
+		    switch (keyCode) {
+		        case KeyCode.C : 
+                    _selectedObjects[playerID][0].GetComponent<KRSpawn>().Spawn("Infantry");
+		            break;
+                case KeyCode.V :
+                    Debug.Log("archer");
+                    _selectedObjects[playerID][0].GetComponent<KRSpawn>().Spawn("Archer");
+		            break;
+		    }
+		   
+		}
+
 	    public static bool IsMines() {
-	        return _selectedObjects[NetworkAPI.PlayerId].Any(u => u.GetComponent<Unit>().PlayerId == NetworkAPI.PlayerId);
+			return _selectedObjects[NetworkAPI.PlayerId].Any(u => u.GetComponent<KRTransform>().PlayerID == NetworkAPI.PlayerId);
 	    }
+
+		public static bool IsBuilding() {
+			return _selectedObjects[NetworkAPI.PlayerId].Any(u => u.GetComponent<KRSpawn>() != null);
+		}
 	}
 }

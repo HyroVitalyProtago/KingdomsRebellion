@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using KingdomsRebellion.Core.Math;
-using KingdomsRebellion.Core.Model;
 using UnityEngine;
 
 namespace KingdomsRebellion.Core.Grid {
+/*
 	public class FlatGrid : AbstractGrid {
 
 		readonly Node[] _grid;
@@ -119,4 +119,5 @@ namespace KingdomsRebellion.Core.Grid {
 			return nodes;
 		}
 	}
+*/
 }

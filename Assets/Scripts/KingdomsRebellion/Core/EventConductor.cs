@@ -8,17 +8,17 @@ namespace KingdomsRebellion.Core {
 
 	/// <summary>
 	/// Event conductor is useful for abstract event links between objects.
-	/// Because an object generally don't need to know who declench the event,
+	/// Because an object generally don't need to know who activate the event,
 	/// this class play the role of middleman for attach and detach events.
 	/// </summary>
 	public static class EventConductor {
 
 		public class EventNotFoundException : Exception {}
 		public class EventNotRegisteredException : Exception {}
-		public class EventAllreadyOffered : Exception {} // TODO
+		public class EventAlreadyOfferedException : Exception {} // TODO
 		public class CallbackNotFoundException : Exception {}
 		public class CallbackBadTypeException : Exception {}
-		public class CallbackAllreadyConnected : Exception {} // TODO
+		public class CallbackAlreadyConnectedException : Exception {} // TODO
 		public class CallbackNotRegisteredException : Exception {}
 		public class EventNotMatchCallbackException : Exception {}
 
@@ -55,7 +55,7 @@ namespace KingdomsRebellion.Core {
 			T talker,
 			String eventName,
 			BindingFlags flags,
-			Dictionary<T, Dictionary<String, MethodInfo[]>> talkers
+			IDictionary<T, Dictionary<string, MethodInfo[]>> talkers
 		) {
 			if (talker == null || eventName == null) {
 				throw new ArgumentNullException();
@@ -69,10 +69,9 @@ namespace KingdomsRebellion.Core {
 				throw new EventNotFoundException();
 			}
 
-			Object invokedTalker = talker is Type ? null : talker as Object;
-
 			// Connect all listeners
 			if (Listeners.ContainsKey(eventName)) {
+                Object invokedTalker = talker is Type ? null : talker as Object;
 				foreach (var pair in Listeners[eventName]) {
 					try {
 						eventAdd.Invoke(invokedTalker, new object[] { pair.Value });
@@ -86,13 +85,13 @@ namespace KingdomsRebellion.Core {
 			if (!talkers.ContainsKey(talker)) {
 				talkers[talker] = new Dictionary<String, MethodInfo[]>();
 			}
-			talkers[talker].Add(eventName, new MethodInfo[]{ eventAdd, eventRemove });
+			talkers[talker].Add(eventName, new[]{ eventAdd, eventRemove });
 		}
 
 		static void AbstractDenial<T>(
 			T talker,
 			string eventName,
-			Dictionary<T, Dictionary<String, MethodInfo[]>> talkers
+			IDictionary<T, Dictionary<String, MethodInfo[]>> talkers
 		) {
 			if (talker == null || eventName == null) {
 				throw new ArgumentNullException();
@@ -102,10 +101,9 @@ namespace KingdomsRebellion.Core {
 				throw new EventNotRegisteredException();
 			}
 
-			Object invokedTalker = talker is Type ? null : talker as Object;
-
 			// Disconnect all listeners
 			if (Listeners.ContainsKey(eventName)) {
+                Object invokedTalker = talker is Type ? null : talker as Object;
 				foreach (var pair in Listeners[eventName]) {
 					talkers[talker][eventName][EventRemoveID].Invoke(invokedTalker, new object[] { pair.Value });
 				}
@@ -115,19 +113,19 @@ namespace KingdomsRebellion.Core {
 		}
 
 		public static void Offer(Type typ, String eventName) {
-			AbstractOffer<Type>(typ, eventName, StaticNonPublic, StaticTalkers);
+			AbstractOffer(typ, eventName, StaticNonPublic, StaticTalkers);
 		}
 
 		public static void Denial(Type typ, string eventName) {
-			AbstractDenial<Type>(typ, eventName, StaticTalkers);
+			AbstractDenial(typ, eventName, StaticTalkers);
 		}
 
 		public static void Offer(Object self, string eventName) {
-			AbstractOffer<Object>(self, eventName, InstanceNonPublic, DynamicTalkers);
+			AbstractOffer(self, eventName, InstanceNonPublic, DynamicTalkers);
 		}
 
 		public static void Denial(Object self, string eventName) {
-			AbstractDenial<Object>(self, eventName, DynamicTalkers);
+			AbstractDenial(self, eventName, DynamicTalkers);
 		}
 
 		#endregion
@@ -222,10 +220,9 @@ namespace KingdomsRebellion.Core {
 			List<Type> args = new List<Type>(method.GetParameters().Select(p => p.ParameterType));
 			if (method.ReturnType == typeof(void)) {
 				return Expression.GetActionType(args.ToArray());
-			} else {
-				args.Add(method.ReturnType);
-				return Expression.GetFuncType(args.ToArray());
 			}
+		    args.Add(method.ReturnType);
+		    return Expression.GetFuncType(args.ToArray());
 		}
 	}
 

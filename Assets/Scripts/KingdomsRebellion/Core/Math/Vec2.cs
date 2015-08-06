@@ -1,6 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using UnityEngine;
-using System;
 
 namespace KingdomsRebellion.Core.Math {
 
@@ -11,7 +11,8 @@ namespace KingdomsRebellion.Core.Math {
 
 		public static readonly Vec2 Zero = new Vec2(0,0);
 		public static readonly Vec2 One = new Vec2(1,1);
-
+        public static readonly Vec2 Up = new Vec2(0,1);
+        public static readonly Vec2 Right = new Vec2(1,0);
 		public readonly int X, Y;
 		
 		public Vec2(int x, int y) {
@@ -66,7 +67,7 @@ namespace KingdomsRebellion.Core.Math {
 		}
 
 		public override bool Equals(object obj) {
-			if ((object)obj == null || !(obj is Vec2)) return false;
+			if (obj == null || !(obj is Vec2)) return false;
 			Vec2 v = obj as Vec2;
 			return X == v.X && Y == v.Y;
 		}

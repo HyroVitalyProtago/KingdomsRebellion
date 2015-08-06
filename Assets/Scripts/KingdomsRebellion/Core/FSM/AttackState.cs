@@ -1,55 +1,57 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using KingdomsRebellion.Core.Components;
 using KingdomsRebellion.Core.Math;
-using KingdomsRebellion.Core.Model;
-using KingdomsRebellion.Core.Player;
 using UnityEngine;
 
 namespace KingdomsRebellion.Core.FSM {
 
     public class AttackState : FSMState {
-        readonly Attack _attack;
-        readonly Unit _unit;
 
+        readonly KRAttack _attack;
+		readonly KRTransform _krtransform;
+        readonly KRMovement _krmovement;
+        
         public AttackState(FiniteStateMachine fsm) : base(fsm) {
-            _attack = fsm.GetComponent<Attack>();
-            _unit = fsm.GetComponent<Unit>();
+            _attack = fsm.GetComponent<KRAttack>();
+			_krtransform = fsm.GetComponent<KRTransform>();
+			_krmovement = fsm.GetComponent<KRMovement>();
         }
 
-        public override void Enter() {
-            Debug.Log("A L'ATTAAAAQUE !!!");
-        }
-
-        public override void Execute() {
+        public override Type Execute() {
             if (_attack.Target == null) {
-                IEnumerable<GameObject> gameObjects = KRFacade.Around(_unit.Pos, 6);
+				IEnumerable<GameObject> gameObjects = KRFacade.Around(_krtransform.Pos, 6);
                 foreach (var obj in gameObjects) {
-                    if (obj.GetComponent<Unit>().PlayerId != _unit.PlayerId) {
-                        _attack.Target = obj;
-                        return;
+                    KRTransform target = obj.GetComponent<KRTransform>();
+                    if (target.PlayerID != _krtransform.PlayerID) {
+                        _attack.Target = target;
+                        return null;
                     }
                 }
-                fsm.PopState();
-                return;
+                return null;
             }
 
-            if (_attack.Target.GetComponent<Unit>().PlayerId == _unit.PlayerId) {
-                fsm.GetComponent<Movement>().Target = Vec2.FromVector3(_attack.Target.transform.position);
-                fsm.PopState();
-                fsm.PushState(new MovementState(fsm), false);
-                return;
+			if (_attack.Target.PlayerID == _krtransform.PlayerID) {
+				_fsm.GetComponent<KRMovement>().Move(_attack.Target.Pos);
+                return typeof(MovementState);
             }
-            if (Vec2.Dist(_attack.Target.GetComponent<Unit>().Pos, _unit.Pos) ==
-                _attack.range) {
-                Debug.Log("FRAPPE !");
+
+			if (Vec2.Dist(_attack.Target.Pos, _krtransform.Pos) ==
+                _attack.Range) {
                 _attack.UpdateGame();
             } else {
-                fsm.GetComponent<Movement>().Follow(_attack.Target);
-                fsm.PushState(new MovementState(fsm), false);
+				if (_krmovement != null) {
+				    if (_attack.Range == 1) {
+                        _krmovement.Follow(_attack.Target);
+                        return typeof(MovementState);
+				    } else {
+				        return typeof(RangeState);
+				    }
+                }
+                return null;
             }
-        }
 
-        public override void Exit() {
-            Debug.Log("Y a plus rien à attaquer :( !");
+            return GetType();
         }
     }
 }

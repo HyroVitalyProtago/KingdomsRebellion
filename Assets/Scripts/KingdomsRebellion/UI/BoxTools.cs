@@ -1,15 +1,15 @@
 ﻿using UnityEngine;
 
-namespace KingdomsRebellion.Tools.UI {
+namespace KingdomsRebellion.UI {
 
 	/// <summary>
 	/// Static class that can be used to create Rect (with Border).
 	/// </summary>
 	public static class BoxTools {
 
-		private static Texture2D _whiteTexture;
+		static Texture2D _whiteTexture;
 
-		public static Texture2D whiteTexture {
+		static Texture2D whiteTexture {
 			get {
 				if (_whiteTexture == null) {
 					_whiteTexture = new Texture2D(1, 1);
