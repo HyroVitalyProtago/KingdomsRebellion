@@ -26,7 +26,14 @@ namespace KingdomsRebellion.Network.Link {
 		
 		public override Action<GameObject> GetAction() {
 			return delegate(GameObject go) {
-				go.GetComponent<KRSpawn>().Spawn(0); // TODO
+				switch (_keyCode) {
+					case KeyCode.C : 
+						go.GetComponent<KRSpawn>().Spawn("Infantry");
+						break;
+					case KeyCode.V :
+						go.GetComponent<KRSpawn>().Spawn("Archer");
+						break;
+				}
 			};
 		}
 		

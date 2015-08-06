@@ -18,15 +18,15 @@ namespace KingdomsRebellion.Core.Components {
 
         Vec2 _spawnPoint;
         Vec2 _rallyPoint;
-        List<Object> _spawnableObjects;
+        Dictionary<String, Object> _spawnableObjects;
 
 		Material _sweetBlue, _sweetRed;
 
 		void Awake() {
 			_krtransform = GetComponent<KRTransform>();
-			_spawnableObjects = new List<Object>();
-			AddSpawnable("Prefabs/Unit");
-
+            _spawnableObjects = new Dictionary<String, Object>();
+			AddSpawnable("Infantry");
+            AddSpawnable("Archer");
 			_sweetBlue = (Material) Resources.Load("Materials/SweetBlue", typeof(Material));
 			_sweetRed = (Material) Resources.Load("Materials/SweetRed", typeof(Material));
 		}
@@ -42,15 +42,15 @@ namespace KingdomsRebellion.Core.Components {
 			_spawnPoint = _krtransform.Pos + 2 * toCenter;
         }
 
-        public void AddSpawnable(String path) {
-            _spawnableObjects.Add(Resources.Load(path));
+        public void AddSpawnable(String name) {
+            _spawnableObjects.Add(name, Resources.Load("Prefabs/" + name));
         }
 
-        public void Spawn(int numObj) {
+		public void Spawn(String nameObj) {
 			if (!KRFacade.IsEmpty(_spawnPoint)) return;
 
-            if (numObj < _spawnableObjects.Count) {
-                GameObject kgo = Instantiate(_spawnableObjects[numObj], _spawnPoint.ToVector3().Adjusted(), Quaternion.identity) as GameObject;
+            if (_spawnableObjects.ContainsKey(nameObj)) {
+                GameObject kgo = Instantiate(_spawnableObjects[nameObj], _spawnPoint.ToVector3().Adjusted(), Quaternion.identity) as GameObject;
 
 				kgo.transform.SetParent(_dynamics);
 

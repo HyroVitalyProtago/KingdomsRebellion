@@ -13,7 +13,7 @@ namespace KingdomsRebellion.Core.Components {
 		public int __strength, __attackSpeed, __range;
 		public AttackTypeEnum __attackType;
 
-		public GameObject Target { get; private set; }
+		public KRTransform Target { get; private set; }
 		public AttackTypeEnum AttackType { get; private set; }
 
 		public int Strength { get; private set; }
@@ -53,19 +53,19 @@ namespace KingdomsRebellion.Core.Components {
 
         public void Attack(Vec2 modelPoint) {
 			BeforeAttack();
-			Target = KRFacade.Find(modelPoint);
+			Target = KRFacade.Find(modelPoint).GetComponent<KRTransform>();
 			AfterAttack();
         }
 
 		public void Attack(GameObject go) {
 			BeforeAttack();
-			Target = go;
+			Target = go.GetComponent<KRTransform>();
 			AfterAttack();
 		}
 
         public void UpdateGame() {
-            Vec2 targetPos = Target.GetComponent<KRTransform>().Pos;
-            if (Vec2.Dist(targetPos, gameObject.GetComponent<KRTransform>().Pos) == Range) {
+			Vec2 targetPos = Target.Pos;
+            if (Vec2.Dist(targetPos, GetComponent<KRTransform>().Pos) == Range) {
 				if (_currentFrame == 0) {
 					_spot.enabled = true;
                     Target.GetComponent<KRHealth>().OnDamageDone(AttackType, Strength);
