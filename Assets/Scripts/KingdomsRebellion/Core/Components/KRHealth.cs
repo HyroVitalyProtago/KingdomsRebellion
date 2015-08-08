@@ -3,8 +3,7 @@ using UnityEngine;
 using KingdomsRebellion.Core.Player;
 
 namespace KingdomsRebellion.Core.Components {
-	
-    [RequireComponent(typeof (KRMovement))]
+
     public class KRHealth : KRBehaviour {
 
 		public event Action<GameObject> OnDeath;

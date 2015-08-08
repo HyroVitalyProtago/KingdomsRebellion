@@ -43,7 +43,7 @@ namespace KingdomsRebellion.Core.Components {
         }
 
         public void AddSpawnable(String name) {
-            _spawnableObjects.Add(name, Resources.Load("Prefabs/" + name));
+            _spawnableObjects.Add(name, Resources.Load("Prefabs/Units/" + name));
         }
 
 		public void Spawn(String nameObj) {
@@ -56,10 +56,10 @@ namespace KingdomsRebellion.Core.Components {
 
 				kgo.GetComponent<KRTransform>().PlayerID = _krtransform.PlayerID;
 				if (_krtransform.PlayerID == 0) {
-					kgo.transform.Find("EthanBody").GetComponent<Renderer>().sharedMaterial = _sweetBlue;
+					kgo.transform.Find("Body").GetComponent<Renderer>().sharedMaterial = _sweetBlue;
 					kgo.transform.Find("Spotlight").GetComponent<Light>().color = new Color(0f,.4f,1f);
 				} else {
-					kgo.transform.Find("EthanBody").GetComponent<Renderer>().sharedMaterial = _sweetRed;
+					kgo.transform.Find("Body").GetComponent<Renderer>().sharedMaterial = _sweetRed;
 					kgo.transform.Find("Spotlight").GetComponent<Light>().color = new Color(.85f,.85f,.3f);
 				}
 
