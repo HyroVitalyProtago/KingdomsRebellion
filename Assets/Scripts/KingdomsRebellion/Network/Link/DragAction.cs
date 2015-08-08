@@ -10,10 +10,10 @@ namespace KingdomsRebellion.Network.Link {
 	/// </summary>
 	public class DragAction : GameAction {
 		
-		static event Action<int, Vec2, Vec2, Vec2> OnModelDrag;
+		static event Action<int, Vec2, Vec2, Vec2> OnDragAction;
 
 		public static new void Awake() {
-			EventConductor.Offer(typeof(DragAction), "OnModelDrag");
+			EventConductor.Offer(typeof(DragAction), "OnDragAction");
 		}
 		
 		protected Vec2 _beginModelPoint;
@@ -33,8 +33,8 @@ namespace KingdomsRebellion.Network.Link {
 		protected DragAction() {}
 		
 		public override void Process(int playerID) {
-			if (OnModelDrag != null) {
-				OnModelDrag(playerID, _beginModelPoint, _endModelPoint, _z);
+			if (OnDragAction != null) {
+				OnDragAction(playerID, _beginModelPoint, _endModelPoint, _z);
 			}
 		}
 		

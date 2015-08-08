@@ -3,7 +3,7 @@ using KingdomsRebellion.Core;
 using UnityEngine;
 
 namespace KingdomsRebellion.Inputs {
-	public class Mouse : KRBehaviour {
+	public class KRInput : KRBehaviour {
 
 		event Action<Vector3> OnLeftClickDown; // mousePosition
 		event Action<Vector3> OnLeftClickUp; // mousePosition

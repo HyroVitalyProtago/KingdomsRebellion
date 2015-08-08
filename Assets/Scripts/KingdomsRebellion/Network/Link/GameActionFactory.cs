@@ -18,6 +18,8 @@ namespace KingdomsRebellion.Network.Link {
                 return AttackAction.FromBytes(data);
 			} else if (b == (byte) GameActionEnum.SpawnAction) {
 				return SpawnAction.FromBytes(data);
+			} else if (b == (byte) GameActionEnum.RallyAction) {
+				return RallyAction.FromBytes(data);
 			}
 
 		    throw new ArgumentException("GameActionFactory :: Get : data type don't correspond a known GameAction");

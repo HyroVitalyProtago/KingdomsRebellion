@@ -7,11 +7,18 @@ namespace KingdomsRebellion.Network {
 	[RequireComponent (typeof(NetworkAPI))]
 	public class NetworkUI : KRBehaviour {
 
+		public bool __displayConsole;
+		static bool displayConsole;
+
 		static StringBuilder Builder = new StringBuilder().AppendLine("Console :");
 		static int BuilderNbLines;
 		static string Console = "Console :";
 		static bool IsSetup, IsConnected, IsLaunched;
 		string ip, port;
+
+		void Awake() {
+			displayConsole = __displayConsole;
+		}
 
 		void Start() {
 			ip = "127.0.0.1";
@@ -32,11 +39,13 @@ namespace KingdomsRebellion.Network {
 		}
 
 		public static void ClearLog() {
+			if (!displayConsole) { return; }
 			Builder = new StringBuilder().AppendLine("Console :");
 			BuilderNbLines = 0;
 		}
 
 		public static void Log(string log) {
+			if (!displayConsole) { return; }
 			if (BuilderNbLines > 30) {
 				ClearLog();
 			}
@@ -68,7 +77,9 @@ namespace KingdomsRebellion.Network {
 				IsLaunched = true;
 			}
 
-			// GUILayout.Label(Console);
+			if (displayConsole) {
+				GUILayout.Label(Console);
+			}
 
 			GUILayout.EndVertical();
 		}

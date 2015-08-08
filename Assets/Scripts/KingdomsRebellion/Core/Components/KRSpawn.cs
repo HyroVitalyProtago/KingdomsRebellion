@@ -17,7 +17,7 @@ namespace KingdomsRebellion.Core.Components {
 		KRTransform _krtransform;
 
         Vec2 _spawnPoint;
-        Vec2 _rallyPoint;
+		public Vec2 RallyPoint { get; set; }
         Dictionary<String, Object> _spawnableObjects;
 
 		Material _sweetBlue, _sweetRed;
@@ -38,7 +38,7 @@ namespace KingdomsRebellion.Core.Components {
 
 			Vec2 toCenter = -(new Vec2(System.Math.Sign(_krtransform.Pos.X), System.Math.Sign(_krtransform.Pos.X)));
 
-			_rallyPoint = _krtransform.Pos + 5 * toCenter;
+			RallyPoint = _krtransform.Pos + 5 * toCenter;
 			_spawnPoint = _krtransform.Pos + 2 * toCenter;
         }
 
@@ -63,7 +63,7 @@ namespace KingdomsRebellion.Core.Components {
 					kgo.transform.Find("Spotlight").GetComponent<Light>().color = new Color(.85f,.85f,.3f);
 				}
 
-				kgo.GetComponent<FiniteStateMachine>().Move(_rallyPoint);
+				kgo.GetComponent<FiniteStateMachine>().Move(RallyPoint);
             }
         }
     }

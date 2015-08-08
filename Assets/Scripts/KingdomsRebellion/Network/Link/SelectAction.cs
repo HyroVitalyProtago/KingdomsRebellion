@@ -10,10 +10,10 @@ namespace KingdomsRebellion.Network.Link {
 	/// </summary>
 	public class SelectAction : GameAction {
 
-		static event Action<int, Vec2> OnModelSelect;
+		static event Action<int, Vec2> OnSelectAction;
 
 		public static new void Awake() {
-			EventConductor.Offer(typeof(SelectAction), "OnModelSelect");
+			EventConductor.Offer(typeof(SelectAction), "OnSelectAction");
 		}
 
 		protected Vec2 _modelPoint;
@@ -29,8 +29,8 @@ namespace KingdomsRebellion.Network.Link {
 		protected SelectAction() {}
 
 		public override void Process(int playerID) {
-			if (OnModelSelect != null) {
-				OnModelSelect(playerID, _modelPoint);
+			if (OnSelectAction != null) {
+				OnSelectAction(playerID, _modelPoint);
 			}
 		}
 

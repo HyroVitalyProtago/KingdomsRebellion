@@ -6,6 +6,7 @@ using UnityEngine;
 using KingdomsRebellion.UI;
 using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Inputs;
+using System.Linq;
 
 namespace KingdomsRebellion.Core.Player {
 	
@@ -17,20 +18,22 @@ namespace KingdomsRebellion.Core.Player {
 		IList<GameObject> _selectableObjects;
 		Vector3? _originWorldMousePoint;
 
-		IList<GameObject> playerPreSelected;
-		IList<GameObject> ennemyPreSelected;
+		IList<GameObject> _playerPreSelected;
+		IList<GameObject> _ennemyPreSelected;
 		
 		event Action<int, IList<GameObject>> OnSelection;
 		
 		void Awake() {
-			On("OnModelSelect");
-			On("OnModelDrag");
+			On("OnSelectAction");
+			On("OnDragAction");
 			
 			On("OnLeftClickDown");
 			On("OnLeftClickUp");
 
 			On("OnBirth");
 			On("OnDeath");
+
+			On("OnGameAction");
 
 			Offer("OnSelection");
 
@@ -43,8 +46,8 @@ namespace KingdomsRebellion.Core.Player {
 				_selectedObjects[i] = new List<GameObject>();
 			}
 			
-			playerPreSelected = new List<GameObject>();
-			ennemyPreSelected = new List<GameObject>();
+			_playerPreSelected = new List<GameObject>();
+			_ennemyPreSelected = new List<GameObject>();
 		}
 
 		void OnGUI() {
@@ -68,39 +71,39 @@ namespace KingdomsRebellion.Core.Player {
 			for (int i = 0; i < _selectableObjects.Count; ++i) {
 				if (IsInRect(_selectableObjects[i])) {
 					PreSelected(_selectableObjects[i]);
-				} else if (playerPreSelected.Remove(_selectableObjects[i]) || ennemyPreSelected.Remove(_selectableObjects[i])) {
+				} else if (_playerPreSelected.Remove(_selectableObjects[i]) || _ennemyPreSelected.Remove(_selectableObjects[i])) {
 					_selectableObjects[i].GetComponent<HealthBar>().Hide();
 				}
 			}
-			if (playerPreSelected.Count > 0) {
-				foreach (var go in playerPreSelected) {
+			if (_playerPreSelected.Count > 0) {
+				foreach (var go in _playerPreSelected) {
 					go.GetComponent<HealthBar>().Show();
 				}
-				foreach (var go in ennemyPreSelected) {
+				foreach (var go in _ennemyPreSelected) {
 					go.GetComponent<HealthBar>().Hide();
 				}
-				ennemyPreSelected.Clear();
-			} else if (ennemyPreSelected.Count > 0) {
-				foreach (var go in ennemyPreSelected) {
+				_ennemyPreSelected.Clear();
+			} else if (_ennemyPreSelected.Count > 0) {
+				foreach (var go in _ennemyPreSelected) {
 					go.GetComponent<HealthBar>().Show();
 				}
-				foreach (var go in playerPreSelected) {
+				foreach (var go in _playerPreSelected) {
 					go.GetComponent<HealthBar>().Hide();
 				}
-				playerPreSelected.Clear();
+				_playerPreSelected.Clear();
 			}
 		}
 
 		bool IsInRect(GameObject go) {
 			return new List<GameObject>(
 				KRFacade.Find(
-					InputNetworkAdapter.BeginDrag,
-					Vec2.FromVector3(InputNetworkAdapter.WorldPosition(Input.mousePosition)),
+					InputModelAdapter.BeginDrag,
+					Vec2.FromVector3(InputModelAdapter.WorldPosition(Input.mousePosition)),
 					Vec2.FromVector3(
-						InputNetworkAdapter.WorldPosition(
+						InputModelAdapter.WorldPosition(
 							new Vector3(
 								Input.mousePosition.x,
-								Camera.main.WorldToScreenPoint(InputNetworkAdapter.BeginDrag.ToVector3()).y,
+								Camera.main.WorldToScreenPoint(InputModelAdapter.BeginDrag.ToVector3()).y,
 								Input.mousePosition.z
 							)
 						)
@@ -111,19 +114,19 @@ namespace KingdomsRebellion.Core.Player {
 
 		void PreSelected(GameObject go) {
 			if (go.GetComponent<KRTransform>().PlayerID == NetworkAPI.PlayerId) {
-				if (!playerPreSelected.Contains(go)) {
-					playerPreSelected.Add(go);
+				if (!_playerPreSelected.Contains(go)) {
+					_playerPreSelected.Add(go);
 				}
-			} else if (!ennemyPreSelected.Contains(go) && playerPreSelected.Count == 0) {
-				ennemyPreSelected.Add(go);
+			} else if (!_ennemyPreSelected.Contains(go) && _playerPreSelected.Count == 0) {
+				_ennemyPreSelected.Add(go);
 			}
 		}
 		
 		void SelectUnits(int playerID, Vector3 originWorldPoint) {
-			if (playerPreSelected.Count > 0) {
-				_selectedObjects[playerID] = playerPreSelected;
-			} else if (ennemyPreSelected.Count > 0) {
-				_selectedObjects[playerID] = ennemyPreSelected;
+			if (_playerPreSelected.Count > 0) {
+				_selectedObjects[playerID] = _playerPreSelected;
+			} else if (_ennemyPreSelected.Count > 0) {
+				_selectedObjects[playerID] = _ennemyPreSelected;
 			}
 
 			foreach (var unit in _selectedObjects[playerID]) {
@@ -153,7 +156,7 @@ namespace KingdomsRebellion.Core.Player {
 			}
 		}
 
-		void OnModelSelect(int player, Vec2 modelPosition) {
+		void OnSelectAction(int player, Vec2 modelPosition) {
 			DeselectUnits(player);
 			
 			GameObject go = KRFacade.Find(modelPosition);
@@ -163,7 +166,7 @@ namespace KingdomsRebellion.Core.Player {
 			}
 		}
 		
-		void OnModelDrag(int player, Vec2 beginModelPosition, Vec2 endModelPosition, Vec2 z) {
+		void OnDragAction(int player, Vec2 beginModelPosition, Vec2 endModelPosition, Vec2 z) {
 			DeselectUnits(player);
 			
 			IEnumerable<GameObject> gos = KRFacade.Find(beginModelPosition, endModelPosition, z);
@@ -190,9 +193,23 @@ namespace KingdomsRebellion.Core.Player {
 			for (int player = 0; player < _selectedObjects.Length; ++player) {
 				_selectedObjects[player].Remove(go);
 			}
-			if (!playerPreSelected.Remove(go)) {
-				ennemyPreSelected.Remove(go);
+			if (!_playerPreSelected.Remove(go)) {
+				_ennemyPreSelected.Remove(go);
 			}
+		}
+
+		void OnGameAction(int playerID, Action<GameObject> f) {
+			for (int i = 0; i < _selectedObjects[playerID].Count; ++i) {
+				f(_selectedObjects[playerID][i]);
+			}
+		}
+
+		public bool IsMines() {
+			return _selectedObjects[NetworkAPI.PlayerId].Any(u => u.GetComponent<KRTransform>().PlayerID == NetworkAPI.PlayerId);
+		}
+		
+		public bool IsBuilding() {
+			return _selectedObjects[NetworkAPI.PlayerId].All(u => u.GetComponent<KRSpawn>() != null);
 		}
 	}
 }
