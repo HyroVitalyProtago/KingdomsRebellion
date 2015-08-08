@@ -19,6 +19,7 @@ namespace KingdomsRebellion.Core.FSM {
         }
 
         public override Type Execute() {
+            if (_attack.Target == null) return null;
             int dist = Mathf.Abs(Vec2.Dist(_krtransform.Pos, _attack.Target.Pos));
             if (dist > _attack.Range) {
                 _krmovement.Move(_attack.Target.Pos);
