@@ -8,26 +8,21 @@ using KingdomsRebellion.Core.Components;
 using KingdomsRebellion.Network.Link;
 
 namespace KingdomsRebellion.Inputs {
-	public class InputNetworkAdapter : KRObject {
+	public static class InputNetworkAdapter {
 
 		static event Action<GameAction> OnDemand;
-
-		static bool Instatiated;
 
 		static Vec2 beginDrag;
 
 		public static Vec2 BeginDrag { get { return beginDrag; } }
 
-		public InputNetworkAdapter() {
-			Debug.Assert(!Instatiated);
-			Instatiated = true;
+		public static void Awake() {
+			EventConductor.On(typeof(InputNetworkAdapter), "OnLeftClickDown");
+			EventConductor.On(typeof(InputNetworkAdapter), "OnLeftClickUp");
+			EventConductor.On(typeof(InputNetworkAdapter), "OnRightClick");
+			EventConductor.On(typeof(InputNetworkAdapter), "OnKeyPress");
 
-			On("OnLeftClickDown");
-			On("OnLeftClickUp");
-			On("OnRightClick");
-			On("OnKeyPress");
-
-			Offer("OnDemand");
+			EventConductor.Offer(typeof(InputNetworkAdapter), "OnDemand");
 		}
 
 		public static Vector3 WorldPosition(Vector3 mousePosition) {

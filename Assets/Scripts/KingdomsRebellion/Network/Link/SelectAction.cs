@@ -12,7 +12,7 @@ namespace KingdomsRebellion.Network.Link {
 
 		static event Action<int, Vec2> OnModelSelect;
 
-		static SelectAction() {
+		public static new void Awake() {
 			EventConductor.Offer(typeof(SelectAction), "OnModelSelect");
 		}
 

@@ -12,7 +12,7 @@ namespace KingdomsRebellion.Network.Link {
 		
 		static event Action<int, Vec2, Vec2, Vec2> OnModelDrag;
 
-		static DragAction() {
+		public static new void Awake() {
 			EventConductor.Offer(typeof(DragAction), "OnModelDrag");
 		}
 		

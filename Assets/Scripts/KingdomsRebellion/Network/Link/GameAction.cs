@@ -14,7 +14,7 @@ namespace KingdomsRebellion.Network.Link {
 
 		protected static event Action<int, Action<GameObject>> OnGameAction;
 
-		static GameAction() {
+		public static void Awake() {
 			EventConductor.Offer(typeof(GameAction), "OnGameAction");
 		}
 

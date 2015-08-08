@@ -15,18 +15,14 @@ using KingdomsRebellion.Core.Components;
 namespace KingdomsRebellion.Core {
 	public static class KRFacade {
 
-		static readonly InputNetworkAdapter _InputNetworkAdapter;
-		static readonly IMap<QuadTreeNode<KRTransform>,KRTransform> _Map;
+		static readonly IMap<QuadTreeNode<KRTransform>,KRTransform> _Map = new QuadTree<KRTransform>(256, 256);
 
 #if !UNITY_EDITOR
 		static IList<Vec2> __walkedNode = new List<Vec2>();
 		static IList<Vec2> __walkedFind = new List<Vec2>();
 #endif
 
-		static KRFacade() {
-			_InputNetworkAdapter = new InputNetworkAdapter();
-			_Map = new QuadTree<KRTransform>(256, 256);
-
+		public static void Awake() {
 #if !UNITY_EDITOR
 			EventConductor.On(typeof(KRFacade), "OnKRDrawGizmos");
 #endif
