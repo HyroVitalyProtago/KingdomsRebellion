@@ -16,8 +16,6 @@ namespace KingdomsRebellion.Inputs {
 
 		static Vec2 beginDrag;
 
-		public static Vec2 BeginDrag { get { return beginDrag; } }
-
 		public static void Awake() {
 			EventConductor.On(typeof(InputModelAdapter), "OnLeftClickDown");
 			EventConductor.On(typeof(InputModelAdapter), "OnLeftClickUp");

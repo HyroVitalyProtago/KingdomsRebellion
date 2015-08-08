@@ -15,7 +15,7 @@ using KingdomsRebellion.Core.Components;
 namespace KingdomsRebellion.Core {
 	public static class KRFacade {
 
-		static readonly IMap<QuadTreeNode<KRTransform>,KRTransform> _Map = new QuadTree<KRTransform>(256, 256);
+		static readonly IMap<QuadTreeNode<KRTransform>,KRTransform> _Map = new QuadTree<KRTransform>(64, 64);
 
 #if !UNITY_EDITOR
 		static IList<Vec2> __walkedNode = new List<Vec2>();

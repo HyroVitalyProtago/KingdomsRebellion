@@ -17,6 +17,7 @@ namespace KingdomsRebellion.Core.Player {
 		IList<GameObject>[] _selectedObjects;
 		IList<GameObject> _selectableObjects;
 		Vector3? _originWorldMousePoint;
+		Vec2 _beginDrag;
 
 		IList<GameObject> _playerPreSelected;
 		IList<GameObject> _ennemyPreSelected;
@@ -97,15 +98,13 @@ namespace KingdomsRebellion.Core.Player {
 		bool IsInRect(GameObject go) {
 			return new List<GameObject>(
 				KRFacade.Find(
-					InputModelAdapter.BeginDrag,
-					Vec2.FromVector3(InputModelAdapter.WorldPosition(Input.mousePosition)),
-					Vec2.FromVector3(
-						InputModelAdapter.WorldPosition(
-							new Vector3(
-								Input.mousePosition.x,
-								Camera.main.WorldToScreenPoint(InputModelAdapter.BeginDrag.ToVector3()).y,
-								Input.mousePosition.z
-							)
+					_beginDrag,
+					InputModelAdapter.ModelPosition(Input.mousePosition),
+					InputModelAdapter.ModelPosition(
+						new Vector3(
+							Input.mousePosition.x,
+							Camera.main.WorldToScreenPoint(_beginDrag.ToVector3()).y,
+							Input.mousePosition.z
 						)
 					)
 				)
@@ -178,6 +177,7 @@ namespace KingdomsRebellion.Core.Player {
 		
 		void OnLeftClickDown(Vector3 mousePosition) {
 			_originWorldMousePoint = Camera.main.ScreenToWorldPoint(mousePosition);
+			_beginDrag = InputModelAdapter.ModelPosition(mousePosition);
 		}
 		
 		void OnLeftClickUp(Vector3 mousePosition) {
