@@ -7,8 +7,8 @@ using KingdomsRebellion.Core.Math;
 
 namespace KingdomsRebellion.Core.Map {
 	public interface IMap<N,T> : IEnumerable<T> where T : IPos where N : IPos {
-		bool Add(T u);
-		bool Remove(T u);
+		bool Add(T u, bool floating);
+		bool Remove(T u, bool floating);
 		T Find(Vec2 pos);
 		bool IsEmpty(Vec2 pos);
 		bool IsInBounds(Vec2 pos);

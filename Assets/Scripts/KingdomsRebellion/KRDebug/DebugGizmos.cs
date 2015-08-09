@@ -15,7 +15,9 @@ namespace KingdomsRebellion.KRDebug {
         }
 
 		void OnDrawGizmos() {
-			if (OnKRDrawGizmos != null) { OnKRDrawGizmos(); }
+			if (OnKRDrawGizmos != null) {
+				OnKRDrawGizmos();
+			}
 		}
 	}
 }

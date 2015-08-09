@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using KingdomsRebellion.Core.Interfaces;
 using KingdomsRebellion.Core.Math;
+using UnityEngine;
 
 namespace KingdomsRebellion.Core.Map {
 
@@ -17,7 +18,8 @@ namespace KingdomsRebellion.Core.Map {
 		Vec2 _bottomLeft, _topRight, _center;
 		QuadTreeNode<T>[] _subnodes;
 		QuadTreeNode<T> _parent;
-		IList<T> _objects;
+		List<T> _floatingObjects;
+		List<T> _fixedObjects;
 		EState _state;
 
 		public int Width { get { return _width; } }
@@ -25,7 +27,7 @@ namespace KingdomsRebellion.Core.Map {
 		public Vec2 Pos { get { return _center; } }
 		public Vec2 BottomLeft { get { return _bottomLeft; } }
 		public Vec2 TopRight { get { return _topRight; } }
-		public IEnumerable<T> Objects { get { return _objects; } }
+		public IEnumerable<T> Objects { get { return _floatingObjects.Concat(_fixedObjects); } }
 
 		public QuadTreeNode(int x, int y, int width = 1, int height = 1, int level = 0) :
 			this(null, new Vec2(x, y), new Vec2(x+width, y+height), level) {}
@@ -35,7 +37,8 @@ namespace KingdomsRebellion.Core.Map {
 			_bottomLeft = bottomLeft;
 			_topRight = topRight;
 			_level = level;
-			_objects = new List<T>();
+			_fixedObjects = new List<T>();
+			_floatingObjects = new List<T>();
 
 			_width = _topRight.X - _bottomLeft.X;
 			_height = _topRight.Y - _bottomLeft.Y;
@@ -45,7 +48,7 @@ namespace KingdomsRebellion.Core.Map {
 		}
 
 		public bool IsLeaf() { return _subnodes == null; }
-		bool IsEmpty() { return _objects.Count == 0; }
+//		bool IsEmpty() { return _fixedObjects.Count == 0; }
 
 		public bool Split() {
 			if (IsLeaf()) {
@@ -65,60 +68,120 @@ namespace KingdomsRebellion.Core.Map {
 			return true;
 		}
 
-		public bool Add(T obj) {
-			if (!IsInBound(obj.Pos)) return false;
-
+		// not floating
+		bool Add(T obj, Vec2 pos, Vec2 size, bool floating = false) {
+			if (!IsInBound(pos)) return false;
+			
 			if (!IsLeaf()) {
-				int index = Index(obj);
+				int index = Index(pos, size);
 				if (index != -1) {
-					return _subnodes[index].Add(obj);
+					return _subnodes[index].Add(obj, pos, size, floating);
+				} else if (floating) {
+					_floatingObjects.Add(obj);
+					return true;
 				} else {
-					_objects.Add(obj);
+					CutAndDispatch(obj, pos, size);
 					return true;
 				}
 			}
-
-			_objects.Add(obj);
-
-			if (_objects.Count <= 1) {
-				if (_width == 1) {
-					_state = EState.OBSTRUCTED;
-					return true;
-				}
+			
+			if (floating) {
+				_floatingObjects.Add(obj);
+				return true;
 			}
-
+			
+			if (_width == 1) {
+				_fixedObjects.Add(obj);
+				_state = EState.OBSTRUCTED;
+				return true;
+			}
+			
 			Split();
-
-			int i = 0;
-			while (i < _objects.Count) {
-				int index = Index(_objects[i]);
+			
+			{
+				int index = Index(pos, size);
 				if (index != -1) {
-					_subnodes[index].Add(_objects[i]);
-					_objects.RemoveAt(i);
+					_subnodes[index].Add(obj, pos, size, floating);
+				} else {
+					CutAndDispatch(obj, pos, size);
+				}
+			}
+			
+			int i = 0;
+			while (i < _floatingObjects.Count) {
+				var fo = _floatingObjects[i];
+				int index = Index(fo.Pos, fo.Size);
+				if (index != -1) {
+					_subnodes[index].Add(_floatingObjects[i], fo.Pos, fo.Size);
+					_floatingObjects.RemoveAt(i);
 				} else {
 					++i;
 				}
 			}
-
+			
 			return true;
 		}
 
+		void CutAndDispatch(T obj, Vec2 pos, Vec2 size) {
+			var p1 = pos; var s1 = _center-p1;
+			if (s1.X > 0 && s1.Y > 0) { Child(EQuadrant.SOUTHWEST).Add(obj, p1, s1); }
+
+			var p2 = _center; var s2 = size-s1;
+			if (s2.X > 0 && s2.Y > 0) { Child(EQuadrant.NORTHEAST).Add(obj, p2, s2); }
+
+			var p3 = new Vec2(p1.X, _center.Y); var s3 = new Vec2(s1.X, s2.Y);
+			if (s3.X > 0 && s3.Y > 0) { Child(EQuadrant.NORTHWEST).Add(obj, p3, s3); }
+
+			var p4 = new Vec2(_center.X, p1.Y); var s4 = new Vec2(s2.X, s1.Y);
+			if (s4.X > 0 && s4.Y > 0) { Child(EQuadrant.SOUTHEAST).Add(obj, p4, s4); }
+		}
+
+		public bool Add(T obj, bool floating = true) {
+			return Add(obj, obj.Pos, obj.Size, floating);
+		}
+
 		void Unsplit(T obj) {
-			if (_subnodes.Count(n => !n.IsLeaf() || n._objects.Count > 0) <= 0) {
+			if (!_subnodes.Any(n => !n.IsLeaf() || n._fixedObjects.Count > 0)) {
 				_state = EState.FREE;
+				foreach(var subnode in _subnodes) {
+					_floatingObjects.AddRange(subnode._floatingObjects);
+				}
 				_subnodes = null;
 				if (_parent != null) { _parent.Unsplit(obj); }
 			}
 		}
 
-		public bool Remove(T obj) {
+		public bool Remove(T obj, bool floating = true) {
 			if (!IsLeaf()) {
-				return Child(Quadrant(obj)).Remove(obj);
+				if (floating) {
+					if (_floatingObjects.Remove(obj)) {
+						return true;
+					} else {
+						return Child(Quadrant(obj.Pos, obj.Size).Value).Remove(obj, floating);
+					}
+				} else {
+					var q = Quadrant(obj.Pos, obj.Size);
+					if (q.HasValue) {
+						return Child(q.Value).Remove(obj, floating);
+					} else {
+						bool ret = false;
+						foreach(var sn in _subnodes) {
+							if (sn != null && sn._fixedObjects.Contains(obj)) {
+								ret = ret || sn.Remove(obj, floating);
+							}
+						}
+						return ret;
+					}
+				}
 			}
 
-			bool res = _objects.Remove(obj);
+			if (floating) {
+				return _floatingObjects.Remove(obj);
+			}
 
-			if (_objects.Count() == 0) {
+			bool res = _fixedObjects.Remove(obj);
+
+			if (res) {
 				_state = EState.FREE;
 				_parent.Unsplit(obj);
 			}
@@ -126,24 +189,18 @@ namespace KingdomsRebellion.Core.Map {
 			return res;
 		}
 
-		public bool IsEmpty(Vec2 target) { return Find(target).Objects.SingleOrDefault(o => o.Pos == target) == null; }
-		public IList<T> Retrieve(T obj) { return Retrieve(obj, new List<T>()); }
+		public bool IsEmpty(Vec2 target) {
+			var qn = Find(target);
+			return !qn._fixedObjects.Any() && qn._floatingObjects.All(n => !Collide(n, target));
+		}
 
-		IList<T> Retrieve(T obj, IList<T> list) {
-			int index = Index(obj);
-			if (index != -1 && !IsLeaf()) {
-				_subnodes[index].Retrieve(obj, list);
-			}
-			
-			for (int i = 0; i < _objects.Count; ++i) {
-				list.Add(_objects[i]);
-			}
-			
-			return list;
+		bool Collide(T t, Vec2 v) {
+			return v.X >= t.Pos.X && v.X < t.Pos.X+t.Size.X && v.Y >= t.Pos.Y && v.Y < t.Pos.Y+t.Size.Y;
 		}
 
 		public void Clear() {
-			_objects.Clear();
+			_fixedObjects.Clear();
+			_floatingObjects.Clear();
 			if (!IsLeaf()) {
 				for (int i = 0; i < _subnodes.Length; ++i) {
 					_subnodes[i].Clear();
@@ -151,14 +208,25 @@ namespace KingdomsRebellion.Core.Map {
 			}
 		}
 
-		int Index(T obj) { return (int) Quadrant(obj); }
-		EQuadrant Quadrant(T obj) { return Quadrant(obj.Pos); }
-		EQuadrant Quadrant(Vec2 pos) {
-			if (pos.X < _center.X) {
-				return pos.Y < _center.Y ? EQuadrant.SOUTHWEST : EQuadrant.NORTHWEST;
-			} else {
-				return pos.Y < _center.Y ? EQuadrant.SOUTHEAST : EQuadrant.NORTHEAST;
+		int Index(Vec2 pos, Vec2 size) {
+			var q = Quadrant(pos, size);
+			return q != null ? (int) q : -1;
+		}
+		EQuadrant? Quadrant(Vec2 pos, Vec2 size) {
+			if (pos.X+size.X <= _center.X) {
+				if (pos.Y+size.Y <= _center.Y) {
+ 					return EQuadrant.SOUTHWEST;
+				} else if (pos.Y >= _center.Y) {
+					return EQuadrant.NORTHWEST;
+				}
+			} else if (pos.X >= _center.X) {
+				if (pos.Y+size.Y <= _center.Y) {
+					return EQuadrant.SOUTHEAST;
+				} else if (pos.Y >= _center.Y) {
+					return EQuadrant.NORTHEAST;
+				}
 			}
+			return null;
 		}
 
 		static readonly bool[,] ADJACENT = new bool[,] {

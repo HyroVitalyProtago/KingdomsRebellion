@@ -17,19 +17,19 @@ namespace KingdomsRebellion.Core.Map {
 			_objects = new List<T>();
 		}
 
-		public bool Add(T t) {
+		public bool Add(T t, bool floating) {
 			if (!IsInBounds(t.Pos)) {
 				throw new ArgumentException("Position is not in bounds : " + t.Pos);
 			}
-			if (_node.Add(t)) {
+			if (_node.Add(t, floating)) {
 				_objects.Add(t);
 				return true;
 			}
 			return false;
 		}
 
-		public bool Remove(T t) {
-			if (_node.Remove(t)) {
+		public bool Remove(T t, bool floating) {
+			if (_node.Remove(t, floating)) {
 				_objects.Remove(t);
 				return true;
 			}
@@ -44,9 +44,7 @@ namespace KingdomsRebellion.Core.Map {
 		}
 
 		public T Find(Vec2 pos) {
-			if (!IsInBounds(pos)) {
-				return default(T);
-			}
+			if (!IsInBounds(pos)) { return default(T); }
 			return _node.Find(pos).Objects.SingleOrDefault(obj => obj.Pos == pos);
 		}
 

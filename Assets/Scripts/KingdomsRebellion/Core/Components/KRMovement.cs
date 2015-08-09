@@ -21,14 +21,16 @@ namespace KingdomsRebellion.Core.Components {
 		IEnumerable<QuadTreeNode<KRTransform>> _waypoints;
 		int _currentFrame;
 
-#if UNITY_EDITOR
+
 		IList<Vec2> __way = new List<Vec2>();
 		List<QuadTreeNode<KRTransform>> __waynodes = new List<QuadTreeNode<KRTransform>>();
-#endif
+
 
 		void Awake() {
 			_krtransform = GetComponent<KRTransform>();
 			Speed = __speed;
+
+			On("OnKRDrawGizmos");
 		}
 
 		void Start() {
@@ -98,9 +100,8 @@ namespace KingdomsRebellion.Core.Components {
 					KRFacade.Remove(GetComponent<KRTransform>());
 					_krtransform.Pos = nextPos;
 					KRFacade.Add(GetComponent<KRTransform>());
-#if UNITY_EDITOR
+
 					__way.Add(_krtransform.Pos);
-#endif
 				} else {
 					_waypoints = null;
 					Target = null;
@@ -118,11 +119,9 @@ namespace KingdomsRebellion.Core.Components {
 			if (Target == null) { _currentFrame = Speed; }
 			Target = target;
 
-#if UNITY_EDITOR
 			__way.Clear();
 			__way.Add(_krtransform.Pos);
 			__waynodes.Clear();
-#endif
 		}
 
 		public void Follow(GameObject kgo) {
@@ -134,8 +133,7 @@ namespace KingdomsRebellion.Core.Components {
 			Move(kt.Pos);
 		}
 
-#if UNITY_EDITOR
-		void OnDrawGizmos() {
+		void OnKRDrawGizmos() {
 			__waynodes.ToList().ForEach(delegate(QuadTreeNode<KRTransform> n) {
 				Gizmos.color = new Color(((float)n.Width)/10f, .2f, ((float)n.Height)/10f);
 				if (n.Width == 1)
@@ -149,6 +147,5 @@ namespace KingdomsRebellion.Core.Components {
 				Gizmos.DrawLine(__way[i].ToVector3().Adjusted(), __way[i+1].ToVector3().Adjusted());
 			}
 		}
-#endif
 	}
 }

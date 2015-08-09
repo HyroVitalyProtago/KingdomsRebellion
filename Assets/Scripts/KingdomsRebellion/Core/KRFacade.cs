@@ -15,17 +15,15 @@ using KingdomsRebellion.Core.Components;
 namespace KingdomsRebellion.Core {
 	public static class KRFacade {
 
-		static readonly IMap<QuadTreeNode<KRTransform>,KRTransform> _Map = new QuadTree<KRTransform>(256, 256);
+		static readonly IMap<QuadTreeNode<KRTransform>,KRTransform> _Map = new QuadTree<KRTransform>(64, 64);
 
-#if !UNITY_EDITOR
+
 		static IList<Vec2> __walkedNode = new List<Vec2>();
 		static IList<Vec2> __walkedFind = new List<Vec2>();
-#endif
+
 
 		public static void Awake() {
-#if !UNITY_EDITOR
 			EventConductor.On(typeof(KRFacade), "OnKRDrawGizmos");
-#endif
 		}
 
 		public static IEnumerable<QuadTreeNode<KRTransform>> FindPath(Vec2 start, Vec2 target) {
@@ -47,8 +45,8 @@ namespace KingdomsRebellion.Core {
 			return (u == null) ? null : u.gameObject;
 		}
 
-		public static void Add(KRTransform t) { _Map.Add(t); }
-		public static void Remove(KRTransform t) { _Map.Remove(t); }
+		public static void Add(KRTransform t, bool floating = true) { _Map.Add(t, floating); }
+		public static void Remove(KRTransform t, bool floating = true) { _Map.Remove(t, floating); }
 		public static bool IsEmpty(Vec2 v) { return _Map.IsEmpty(v); }
 		public static bool IsInBounds(Vec2 v) { return _Map.IsInBounds(v); }
 
@@ -61,14 +59,14 @@ namespace KingdomsRebellion.Core {
 
 			Vec2 v4 = v2 - (v3 - v1);
 
-#if !UNITY_EDITOR
+
 			__walkedNode.Clear();
 			__walkedFind.Clear();
 			__walkedFind.Add(v1);
 			__walkedFind.Add(v2);
 			__walkedFind.Add(v3);
 			__walkedFind.Add(v4);
-#endif
+
 
 			// bottomLeft, bottomRight, topLeft, topRight
 			Vec2[] vecs = { v1,v2,v3,v4 };
@@ -124,9 +122,9 @@ namespace KingdomsRebellion.Core {
 				for (int y = minYS; y < maxYS; ++y) {
 					Vec2 c = new Vec2(x,y);
 					if (_in(c) || _on(c)) {
-#if !UNITY_EDITOR
+
 						__walkedNode.Add(c);
-#endif
+
 						u = _Map.Find(c);
 						if (u != null) { gos.Add(u.gameObject); }
 					}
@@ -189,7 +187,8 @@ namespace KingdomsRebellion.Core {
 	        }
 	        return _Map.IsEmpty(left) ? left : right;
 	    }
-#if !UNITY_EDITOR
+
+
 		static void OnKRDrawGizmos() {
 			_Map.Walk(GizmosDrawNode);
 
@@ -212,6 +211,7 @@ namespace KingdomsRebellion.Core {
 			Gizmos.DrawLine(p1, p1 - new Vector3(n.Width-.2f, 0, .1f));
 			Gizmos.DrawLine(p1, p1 - new Vector3(.1f, 0, n.Height-.2f));
 		}
-#endif
+
+
 	}
 }
