@@ -15,13 +15,14 @@ namespace KingdomsRebellion.KRDebug {
 
 	public class DebugPathfinding : KRBehaviour {
 
+		#region Attributes
 		Stopwatch _stopwatch;
-
 		Vec2 _begin, _end;
 		QuadTreeNode<KRTransform> _beginNode, _endNode;
 		IEnumerable<QuadTreeNode<KRTransform>> _waynodes;
 		List<Vec2> _waypoints;
 		List<Vec2> _realPath;
+		#endregion
 
 		void Awake() {
 			On("OnLeftClickUp");
@@ -84,6 +85,8 @@ namespace KingdomsRebellion.KRDebug {
 			_stopwatch.Reset();
 			_stopwatch.Start();
 			_waynodes = KRFacade.FindPath(_begin, _end);
+			_stopwatch.Stop();
+			Debug.Log(String.Format("DebugPathfinding::FindPath | time elapsed: {0}", _stopwatch.Elapsed));
 
 			_waypoints.Clear();
 			_waypoints.Add(_begin);
@@ -96,11 +99,9 @@ namespace KingdomsRebellion.KRDebug {
 			_waypoints.Add(_end);
 
 			_realPath = SimplifyPath(_waypoints);
-
-			_stopwatch.Stop();
-			Debug.Log(String.Format("DebugPathfinding::FindPath | time elapsed: {0}", _stopwatch.Elapsed));
 		}
 
+		#region DrawGizmos
 		static void DrawNode(QuadTreeNode<KRTransform> n) {
 			if (n.Width == 1) {
 				Gizmos.DrawCube((new Vector3(n.Pos.X,0,n.Pos.Y)).Adjusted(), new Vector3(n.Width,.01f,n.Height));
@@ -108,11 +109,9 @@ namespace KingdomsRebellion.KRDebug {
 				Gizmos.DrawCube(new Vector3(n.Pos.X,0,n.Pos.Y), new Vector3(n.Width,.01f,n.Height));
 			}
 		}
-
 		static void DrawPoint(Vec2 p) {
 			Gizmos.DrawSphere(p.ToVector3().Adjusted(), .5f);
 		}
-
 		void DrawSelectedQuadTreeNodes() {
 			Gizmos.color = new Color(0f,0f,1f,.5f);
 			DrawNode(_beginNode);
@@ -123,12 +122,10 @@ namespace KingdomsRebellion.KRDebug {
 			Gizmos.color = new Color(1f,0f,0f,.5f);
 			DrawNode(_endNode);
 		}
-
 		void DrawWaypoints() {
 			Gizmos.color = new Color(0f,1f,0f,.7f);
 			_waypoints.ForEach(DrawPoint);
 		}
-
 		void DrawRealPath() {
 			Gizmos.color = new Color(0f,1f,1f,1f);
 			_realPath.ForEach(DrawPoint);
@@ -138,7 +135,6 @@ namespace KingdomsRebellion.KRDebug {
 				Gizmos.DrawLine(_realPath[i].ToVector3().Adjusted(), _realPath[i+1].ToVector3().Adjusted());
 			}
 		}
-
 		void OnDrawGizmos() {
 			if (_waynodes == null) {
 				return;
@@ -148,7 +144,9 @@ namespace KingdomsRebellion.KRDebug {
 			DrawWaypoints();
 			DrawRealPath();
 		}
+		#endregion
 
+		#region Events
 		void OnLeftClickUp(Vector3 mousePosition) {
 			_begin = InputModelAdapter.ModelPosition(mousePosition);
 			_beginNode = KRFacade.FindNode(_begin);
@@ -159,5 +157,6 @@ namespace KingdomsRebellion.KRDebug {
 			_endNode = KRFacade.FindNode(_end);
 			if (_begin != null && _end != null) { FindPath(); }
 		}
+		#endregion
 	}
 }

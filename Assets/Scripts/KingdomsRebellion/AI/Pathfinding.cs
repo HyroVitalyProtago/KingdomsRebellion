@@ -6,24 +6,34 @@ namespace KingdomsRebellion.AI {
 
 	public static class Pathfinding<T> where T : IPos {
 
+		static Heap<AbstractNode<T>> openSet = new Heap<AbstractNode<T>>(64);
+		static IList<AbstractNode<T>> nodes = new List<AbstractNode<T>>();
+
+		static void Reset() {
+			foreach (AbstractNode<T> n in nodes) {
+				n.Reset();
+			}
+			nodes.Clear();
+		}
+
 		public static IEnumerable<AbstractNode<T>> FindPath(AbstractNode<T> startNode, AbstractNode<T> targetNode) {
-			IList<AbstractNode<T>> openSet = new List<AbstractNode<T>>();
-			HashSet<AbstractNode<T>> closedSet = new HashSet<AbstractNode<T>>();
-			openSet.Add(startNode);
+			openSet.Clear();
+			openSet.Push(startNode);
+			nodes.Add(startNode);
+			startNode.Open();
 			startNode.PathCost = 0;
 			
-			while (openSet.Count > 0) {
-				AbstractNode<T> currentNode = openSet.Min();
+			while (!openSet.IsEmpty()) {
+				AbstractNode<T> currentNode = openSet.Pop();
 
 				if (currentNode == targetNode) {
-					return RetracePath(startNode,currentNode);
+					return RetracePath(startNode, currentNode);
 				}
-
-				openSet.Remove(currentNode);
-				closedSet.Add(currentNode);
+					
+				currentNode.Close();
 
 				foreach (AbstractNode<T> neighbour in currentNode.Neighbours()) {
-					if (!neighbour.IsFree() || closedSet.Contains(neighbour)) {
+					if (!neighbour.IsFree() || neighbour.IsClosed()) {
 						if (neighbour == targetNode) { // abort if path can't join target
 							return RetracePath(startNode, currentNode);
 						}
@@ -31,16 +41,21 @@ namespace KingdomsRebellion.AI {
 					}
 					
 					int newMovementCostToNeighbour = currentNode.PathCost + currentNode.GetDistance(neighbour);
-					if (!openSet.Contains(neighbour) || newMovementCostToNeighbour < neighbour.PathCost) {
+					if (!neighbour.IsOpened() || newMovementCostToNeighbour < neighbour.PathCost) {
 						neighbour.PathCost = newMovementCostToNeighbour;
 						neighbour.EstimatedCost = neighbour.GetDistance(targetNode);
 						neighbour.Parent = currentNode;
 
-						if (!openSet.Contains(neighbour)) { openSet.Add(neighbour); }
+						if (!neighbour.IsOpened()) {
+							neighbour.Open();
+							openSet.Push(neighbour);
+							nodes.Add(neighbour);
+						}
 					}
 				}
 			}
 
+			Reset();
 			return openSet;
 		}
 			
@@ -53,6 +68,7 @@ namespace KingdomsRebellion.AI {
 				currentNode = currentNode.Parent;
 			}
 
+			Reset();
 			return path.Reverse();
 		}
 

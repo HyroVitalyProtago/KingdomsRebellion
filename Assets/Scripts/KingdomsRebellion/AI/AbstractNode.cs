@@ -5,8 +5,11 @@ using UnityEngine;
 using Object = System.Object;
 
 namespace KingdomsRebellion.AI {
-	public abstract class AbstractNode<T> : IComparable where T : IPos {
+	public abstract class AbstractNode<T> : IComparable<AbstractNode<T>> where T : IPos {
+		enum EState { OPENED, CLOSED, UNVISITED }
+
 		int _totalCost, _pathCost, _estimatedCost;
+		EState _state;
 
 		public AbstractNode<T> Parent { get; set; }
 		public int TotalCost { get { return _totalCost; } } // FCost : Total cost
@@ -30,9 +33,26 @@ namespace KingdomsRebellion.AI {
 		} 
 
 		protected AbstractNode(AbstractNode<T> parent, int path, int estimate) {
+			_state = EState.UNVISITED;
 			Parent = parent;
 			PathCost = path;
 			EstimatedCost = estimate;
+		}
+
+		public void Close() {
+			_state = EState.CLOSED;
+		}
+		public bool IsClosed() {
+			return _state == EState.CLOSED;
+		}
+		public void Open() {
+			_state = EState.OPENED;
+		}
+		public bool IsOpened() {
+			return _state == EState.OPENED;
+		}
+		public void Reset() {
+			_state = EState.UNVISITED;
 		}
 
 		public abstract bool IsFree();
@@ -40,14 +60,10 @@ namespace KingdomsRebellion.AI {
 
 		void UpdateTotal() { _totalCost = _pathCost + _estimatedCost; }
 
-		public int CompareTo(object obj) {
-			AbstractNode<T> temp = obj as AbstractNode<T>;
-			if (temp == null) { throw new ArgumentException("Object is not an AbstractNode"); }
-			
-			int result = TotalCost.CompareTo(temp.TotalCost);
-			if (result != 0) { return result; }
-			
-			return EstimatedCost.CompareTo(temp.EstimatedCost);
+		public int CompareTo(AbstractNode<T> other) {
+			int result = TotalCost.CompareTo(other.TotalCost);
+			return result != 0 ? result : EstimatedCost.CompareTo(other.EstimatedCost);
+
 		}
 
 		// Heuristic
