@@ -49,7 +49,7 @@ namespace KingdomsRebellion.Core.Player {
 				}
 			} else { // units
 				var go = KRFacade.Find(v);
-				if (go != null && go.GetComponent<KRTransform>().PlayerID != NetworkAPI.PlayerId) {
+				if (go != null && go.GetComponent<KRTransform>().PlayerID != -1 && go.GetComponent<KRTransform>().PlayerID != NetworkAPI.PlayerId) {
 					if (OnDemand != null) {
 						OnDemand(new AttackAction(v));
 					}

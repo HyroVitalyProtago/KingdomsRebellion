@@ -4,7 +4,7 @@ using KingdomsRebellion.Core.Interfaces;
 
 namespace KingdomsRebellion.AI {
 
-	public class Pathfinding<T> where T : IPos {
+	public static class Pathfinding<T> where T : IPos {
 
 		public static IEnumerable<AbstractNode<T>> FindPath(AbstractNode<T> startNode, AbstractNode<T> targetNode) {
 			IList<AbstractNode<T>> openSet = new List<AbstractNode<T>>();
@@ -41,9 +41,9 @@ namespace KingdomsRebellion.AI {
 				}
 			}
 
-			return null;
+			return openSet;
 		}
-		
+			
 		static IEnumerable<AbstractNode<T>> RetracePath(AbstractNode<T> startNode, AbstractNode<T> endNode) {
 			IList<AbstractNode<T>> path = new List<AbstractNode<T>>();
 			AbstractNode<T> currentNode = endNode;
@@ -55,5 +55,6 @@ namespace KingdomsRebellion.AI {
 
 			return path.Reverse();
 		}
+
 	}
 }

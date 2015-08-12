@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using KingdomsRebellion.AI;
+using KingdomsRebellion.Core.Components;
 using KingdomsRebellion.Core.FSM;
 using KingdomsRebellion.Core.Map;
 using KingdomsRebellion.Core.Math;
-using KingdomsRebellion.Inputs;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
-using KingdomsRebellion.Core.Components;
 
 namespace KingdomsRebellion.Core {
 	public static class KRFacade {
@@ -25,6 +23,8 @@ namespace KingdomsRebellion.Core {
 		public static void Awake() {
 			EventConductor.On(typeof(KRFacade), "OnKRDrawGizmos");
 		}
+
+		public static QuadTreeNode<KRTransform> FindNode(Vec2 p) { return _Map.FindNode(p).WrappedNode(); }
 
 		public static IEnumerable<QuadTreeNode<KRTransform>> FindPath(Vec2 start, Vec2 target) {
 			return Pathfinding<QuadTreeNode<KRTransform>>.FindPath(_Map.FindNode(start), _Map.FindNode(target))
@@ -132,7 +132,7 @@ namespace KingdomsRebellion.Core {
 			}
 
 			stopwatch.Stop();
-			Debug.Log(String.Format("DragFind :: time elapsed: {0}", stopwatch.Elapsed));
+//			Debug.Log(String.Format("DragFind :: time elapsed: {0}", stopwatch.Elapsed));
 
 			return gos;
 		}

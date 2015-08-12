@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using KingdomsRebellion.Core.Interfaces;
 using KingdomsRebellion.Core.Math;
-using UnityEngine;
 
 namespace KingdomsRebellion.Core.Map {
 
+	public enum ESide { NORTH, EAST, SOUTH, WEST }
+	public enum EQuadrant { NORTHWEST, NORTHEAST, SOUTHWEST, SOUTHEAST }
+	public enum EState { FREE, MIXED, OBSTRUCTED }
+
 	public class QuadTreeNode<T> : KRObject, IPos where T : IPos, ISize {
-
-		enum ESide { NORTH, EAST, SOUTH, WEST }
-		enum EQuadrant { NORTHWEST, NORTHEAST, SOUTHWEST, SOUTHEAST }
-		enum EState { FREE, MIXED, OBSTRUCTED }
-
+		
 		int _level;
 		int _width, _height;
 		Vec2 _bottomLeft, _topRight, _center;
@@ -360,13 +359,34 @@ namespace KingdomsRebellion.Core.Map {
 				}
 			}
 		}
-/*
-		void TryAddQuadrantSide(ESide s1, ESide s2, EQuadrant q, IList<QuadTreeNode<T>> l) {
-			var n1 = Neighbour(s1); if (n1 == null) return;
-			var n2 = n1.Neighbour(s2); if (n2 == null) return;
-			l.Add(n2.DeepChild(q));
+
+		public ESide SideOfNeighbour(QuadTreeNode<T> neighbour) {
+			IList<QuadTreeNode<T>> neighbours = new List<QuadTreeNode<T>>();
+
+			foreach (ESide side in Enum.GetValues(typeof(ESide))) {
+				Neighbours(side, neighbours);
+				if (neighbours.Contains(neighbour)) {
+					return side;
+				}
+				neighbours.Clear();
+			}
+
+			throw new SystemException("Search side of an invalid neighbour");
 		}
-*/
+
+//		QuadTreeNode<T> Root() {
+//			var root = this;
+//			while (root._parent != null) {
+//				root = root._parent;
+//			}
+//			return root;
+//		}
+//
+//		void TryAddDiagonalNeighbour(Vec2 p, IList<QuadTreeNode<T>> l) {
+//			var qn = Find(p);
+//			if (qn != null && !l.Contains(qn)) { l.Add(qn); }
+//		}
+
 		public IList<QuadTreeNode<T>> Neighbours() {
 			IList<QuadTreeNode<T>> neighbours = new List<QuadTreeNode<T>>();
 			Neighbours(ESide.NORTH, neighbours);
@@ -375,10 +395,11 @@ namespace KingdomsRebellion.Core.Map {
 			Neighbours(ESide.WEST, neighbours);
 
 			// TRY for Quadrant side
-//			TryAddQuadrantSide(ESide.NORTH, ESide.EAST, EQuadrant.SOUTHWEST, neighbours);
-//			TryAddQuadrantSide(ESide.NORTH, ESide.WEST, EQuadrant.SOUTHEAST, neighbours);
-//			TryAddQuadrantSide(ESide.SOUTH, ESide.EAST, EQuadrant.NORTHWEST, neighbours);
-//			TryAddQuadrantSide(ESide.SOUTH, ESide.WEST, EQuadrant.NORTHEAST, neighbours);
+//			var root = Root();
+//			root.TryAddDiagonalNeighbour(new Vec2(_bottomLeft.X-1,_topRight.Y+1), neighbours); // NORTHWEST
+//			root.TryAddDiagonalNeighbour(new Vec2(_topRight.X+1,_topRight.Y+1), neighbours); // NORTHEAST
+//			root.TryAddDiagonalNeighbour(new Vec2(_bottomLeft.X-1,_bottomLeft.Y-1), neighbours); // SOUTHWEST
+//			root.TryAddDiagonalNeighbour(new Vec2(_topRight.X+1,_bottomLeft.Y-1), neighbours); // SOUTHEAST
 
 			return neighbours;
 		}

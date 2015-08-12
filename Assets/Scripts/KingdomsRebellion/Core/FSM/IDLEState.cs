@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using KingdomsRebellion.Core.Components;
 using UnityEngine;
+using System.Linq;
 
 namespace KingdomsRebellion.Core.FSM {
 
@@ -11,7 +12,7 @@ namespace KingdomsRebellion.Core.FSM {
 
         // TODO IDLE by type of units, here is the code for soldier. Replace 6 by vision sight
         public override Type Execute() {
-			IEnumerable<GameObject> gameObjects = KRFacade.Around(_fsm.GetComponent<KRTransform>().Pos, 6);
+			IEnumerable<GameObject> gameObjects = KRFacade.Around(_fsm.GetComponent<KRTransform>().Pos, 6).Where(go => go.GetComponent<KRTransform>().PlayerID != -1);
             foreach (var obj in gameObjects) {
 				if (obj.GetComponent<KRTransform>().PlayerID != _fsm.GetComponent<KRTransform>().PlayerID) {
                     _fsm.GetComponent<KRAttack>().Attack(obj);

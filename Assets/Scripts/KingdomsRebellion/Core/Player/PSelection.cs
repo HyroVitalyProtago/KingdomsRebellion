@@ -108,7 +108,7 @@ namespace KingdomsRebellion.Core.Player {
 							)
 						)
 					)
-				)
+				).Where(g => g.GetComponent<KRTransform>().PlayerID != -1)
 			).Contains(go);
 		}
 
@@ -160,7 +160,7 @@ namespace KingdomsRebellion.Core.Player {
 			DeselectUnits(player);
 			
 			GameObject go = KRFacade.Find(modelPosition);
-			if (go != null) {
+			if (go != null && go.GetComponent<KRTransform>().PlayerID != -1) {
 				_selectedObjects[player].Add(go);
 				ApplySelection(player);
 			}
@@ -169,7 +169,7 @@ namespace KingdomsRebellion.Core.Player {
 		void OnDragAction(int player, Vec2 beginModelPosition, Vec2 endModelPosition, Vec2 z) {
 			DeselectUnits(player);
 			
-			IEnumerable<GameObject> gos = KRFacade.Find(beginModelPosition, endModelPosition, z);
+			IEnumerable<GameObject> gos = KRFacade.Find(beginModelPosition, endModelPosition, z).Where(go => go.GetComponent<KRTransform>().PlayerID != -1);
 			foreach (GameObject go in gos) {
 				_selectedObjects[player].Add(go);
 			}

@@ -30,7 +30,7 @@ namespace KingdomsRebellion.Core.Components {
 			Pos = Vec2.FromVector3(transform.position);
 			Size = new Vec2(__sizeX, __sizeY);
 
-			KRFacade.Add(this, GetComponent<KRSpawn>() == null);
+			KRFacade.Add(this, GetComponent<KRMovement>() != null);
 			Offer("OnBirth");
 		}
 

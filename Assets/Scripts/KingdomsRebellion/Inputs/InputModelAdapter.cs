@@ -1,11 +1,8 @@
 ﻿using System;
 using KingdomsRebellion.Core;
 using KingdomsRebellion.Core.Math;
-using KingdomsRebellion.Core.Player;
-using KingdomsRebellion.Network;
 using UnityEngine;
 using KingdomsRebellion.Core.Components;
-using KingdomsRebellion.Network.Link;
 
 namespace KingdomsRebellion.Inputs {
 	public static class InputModelAdapter {

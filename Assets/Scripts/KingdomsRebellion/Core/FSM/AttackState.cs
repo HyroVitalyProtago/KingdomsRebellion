@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using KingdomsRebellion.Core.Components;
 using KingdomsRebellion.Core.Math;
 using UnityEngine;
+using System.Linq;
 
 namespace KingdomsRebellion.Core.FSM {
 
@@ -20,7 +21,7 @@ namespace KingdomsRebellion.Core.FSM {
 
         public override Type Execute() {
             if (_attack.Target == null) {
-				IEnumerable<GameObject> gameObjects = KRFacade.Around(_krtransform.Pos, 6);
+				IEnumerable<GameObject> gameObjects = KRFacade.Around(_krtransform.Pos, 6).Where(go => go.GetComponent<KRTransform>().PlayerID != -1);
                 foreach (var obj in gameObjects) {
 					if (obj.GetComponent<KRTransform>().PlayerID != _krtransform.PlayerID) {
                         _attack.Attack(obj);
