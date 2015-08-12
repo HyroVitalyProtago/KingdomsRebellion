@@ -1,5 +1,4 @@
 ﻿using System;
-using UnityEngine;
 
 namespace KingdomsRebellion.Network.Link {
 	public static class GameActionFactory {
@@ -18,7 +17,9 @@ namespace KingdomsRebellion.Network.Link {
                 return AttackAction.FromBytes(data);
 			} else if (b == (byte) GameActionEnum.SpawnAction) {
 				return SpawnAction.FromBytes(data);
-			} else if (b == (byte) GameActionEnum.RallyAction) {
+            } else if (b == (byte)GameActionEnum.BuildAction) {
+                return BuildAction.FromBytes(data);
+            } else if (b == (byte)GameActionEnum.RallyAction) {
 				return RallyAction.FromBytes(data);
 			}
 

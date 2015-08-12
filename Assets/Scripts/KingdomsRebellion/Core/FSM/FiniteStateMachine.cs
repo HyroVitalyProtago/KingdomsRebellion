@@ -1,9 +1,8 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using KingdomsRebellion.Core.Math;
-using KingdomsRebellion.Core.Player;
 using KingdomsRebellion.Core.Components;
+using KingdomsRebellion.Core.Math;
 
 namespace KingdomsRebellion.Core.FSM {
 
@@ -11,8 +10,14 @@ namespace KingdomsRebellion.Core.FSM {
 
         Stack<FSMState> _stack;
         object[] self;
+        IDLEState idle;
 
         void Awake() {
+            if (GetComponent<KRBuild>() != null) {
+                idle = new IDLEWorkerState(this);
+            } else {
+                idle = new IDLESoldierState(this);
+            }
             _stack = new Stack<FSMState>();
             _stack.Push(new IDLEState(this));
             self = new object[]{ this };
@@ -22,7 +27,7 @@ namespace KingdomsRebellion.Core.FSM {
             GetCurrentState().Exit();
             _stack.Pop();
             if (GetCurrentState() == null) {
-                PushState(new IDLEState(this));
+                PushState(idle);
             }
             GetCurrentState().Enter();
         }
@@ -30,7 +35,7 @@ namespace KingdomsRebellion.Core.FSM {
         void PushState(FSMState state, bool isHumanOrder = false) {
             if (isHumanOrder) {
                 _stack.Clear();
-                _stack.Push(new IDLEState(this));
+                _stack.Push(idle);
             }
             if (state != GetCurrentState()) {
                 GetCurrentState().Exit();

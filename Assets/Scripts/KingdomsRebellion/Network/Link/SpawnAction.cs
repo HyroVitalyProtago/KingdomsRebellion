@@ -1,9 +1,7 @@
 ﻿using System;
 using System.IO;
-using KingdomsRebellion.Core.Math;
-using UnityEngine;
-using KingdomsRebellion.Core;
 using KingdomsRebellion.Core.Components;
+using UnityEngine;
 
 namespace KingdomsRebellion.Network.Link {
 	
@@ -33,6 +31,9 @@ namespace KingdomsRebellion.Network.Link {
 					case KeyCode.V :
 						go.GetComponent<KRSpawn>().Spawn("Archer");
 						break;
+                    case KeyCode.T:
+                        go.GetComponent<KRSpawn>().Spawn("Worker");
+                        break;
 				}
 			};
 		}

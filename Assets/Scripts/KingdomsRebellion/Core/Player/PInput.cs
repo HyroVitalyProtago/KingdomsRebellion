@@ -63,11 +63,15 @@ namespace KingdomsRebellion.Core.Player {
 
 		void OnKeyPress(KeyCode k) {
 			if (!_selection.IsMines()) return;
-			if (!_selection.IsBuilding()) return;
-			
-			if (OnDemand != null) {
-				OnDemand(new SpawnAction(k));
-			}
+		    if (_selection.IsBuilding()) {
+		        if (OnDemand != null) {
+		            OnDemand(new SpawnAction(k));
+		        }
+		    } else {
+		        if (OnDemand != null) {
+		            OnDemand(new BuildAction(k));
+		        }
+		    }
 		}
 
 	}

@@ -4,7 +4,6 @@ using KingdomsRebellion.AI;
 using KingdomsRebellion.Core.Map;
 using KingdomsRebellion.Core.Math;
 using UnityEngine;
-using System;
 
 namespace KingdomsRebellion.Core.Components {
 

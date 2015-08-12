@@ -1,7 +1,7 @@
 ﻿using System;
-using UnityEngine;
 using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Core.Player;
+using UnityEngine;
 
 namespace KingdomsRebellion.Core.Components {
 

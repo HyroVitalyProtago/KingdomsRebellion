@@ -1,6 +1,6 @@
 ﻿using System;
-using UnityEngine;
 using KingdomsRebellion.Core.Player;
+using UnityEngine;
 
 namespace KingdomsRebellion.Core.Components {
 
@@ -24,12 +24,13 @@ namespace KingdomsRebellion.Core.Components {
         }
         
         public void OnDamageDone(AttackTypeEnum type, int damage) {
+            int dam;
 			if (Weakness == type) {
-                Life -= Mathf.FloorToInt(1.3f * (damage - Defense));
-            } else {
-                Life -= damage - Defense;
-            }
-
+			    dam = Mathf.FloorToInt(1.3f*(damage - Defense));
+			} else {
+			        dam = damage - Defense;
+			}
+            Life -= Mathf.Clamp(dam, 1, Life);
 			if (IsDead()) {
                 Destroy(gameObject);
             }

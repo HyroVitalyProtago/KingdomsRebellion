@@ -1,6 +1,4 @@
 ﻿using System;
-using KingdomsRebellion.Core.Player;
-using UnityEngine;
 using KingdomsRebellion.Core.Components;
 
 namespace KingdomsRebellion.Core.FSM {

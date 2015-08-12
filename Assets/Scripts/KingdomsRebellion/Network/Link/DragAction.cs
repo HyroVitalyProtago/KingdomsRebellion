@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Core;
+using KingdomsRebellion.Core.Math;
 
 namespace KingdomsRebellion.Network.Link {
 	

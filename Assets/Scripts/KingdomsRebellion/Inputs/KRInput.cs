@@ -45,6 +45,10 @@ namespace KingdomsRebellion.Inputs {
                 if (OnKeyPress != null) {
                     OnKeyPress(KeyCode.V);
                 }
+            } else if (Input.GetKeyUp(KeyCode.T)) {
+                if (OnKeyPress != null) {
+                    OnKeyPress(KeyCode.T);
+                }
             }
 		}
 	}

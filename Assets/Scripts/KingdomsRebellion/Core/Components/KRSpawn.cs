@@ -1,11 +1,8 @@
 ﻿using System;
-using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using KingdomsRebellion.Core.FSM;
-using KingdomsRebellion.Core.Interfaces;
 using KingdomsRebellion.Core.Math;
-using KingdomsRebellion.Core.Player;
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace KingdomsRebellion.Core.Components {
@@ -27,6 +24,7 @@ namespace KingdomsRebellion.Core.Components {
             _spawnableObjects = new Dictionary<String, Object>();
 			AddSpawnable("Infantry");
             AddSpawnable("Archer");
+            AddSpawnable("Worker");
 			_sweetBlue = (Material) Resources.Load("Materials/SweetBlue", typeof(Material));
 			_sweetRed = (Material) Resources.Load("Materials/SweetRed", typeof(Material));
 		}
