@@ -6,9 +6,25 @@ using KingdomsRebellion.Core.Math;
 
 namespace KingdomsRebellion.Core.Map {
 
-	public enum ESide { NORTH, EAST, SOUTH, WEST }
-	public enum EQuadrant { NORTHWEST, NORTHEAST, SOUTHWEST, SOUTHEAST }
-	public enum EState { FREE, MIXED, OBSTRUCTED }
+	public enum ESide {
+		NORTH,
+		EAST,
+		SOUTH,
+		WEST
+	}
+
+	public enum EQuadrant {
+		NORTHWEST,
+		NORTHEAST,
+		SOUTHWEST,
+		SOUTHEAST
+	}
+
+	public enum EState {
+		FREE,
+		MIXED,
+		OBSTRUCTED
+	}
 
 	public class QuadTreeNode<T> : KRObject, IPos where T : IPos, ISize {
 		
@@ -22,14 +38,20 @@ namespace KingdomsRebellion.Core.Map {
 		EState _state;
 
 		public int Width { get { return _width; } }
+
 		public int Height { get { return _height; } }
+
 		public Vec2 Pos { get { return _center; } }
+
 		public Vec2 BottomLeft { get { return _bottomLeft; } }
+
 		public Vec2 TopRight { get { return _topRight; } }
+
 		public IEnumerable<T> Objects { get { return _floatingObjects.Concat(_fixedObjects); } }
 
 		public QuadTreeNode(int x, int y, int width = 1, int height = 1, int level = 0) :
-			this(null, new Vec2(x, y), new Vec2(x+width, y+height), level) {}
+			this(null, new Vec2(x, y), new Vec2(x + width, y + height), level) {
+		}
 
 		QuadTreeNode(QuadTreeNode<T> parent, Vec2 bottomLeft, Vec2 topRight, int level = 0) {
 			_parent = parent;
@@ -46,8 +68,9 @@ namespace KingdomsRebellion.Core.Map {
 			_state = EState.FREE;
 		}
 
-		public bool IsLeaf() { return _subnodes == null; }
-//		bool IsEmpty() { return _fixedObjects.Count == 0; }
+		public bool IsLeaf() {
+			return _subnodes == null;
+		}
 
 		public bool Split() {
 			if (IsLeaf()) {
@@ -69,7 +92,8 @@ namespace KingdomsRebellion.Core.Map {
 
 		// not floating
 		bool Add(T obj, Vec2 pos, Vec2 size, bool floating = false) {
-			if (!IsInBound(pos)) return false;
+			if (!IsInBound(pos))
+				return false;
 			
 			if (!IsLeaf()) {
 				int index = Index(pos, size);
@@ -122,17 +146,29 @@ namespace KingdomsRebellion.Core.Map {
 		}
 
 		void CutAndDispatch(T obj, Vec2 pos, Vec2 size) {
-			var p1 = pos; var s1 = _center-p1;
-			if (s1.X > 0 && s1.Y > 0) { Child(EQuadrant.SOUTHWEST).Add(obj, p1, s1); }
+			var p1 = pos;
+			var s1 = _center - p1;
+			if (s1.X > 0 && s1.Y > 0) {
+				Child(EQuadrant.SOUTHWEST).Add(obj, p1, s1);
+			}
 
-			var p2 = _center; var s2 = size-s1;
-			if (s2.X > 0 && s2.Y > 0) { Child(EQuadrant.NORTHEAST).Add(obj, p2, s2); }
+			var p2 = _center;
+			var s2 = size - s1;
+			if (s2.X > 0 && s2.Y > 0) {
+				Child(EQuadrant.NORTHEAST).Add(obj, p2, s2);
+			}
 
-			var p3 = new Vec2(p1.X, _center.Y); var s3 = new Vec2(s1.X, s2.Y);
-			if (s3.X > 0 && s3.Y > 0) { Child(EQuadrant.NORTHWEST).Add(obj, p3, s3); }
+			var p3 = new Vec2(p1.X, _center.Y);
+			var s3 = new Vec2(s1.X, s2.Y);
+			if (s3.X > 0 && s3.Y > 0) {
+				Child(EQuadrant.NORTHWEST).Add(obj, p3, s3);
+			}
 
-			var p4 = new Vec2(_center.X, p1.Y); var s4 = new Vec2(s2.X, s1.Y);
-			if (s4.X > 0 && s4.Y > 0) { Child(EQuadrant.SOUTHEAST).Add(obj, p4, s4); }
+			var p4 = new Vec2(_center.X, p1.Y);
+			var s4 = new Vec2(s2.X, s1.Y);
+			if (s4.X > 0 && s4.Y > 0) {
+				Child(EQuadrant.SOUTHEAST).Add(obj, p4, s4);
+			}
 		}
 
 		public bool Add(T obj, bool floating = true) {
@@ -142,11 +178,13 @@ namespace KingdomsRebellion.Core.Map {
 		void Unsplit(T obj) {
 			if (!_subnodes.Any(n => !n.IsLeaf() || n._fixedObjects.Count > 0)) {
 				_state = EState.FREE;
-				foreach(var subnode in _subnodes) {
+				foreach (var subnode in _subnodes) {
 					_floatingObjects.AddRange(subnode._floatingObjects);
 				}
 				_subnodes = null;
-				if (_parent != null) { _parent.Unsplit(obj); }
+				if (_parent != null) {
+					_parent.Unsplit(obj);
+				}
 			}
 		}
 
@@ -164,7 +202,7 @@ namespace KingdomsRebellion.Core.Map {
 						return Child(q.Value).Remove(obj, floating);
 					} else {
 						bool ret = false;
-						foreach(var sn in _subnodes) {
+						foreach (var sn in _subnodes) {
 							if (sn != null && sn._fixedObjects.Contains(obj)) {
 								ret = ret || sn.Remove(obj, floating);
 							}
@@ -193,8 +231,8 @@ namespace KingdomsRebellion.Core.Map {
 			return !qn._fixedObjects.Any() && qn._floatingObjects.All(n => !Collide(n, target));
 		}
 
-		bool Collide(T t, Vec2 v) {
-			return v.X >= t.Pos.X && v.X < t.Pos.X+t.Size.X && v.Y >= t.Pos.Y && v.Y < t.Pos.Y+t.Size.Y;
+		static bool Collide(T t, Vec2 v) {
+			return v.X >= t.Pos.X && v.X < t.Pos.X + t.Size.X && v.Y >= t.Pos.Y && v.Y < t.Pos.Y + t.Size.Y;
 		}
 
 		public void Clear() {
@@ -209,17 +247,18 @@ namespace KingdomsRebellion.Core.Map {
 
 		int Index(Vec2 pos, Vec2 size) {
 			var q = Quadrant(pos, size);
-			return q != null ? (int) q : -1;
+			return q.HasValue ? (int)q.Value : -1;
 		}
+
 		EQuadrant? Quadrant(Vec2 pos, Vec2 size) {
-			if (pos.X+size.X <= _center.X) {
-				if (pos.Y+size.Y <= _center.Y) {
- 					return EQuadrant.SOUTHWEST;
+			if (pos.X + size.X <= _center.X) {
+				if (pos.Y + size.Y <= _center.Y) {
+					return EQuadrant.SOUTHWEST;
 				} else if (pos.Y >= _center.Y) {
 					return EQuadrant.NORTHWEST;
 				}
 			} else if (pos.X >= _center.X) {
-				if (pos.Y+size.Y <= _center.Y) {
+				if (pos.Y + size.Y <= _center.Y) {
 					return EQuadrant.SOUTHEAST;
 				} else if (pos.Y >= _center.Y) {
 					return EQuadrant.NORTHEAST;
@@ -228,30 +267,55 @@ namespace KingdomsRebellion.Core.Map {
 			return null;
 		}
 
-		static readonly bool[,] ADJACENT = new bool[,] {
-					/* NW     NE     SW     SE  */
-			/* N */ { true,  true,  false, false },
-			/* E */ { false, true,  false, true  },
-			/* S */ { false, false, true,  true  },
-			/* W */ { true,  false, true,  false }
+		// [NW|NE|SW|SE][N|E|S|W]
+		static readonly bool[,] ADJACENT = {
+			{ true,  true,  false, false },
+			{ false, true,  false, true  },
+			{ false, false, true,  true  },
+			{ true,  false, true,  false }
 		};
-		bool Adjacent(ESide side, EQuadrant quad) {
+
+		static bool Adjacent(ESide side, EQuadrant quad) {
 			return ADJACENT[(int)side, (int)quad];
 		}
 
-		static readonly EQuadrant[,] REFLECT = new EQuadrant[,] {
-					/*   NW         NE         SW         SE    */
-			/* N */ { EQuadrant.SOUTHWEST, EQuadrant.SOUTHEAST, EQuadrant.NORTHWEST, EQuadrant.NORTHEAST },
-			/* E */ { EQuadrant.NORTHEAST, EQuadrant.NORTHWEST, EQuadrant.SOUTHEAST, EQuadrant.SOUTHWEST },
-			/* S */ { EQuadrant.SOUTHWEST, EQuadrant.SOUTHEAST, EQuadrant.NORTHWEST, EQuadrant.NORTHEAST },
-			/* W */ { EQuadrant.NORTHEAST, EQuadrant.NORTHWEST, EQuadrant.SOUTHEAST, EQuadrant.SOUTHWEST }
+		// [NW|NE|SW|SE][N|E|S|W]
+		static readonly EQuadrant[,] REFLECT = { {
+				EQuadrant.SOUTHWEST,
+				EQuadrant.SOUTHEAST,
+				EQuadrant.NORTHWEST,
+				EQuadrant.NORTHEAST
+			}, {
+				EQuadrant.NORTHEAST,
+				EQuadrant.NORTHWEST,
+				EQuadrant.SOUTHEAST,
+				EQuadrant.SOUTHWEST
+			}, {
+				EQuadrant.SOUTHWEST,
+				EQuadrant.SOUTHEAST,
+				EQuadrant.NORTHWEST,
+				EQuadrant.NORTHEAST
+			}, {
+				EQuadrant.NORTHEAST,
+				EQuadrant.NORTHWEST,
+				EQuadrant.SOUTHEAST,
+				EQuadrant.SOUTHWEST
+			}
 		};
-		EQuadrant Reflect(ESide side, EQuadrant quad) {
+
+		static EQuadrant Reflect(ESide side, EQuadrant quad) {
 			return REFLECT[(int)side, (int)quad];
 		}
 
-		static readonly ESide[] OPPOSITE = new ESide[] { ESide.SOUTH, ESide.WEST, ESide.NORTH, ESide.EAST }; // N, E, S, W
-		ESide Opposite(ESide side) {
+		// N, E, S, W
+		static readonly ESide[] OPPOSITE = {
+			ESide.SOUTH,
+			ESide.WEST,
+			ESide.NORTH,
+			ESide.EAST
+		};
+
+		static ESide Opposite(ESide side) {
 			return OPPOSITE[(int)side];
 		}
 
@@ -290,27 +354,28 @@ namespace KingdomsRebellion.Core.Map {
 		}
 
 		void Children(ESide direction, IList<QuadTreeNode<T>> children) {
-			if (IsLeaf()) return;
+			if (IsLeaf())
+				return;
 			
 			QuadTreeNode<T>[] nodes = new QuadTreeNode<T>[2];
 
 			switch (direction) {
-				case ESide.NORTH:
-					nodes[0] = Child(EQuadrant.NORTHEAST);
-					nodes[1] = Child(EQuadrant.NORTHWEST);
-					break;
-				case ESide.EAST:
-					nodes[0] = Child(EQuadrant.NORTHEAST);
-					nodes[1] = Child(EQuadrant.SOUTHEAST);
-					break;
-				case ESide.SOUTH:
-					nodes[0] = Child(EQuadrant.SOUTHEAST);
-					nodes[1] = Child(EQuadrant.SOUTHWEST);
-					break;
-				case ESide.WEST:
-					nodes[0] = Child(EQuadrant.NORTHWEST);
-					nodes[1] = Child(EQuadrant.SOUTHWEST);
-					break;
+			case ESide.NORTH:
+				nodes[0] = Child(EQuadrant.NORTHEAST);
+				nodes[1] = Child(EQuadrant.NORTHWEST);
+				break;
+			case ESide.EAST:
+				nodes[0] = Child(EQuadrant.NORTHEAST);
+				nodes[1] = Child(EQuadrant.SOUTHEAST);
+				break;
+			case ESide.SOUTH:
+				nodes[0] = Child(EQuadrant.SOUTHEAST);
+				nodes[1] = Child(EQuadrant.SOUTHWEST);
+				break;
+			case ESide.WEST:
+				nodes[0] = Child(EQuadrant.NORTHWEST);
+				nodes[1] = Child(EQuadrant.SOUTHWEST);
+				break;
 			}
 
 			for (int i = 0; i < nodes.Length; ++i) {
@@ -342,7 +407,8 @@ namespace KingdomsRebellion.Core.Map {
 
 		QuadTreeNode<T> Neighbour(ESide direction, EQuadrant corner) {
 			QuadTreeNode<T> quadnode = Neighbour(direction);
-			if (quadnode == null) return null;
+			if (quadnode == null)
+				return null;
 			while (!quadnode.IsLeaf()) {
 				quadnode = quadnode.Child(Reflect(direction, corner));
 			}
@@ -374,40 +440,23 @@ namespace KingdomsRebellion.Core.Map {
 			throw new SystemException("Search side of an invalid neighbour");
 		}
 
-//		QuadTreeNode<T> Root() {
-//			var root = this;
-//			while (root._parent != null) {
-//				root = root._parent;
-//			}
-//			return root;
-//		}
-//
-//		void TryAddDiagonalNeighbour(Vec2 p, IList<QuadTreeNode<T>> l) {
-//			var qn = Find(p);
-//			if (qn != null && !l.Contains(qn)) { l.Add(qn); }
-//		}
-
 		public IList<QuadTreeNode<T>> Neighbours() {
 			IList<QuadTreeNode<T>> neighbours = new List<QuadTreeNode<T>>();
 			Neighbours(ESide.NORTH, neighbours);
 			Neighbours(ESide.SOUTH, neighbours);
 			Neighbours(ESide.EAST, neighbours);
 			Neighbours(ESide.WEST, neighbours);
-
-			// TRY for Quadrant side
-//			var root = Root();
-//			root.TryAddDiagonalNeighbour(new Vec2(_bottomLeft.X-1,_topRight.Y+1), neighbours); // NORTHWEST
-//			root.TryAddDiagonalNeighbour(new Vec2(_topRight.X+1,_topRight.Y+1), neighbours); // NORTHEAST
-//			root.TryAddDiagonalNeighbour(new Vec2(_bottomLeft.X-1,_bottomLeft.Y-1), neighbours); // SOUTHWEST
-//			root.TryAddDiagonalNeighbour(new Vec2(_topRight.X+1,_bottomLeft.Y-1), neighbours); // SOUTHEAST
-
 			return neighbours;
 		}
 
-		public bool IsFree() { return _state == EState.FREE; }
+		public bool IsFree() {
+			return _state == EState.FREE;
+		}
 
 		public QuadTreeNode<T> Find(Vec2 pos) {
-			if (IsLeaf()) { return this; }
+			if (IsLeaf()) {
+				return this;
+			}
 
 			if (pos.X < _center.X) {
 				return Child(pos.Y < _center.Y ? EQuadrant.SOUTHWEST : EQuadrant.NORTHWEST).Find(pos);
@@ -416,7 +465,9 @@ namespace KingdomsRebellion.Core.Map {
 			}
 		}
 
-		public bool IsInBound(Vec2 pos) { return pos.X >= _bottomLeft.X && pos.Y >= _bottomLeft.Y && pos.X < _topRight.X && pos.Y < _topRight.Y; }
+		public bool IsInBound(Vec2 pos) {
+			return pos.X >= _bottomLeft.X && pos.Y >= _bottomLeft.Y && pos.X < _topRight.X && pos.Y < _topRight.Y;
+		}
 
 		public void Walk(Action<QuadTreeNode<T>> f) {
 			if (IsLeaf()) {

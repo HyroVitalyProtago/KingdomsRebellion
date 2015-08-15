@@ -21,6 +21,7 @@ namespace KingdomsRebellion.KRDebug {
 		QuadTreeNode<KRTransform> _beginNode, _endNode;
 		IEnumerable<QuadTreeNode<KRTransform>> _waynodes;
 		List<Vec2> _waypoints;
+		List<Vec2> _simplifiedPath;
 		List<Vec2> _realPath;
 		#endregion
 
@@ -30,6 +31,7 @@ namespace KingdomsRebellion.KRDebug {
 
 			_stopwatch = new Stopwatch();
 			_waypoints = new List<Vec2>();
+			_simplifiedPath = new List<Vec2>();
 			_realPath = new List<Vec2>();
 		}
 
@@ -98,7 +100,9 @@ namespace KingdomsRebellion.KRDebug {
 			}
 			_waypoints.Add(_end);
 
-			_realPath = SimplifyPath(_waypoints);
+			_simplifiedPath = SimplifyPath(_waypoints);
+
+			// TODO realPath
 		}
 
 		#region DrawGizmos
@@ -128,11 +132,11 @@ namespace KingdomsRebellion.KRDebug {
 		}
 		void DrawRealPath() {
 			Gizmos.color = new Color(0f,1f,1f,1f);
-			_realPath.ForEach(DrawPoint);
+			_simplifiedPath.ForEach(DrawPoint);
 
 			Gizmos.color = Color.red;
-			for (int i = 0; i < _realPath.Count-1; ++i)  {
-				Gizmos.DrawLine(_realPath[i].ToVector3().Adjusted(), _realPath[i+1].ToVector3().Adjusted());
+			for (int i = 0; i < _simplifiedPath.Count-1; ++i)  {
+				Gizmos.DrawLine(_simplifiedPath[i].ToVector3().Adjusted(), _simplifiedPath[i+1].ToVector3().Adjusted());
 			}
 		}
 		void OnDrawGizmos() {
@@ -148,12 +152,20 @@ namespace KingdomsRebellion.KRDebug {
 
 		#region Events
 		void OnLeftClickUp(Vector3 mousePosition) {
-			_begin = InputModelAdapter.ModelPosition(mousePosition);
+			var pos = InputModelAdapter.ModelPosition(mousePosition);
+			if (!KRFacade.IsInBounds (pos)) {
+				return;
+			}
+			_begin = pos;
 			_beginNode = KRFacade.FindNode(_begin);
 			if (_begin != null && _end != null) { FindPath(); }
 		}
 		void OnRightClick(Vector3 mousePosition) {
-			_end = InputModelAdapter.ModelPosition(mousePosition);
+			var pos = InputModelAdapter.ModelPosition(mousePosition);
+			if (!KRFacade.IsInBounds (pos)) {
+				return;
+			}
+			_end = pos;
 			_endNode = KRFacade.FindNode(_end);
 			if (_begin != null && _end != null) { FindPath(); }
 		}

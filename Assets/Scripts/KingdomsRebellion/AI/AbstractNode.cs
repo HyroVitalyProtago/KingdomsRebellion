@@ -6,13 +6,26 @@ using Object = System.Object;
 
 namespace KingdomsRebellion.AI {
 	public abstract class AbstractNode<T> : IComparable<AbstractNode<T>> where T : IPos {
-		enum EState { OPENED, CLOSED, UNVISITED }
+		enum EState {
+			OPENED,
+			CLOSED,
+			UNVISITED
+		}
+
+		#region Attributes
 
 		int _totalCost, _pathCost, _estimatedCost;
 		EState _state;
 
+		#endregion
+
+		#region Properties
+
 		public AbstractNode<T> Parent { get; set; }
-		public int TotalCost { get { return _totalCost; } } // FCost : Total cost
+
+		public int TotalCost { get { return _totalCost; } }
+
+		// FCost : Total cost
 		public int PathCost { // GCost : Path cost from the starting point
 			get {
 				return _pathCost;
@@ -22,6 +35,7 @@ namespace KingdomsRebellion.AI {
 				UpdateTotal();
 			}
 		}
+
 		public int EstimatedCost { // HCost : Estimated path cost to the goal
 			get {
 				return _estimatedCost;
@@ -30,7 +44,9 @@ namespace KingdomsRebellion.AI {
 				_estimatedCost = value;
 				UpdateTotal();
 			}
-		} 
+		}
+
+		#endregion
 
 		protected AbstractNode(AbstractNode<T> parent, int path, int estimate) {
 			_state = EState.UNVISITED;
@@ -39,59 +55,87 @@ namespace KingdomsRebellion.AI {
 			EstimatedCost = estimate;
 		}
 
+		#region State
+
 		public void Close() {
 			_state = EState.CLOSED;
 		}
+
 		public bool IsClosed() {
 			return _state == EState.CLOSED;
 		}
+
 		public void Open() {
 			_state = EState.OPENED;
 		}
+
 		public bool IsOpened() {
 			return _state == EState.OPENED;
 		}
+
 		public void Reset() {
 			_state = EState.UNVISITED;
 		}
 
+		#endregion
+
+		#region Abstract
+
 		public abstract bool IsFree();
+
 		public abstract IEnumerable<AbstractNode<T>> Neighbours();
 
-		void UpdateTotal() { _totalCost = _pathCost + _estimatedCost; }
+		public abstract T WrappedNode();
 
-		public int CompareTo(AbstractNode<T> other) {
-			int result = TotalCost.CompareTo(other.TotalCost);
-			return result != 0 ? result : EstimatedCost.CompareTo(other.EstimatedCost);
+		#endregion
 
+		void UpdateTotal() {
+			_totalCost = _pathCost + _estimatedCost;
 		}
 
 		// Heuristic
 		// @see http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html
 		public int GetDistance(AbstractNode<T> node) {
-			int dx = Mathf.Abs(WrappedNode().Pos.X - node.WrappedNode().Pos.X);
-			int dy = Mathf.Abs(WrappedNode().Pos.Y - node.WrappedNode().Pos.Y);
-			
-			if (dx > dy) { return 14*dy + 10*(dx-dy); }
-			return 14*dx + 10*(dy-dx);
+			T wn = WrappedNode();
+			T nwn = node.WrappedNode();
+			int dx = Mathf.Abs(wn.Pos.X - nwn.Pos.X);
+			int dy = Mathf.Abs(wn.Pos.Y - nwn.Pos.Y);
+			return (dx > dy) ? 14 * dy + 10 * (dx - dy) : 14 * dx + 10 * (dy - dx);
 		}
 
-		public abstract T WrappedNode();
+		#region Equals
+
+		public int CompareTo(AbstractNode<T> other) {
+			int result = TotalCost.CompareTo(other.TotalCost);
+			return result != 0 ? result : EstimatedCost.CompareTo(other.EstimatedCost);
+		}
 
 		public static bool operator ==(AbstractNode<T> a, AbstractNode<T> b) {
-			if (((object)a == null) && ((object)b == null)) { return true; }
-			if (((object)a == null) || ((object)b == null)) { return false; }
+			if (((object)a == null) && ((object)b == null)) {
+				return true;
+			}
+			if (((object)a == null) || ((object)b == null)) {
+				return false;
+			}
 			return ReferenceEquals(a.WrappedNode(), b.WrappedNode());
 		}
-		public static bool operator !=(AbstractNode<T> a, AbstractNode<T> b) { return !(a == b); }
+
+		public static bool operator !=(AbstractNode<T> a, AbstractNode<T> b) {
+			return !(a == b);
+		}
 
 		public override bool Equals(Object obj) {
 			AbstractNode<T> p = obj as AbstractNode<T>;
-			if ((object)p == null) { return false; }
+			if ((object)p == null) {
+				return false;
+			}
 			return this == p;
 		}
+
 		public override int GetHashCode() {
 			return WrappedNode().GetHashCode();
 		}
+
+		#endregion
 	}
 }

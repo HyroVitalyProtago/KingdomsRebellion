@@ -3,28 +3,19 @@ using System.Linq;
 using KingdomsRebellion.Core.Interfaces;
 
 namespace KingdomsRebellion.AI {
-
 	public static class Pathfinding<T> where T : IPos {
-
-		static Heap<AbstractNode<T>> openSet = new Heap<AbstractNode<T>>(64);
-		static IList<AbstractNode<T>> nodes = new List<AbstractNode<T>>();
-
-		static void Reset() {
-			foreach (AbstractNode<T> n in nodes) {
-				n.Reset();
-			}
-			nodes.Clear();
-		}
+		readonly static Heap<AbstractNode<T>> OpenSet = new Heap<AbstractNode<T>>(64);
+		readonly static IList<AbstractNode<T>> Nodes = new List<AbstractNode<T>>();
 
 		public static IEnumerable<AbstractNode<T>> FindPath(AbstractNode<T> startNode, AbstractNode<T> targetNode) {
-			openSet.Clear();
-			openSet.Push(startNode);
-			nodes.Add(startNode);
+			OpenSet.Clear();
+			OpenSet.Push(startNode);
+			Nodes.Add(startNode);
 			startNode.Open();
 			startNode.PathCost = 0;
 			
-			while (!openSet.IsEmpty()) {
-				AbstractNode<T> currentNode = openSet.Pop();
+			while (!OpenSet.IsEmpty()) {
+				AbstractNode<T> currentNode = OpenSet.Pop();
 
 				if (currentNode == targetNode) {
 					return RetracePath(startNode, currentNode);
@@ -48,17 +39,17 @@ namespace KingdomsRebellion.AI {
 
 						if (!neighbour.IsOpened()) {
 							neighbour.Open();
-							openSet.Push(neighbour);
-							nodes.Add(neighbour);
+							OpenSet.Push(neighbour);
+							Nodes.Add(neighbour);
 						}
 					}
 				}
 			}
 
 			Reset();
-			return openSet;
+			return OpenSet;
 		}
-			
+
 		static IEnumerable<AbstractNode<T>> RetracePath(AbstractNode<T> startNode, AbstractNode<T> endNode) {
 			IList<AbstractNode<T>> path = new List<AbstractNode<T>>();
 			AbstractNode<T> currentNode = endNode;
@@ -72,5 +63,11 @@ namespace KingdomsRebellion.AI {
 			return path.Reverse();
 		}
 
+		static void Reset() {
+			foreach (AbstractNode<T> n in Nodes) {
+				n.Reset();
+			}
+			Nodes.Clear();
+		}
 	}
 }
