@@ -2,15 +2,12 @@
 using System.Linq;
 using KingdomsRebellion.AI;
 using KingdomsRebellion.Core.Interfaces;
-using KingdomsRebellion.Core.Math;
 
 namespace KingdomsRebellion.Core.Map {
-	public class QuadTreeNodeWrapper<T> : AbstractNode<QuadTreeNode<T>>, IPos where T : IPos, ISize {
+	public class QuadTreeNodeWrapper<T> : AbstractNode where T : IPos,ISize {
 		readonly QuadTreeNode<T> _node;
 
-		public Vec2 Pos { get { return _node.Pos; } }
-
-		QuadTreeNodeWrapper(QuadTreeNode<T> node) : base(null, 0, 0) {
+		QuadTreeNodeWrapper(QuadTreeNode<T> node) : base(node.Pos) {
 			_node = node;
 			_node.SetProperty("NodeWrapper", this);
 		}
@@ -27,12 +24,8 @@ namespace KingdomsRebellion.Core.Map {
 			return _node.IsFree();
 		}
 
-		public override IEnumerable<AbstractNode<QuadTreeNode<T>>> Neighbours() {
-			return _node.Neighbours().Select(quadTreeNode => Wrap(quadTreeNode) as AbstractNode<QuadTreeNode<T>>);
-		}
-
-		public override QuadTreeNode<T> WrappedNode() {
-			return _node;
+		public override IEnumerable<AbstractNode> Neighbours() {
+			return _node.Neighbours().Select(quadTreeNode => Wrap(quadTreeNode) as AbstractNode);
 		}
 
 		public override string ToString() {

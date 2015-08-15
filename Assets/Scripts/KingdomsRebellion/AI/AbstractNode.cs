@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using KingdomsRebellion.Core.Interfaces;
 using UnityEngine;
 using Object = System.Object;
+using KingdomsRebellion.Core.Interfaces;
+using KingdomsRebellion.Core.Math;
 
 namespace KingdomsRebellion.AI {
-	public abstract class AbstractNode<T> : IComparable<AbstractNode<T>> where T : IPos {
+	public abstract class AbstractNode : IComparable<AbstractNode>, IPos {
 		enum EState {
 			OPENED,
 			CLOSED,
@@ -21,7 +22,7 @@ namespace KingdomsRebellion.AI {
 
 		#region Properties
 
-		public AbstractNode<T> Parent { get; set; }
+		public AbstractNode Parent { get; set; }
 
 		public int TotalCost { get { return _totalCost; } }
 
@@ -45,14 +46,14 @@ namespace KingdomsRebellion.AI {
 				UpdateTotal();
 			}
 		}
+			
+		public Vec2 Pos { get; private set; }
 
 		#endregion
 
-		protected AbstractNode(AbstractNode<T> parent, int path, int estimate) {
+		protected AbstractNode(Vec2 pos) {
+			Pos = pos;
 			_state = EState.UNVISITED;
-			Parent = parent;
-			PathCost = path;
-			EstimatedCost = estimate;
 		}
 
 		#region State
@@ -83,9 +84,7 @@ namespace KingdomsRebellion.AI {
 
 		public abstract bool IsFree();
 
-		public abstract IEnumerable<AbstractNode<T>> Neighbours();
-
-		public abstract T WrappedNode();
+		public abstract IEnumerable<AbstractNode> Neighbours();
 
 		#endregion
 
@@ -95,45 +94,25 @@ namespace KingdomsRebellion.AI {
 
 		// Heuristic
 		// @see http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html
-		public int GetDistance(AbstractNode<T> node) {
-			T wn = WrappedNode();
-			T nwn = node.WrappedNode();
-			int dx = Mathf.Abs(wn.Pos.X - nwn.Pos.X);
-			int dy = Mathf.Abs(wn.Pos.Y - nwn.Pos.Y);
+		public int GetDistance(AbstractNode other) {
+			int dx = Mathf.Abs(Pos.X - other.Pos.X);
+			int dy = Mathf.Abs(Pos.Y - other.Pos.Y);
 			return (dx > dy) ? 14 * dy + 10 * (dx - dy) : 14 * dx + 10 * (dy - dx);
 		}
 
 		#region Equals
 
-		public int CompareTo(AbstractNode<T> other) {
+		public int CompareTo(AbstractNode other) {
 			int result = TotalCost.CompareTo(other.TotalCost);
 			return result != 0 ? result : EstimatedCost.CompareTo(other.EstimatedCost);
 		}
 
-		public static bool operator ==(AbstractNode<T> a, AbstractNode<T> b) {
-			if (((object)a == null) && ((object)b == null)) {
-				return true;
-			}
-			if (((object)a == null) || ((object)b == null)) {
-				return false;
-			}
-			return ReferenceEquals(a.WrappedNode(), b.WrappedNode());
-		}
-
-		public static bool operator !=(AbstractNode<T> a, AbstractNode<T> b) {
-			return !(a == b);
-		}
-
 		public override bool Equals(Object obj) {
-			AbstractNode<T> p = obj as AbstractNode<T>;
-			if ((object)p == null) {
-				return false;
-			}
-			return this == p;
+			return this == obj;
 		}
 
 		public override int GetHashCode() {
-			return WrappedNode().GetHashCode();
+			return base.GetHashCode();
 		}
 
 		#endregion

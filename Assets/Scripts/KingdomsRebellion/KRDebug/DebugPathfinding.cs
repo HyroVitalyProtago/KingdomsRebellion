@@ -21,7 +21,7 @@ namespace KingdomsRebellion.KRDebug {
 		QuadTreeNode<KRTransform> _beginNode, _endNode;
 		IEnumerable<QuadTreeNode<KRTransform>> _waynodes;
 		List<Vec2> _waypoints;
-		List<Vec2> _simplifiedPath;
+		IEnumerable<Vec2> _simplifiedPath;
 		List<Vec2> _realPath;
 		#endregion
 
@@ -35,72 +35,72 @@ namespace KingdomsRebellion.KRDebug {
 			_realPath = new List<Vec2>();
 		}
 
-		static Vec2 PointBetweenQuadTreeNode(QuadTreeNode<KRTransform> src, QuadTreeNode<KRTransform> dst) {
-			int x = -1, y = -1;
+//		static Vec2 PointBetweenQuadTreeNode(QuadTreeNode<KRTransform> src, QuadTreeNode<KRTransform> dst) {
+//			int x = -1, y = -1;
+//
+//			switch (src.SideOfNeighbour(dst)) {
+//				case ESide.SOUTH: y = src.BottomLeft.Y; break;
+//				case ESide.NORTH: y = src.TopRight.Y-1; break;
+//				case ESide.EAST: x = src.TopRight.X-1; break;
+//				case ESide.WEST: x = src.BottomLeft.X; break;
+//			}
+//
+//			if (x == -1) {
+//				x = (src.Width > dst.Width) ? dst.Pos.X : src.Pos.X;
+//			} else {
+//				y = (src.Height > dst.Height) ? dst.Pos.Y : src.Pos.Y;
+//			}
+//
+//			return new Vec2(x,y);
+//		}
 
-			switch (src.SideOfNeighbour(dst)) {
-				case ESide.SOUTH: y = src.BottomLeft.Y; break;
-				case ESide.NORTH: y = src.TopRight.Y-1; break;
-				case ESide.EAST: x = src.TopRight.X-1; break;
-				case ESide.WEST: x = src.BottomLeft.X; break;
-			}
-
-			if (x == -1) {
-				x = (src.Width > dst.Width) ? dst.Pos.X : src.Pos.X;
-			} else {
-				y = (src.Height > dst.Height) ? dst.Pos.Y : src.Pos.Y;
-			}
-
-			return new Vec2(x,y);
-		}
-
-		List<Vec2> SimplifyPath(List<Vec2> waypoints) {
-			List<Vec2> simplifiedPath = new List<Vec2>(waypoints);
-
-			if (simplifiedPath.Count == 2) {
-				return simplifiedPath;
-			}
-				
-			bool canTraceStraightLine = true;
-			do {
-				Vec2 current = simplifiedPath[2];
-				Bresenham.Line(_begin.X, _begin.Y, current.X, current.Y, delegate(int x, int y) {
-					if (!KRFacade.IsEmpty(new Vec2(x,y))) {
-						canTraceStraightLine = false;
-						return false;
-					}
-					return true;
-				});
-				if (canTraceStraightLine) {
-					simplifiedPath.RemoveAt(1);
-				} else {
-					return simplifiedPath;
-				}
-			} while(canTraceStraightLine && simplifiedPath.Count > 2);
-
-			return simplifiedPath;
-		}
+//		List<Vec2> SimplifyPath(List<Vec2> waypoints) {
+//			List<Vec2> simplifiedPath = new List<Vec2>(waypoints);
+//
+//			if (simplifiedPath.Count == 2) {
+//				return simplifiedPath;
+//			}
+//				
+//			bool canTraceStraightLine = true;
+//			do {
+//				Vec2 current = simplifiedPath[2];
+//				Bresenham.Line(_begin.X, _begin.Y, current.X, current.Y, delegate(int x, int y) {
+//					if (!KRFacade.IsEmpty(new Vec2(x,y))) {
+//						canTraceStraightLine = false;
+//						return false;
+//					}
+//					return true;
+//				});
+//				if (canTraceStraightLine) {
+//					simplifiedPath.RemoveAt(1);
+//				} else {
+//					return simplifiedPath;
+//				}
+//			} while(canTraceStraightLine && simplifiedPath.Count > 2);
+//
+//			return simplifiedPath;
+//		}
 
 		public void FindPath() {
 			Debug.ClearDeveloperConsole();
 
-			_stopwatch.Reset();
-			_stopwatch.Start();
-			_waynodes = KRFacade.FindPath(_begin, _end);
-			_stopwatch.Stop();
-			Debug.Log(String.Format("DebugPathfinding::FindPath | time elapsed: {0}", _stopwatch.Elapsed));
+//			_stopwatch.Reset();
+//			_stopwatch.Start();
+//			_waynodes = KRFacade.FindPath(_begin, _end);
+//			_stopwatch.Stop();
+//			Debug.Log(String.Format("DebugPathfinding::FindPath | time elapsed: {0}", _stopwatch.Elapsed));
+//
+//			_waypoints.Clear();
+//			_waypoints.Add(_begin);
+//			if (_waynodes.Any()) {
+//				_waypoints.Add(PointBetweenQuadTreeNode(_beginNode, _waynodes.ElementAt(0)));
+//				for (int i = 0; i < _waynodes.Count() - 1; ++i) {
+//					_waypoints.Add(PointBetweenQuadTreeNode(_waynodes.ElementAt(i), _waynodes.ElementAt(i + 1)));
+//				}
+//			}
+//			_waypoints.Add(_end);
 
-			_waypoints.Clear();
-			_waypoints.Add(_begin);
-			if (_waynodes.Any()) {
-				_waypoints.Add(PointBetweenQuadTreeNode(_beginNode, _waynodes.ElementAt(0)));
-				for (int i = 0; i < _waynodes.Count() - 1; ++i) {
-					_waypoints.Add(PointBetweenQuadTreeNode(_waynodes.ElementAt(i), _waynodes.ElementAt(i + 1)));
-				}
-			}
-			_waypoints.Add(_end);
-
-			_simplifiedPath = SimplifyPath(_waypoints);
+			_simplifiedPath = KRFacade.FindPath(_begin, _end); //SimplifyPath(_waypoints);
 
 			// TODO realPath
 		}
@@ -131,21 +131,31 @@ namespace KingdomsRebellion.KRDebug {
 			_waypoints.ForEach(DrawPoint);
 		}
 		void DrawRealPath() {
-			Gizmos.color = new Color(0f,1f,1f,1f);
-			_simplifiedPath.ForEach(DrawPoint);
+			var c = new Color(0f, 1f, 1f, 1f);
 
-			Gizmos.color = Color.red;
-			for (int i = 0; i < _simplifiedPath.Count-1; ++i)  {
-				Gizmos.DrawLine(_simplifiedPath[i].ToVector3().Adjusted(), _simplifiedPath[i+1].ToVector3().Adjusted());
+			Vec2 prev = null;
+			foreach (Vec2 pos in _simplifiedPath) {
+				Gizmos.color = c;
+				DrawPoint(pos);
+
+				if (prev != null) {
+					Gizmos.color = Color.red;
+					Gizmos.DrawLine(prev.ToVector3().Adjusted(), pos.ToVector3().Adjusted());
+				}
+
+				prev = pos;
+			}
+			if (prev != null) {
+				DrawPoint(prev);
 			}
 		}
 		void OnDrawGizmos() {
-			if (_waynodes == null) {
+//			DrawSelectedQuadTreeNodes();
+//			DrawWaypoints();
+
+			if (_simplifiedPath == null || !_simplifiedPath.Any()) {
 				return;
 			}
-
-			DrawSelectedQuadTreeNodes();
-			DrawWaypoints();
 			DrawRealPath();
 		}
 		#endregion
@@ -157,7 +167,7 @@ namespace KingdomsRebellion.KRDebug {
 				return;
 			}
 			_begin = pos;
-			_beginNode = KRFacade.FindNode(_begin);
+//			_beginNode = KRFacade.FindNode(_begin);
 			if (_begin != null && _end != null) { FindPath(); }
 		}
 		void OnRightClick(Vector3 mousePosition) {
@@ -166,7 +176,7 @@ namespace KingdomsRebellion.KRDebug {
 				return;
 			}
 			_end = pos;
-			_endNode = KRFacade.FindNode(_end);
+//			_endNode = KRFacade.FindNode(_end);
 			if (_begin != null && _end != null) { FindPath(); }
 		}
 		#endregion
