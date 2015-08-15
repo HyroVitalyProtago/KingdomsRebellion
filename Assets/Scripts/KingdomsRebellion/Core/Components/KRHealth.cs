@@ -42,7 +42,7 @@ namespace KingdomsRebellion.Core.Components {
 
         void OnDestroy() {
 			if (OnDeath!= null) { OnDeath(gameObject); }
-            KRFacade.Remove(GetComponent<KRTransform>());
+            KRFacade.Remove(GetComponent<KRTransform>(), GetComponent<KRMovement>() != null);
         }
     }
 }

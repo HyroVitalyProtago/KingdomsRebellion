@@ -1,10 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
+using KingdomsRebellion.Core.Components;
+using UnityEngine;
+using System.Linq;
 
 namespace KingdomsRebellion.Core.FSM {
     public class IDLEState :  FSMState {
         public IDLEState(FiniteStateMachine fsm) : base(fsm) { }
 
         public override Type Execute() {
+			IEnumerable<GameObject> gameObjects = KRFacade.Around(_fsm.GetComponent<KRTransform>().Pos, 6).Where(go => go.GetComponent<KRTransform>().PlayerID != -1);
+            foreach (var obj in gameObjects) {
+				if (obj.GetComponent<KRTransform>().PlayerID != _fsm.GetComponent<KRTransform>().PlayerID) {
+                    _fsm.GetComponent<KRAttack>().Attack(obj);
+                    return typeof(AttackState);
+                }
+            }
             return GetType();
         }
     }

@@ -1,8 +1,5 @@
 ﻿using System;
 using KingdomsRebellion.Core;
-using KingdomsRebellion.Core.Map;
-using UnityEngine;
-using KingdomsRebellion.Core.Components;
 
 namespace KingdomsRebellion.KRDebug {
 
@@ -15,7 +12,9 @@ namespace KingdomsRebellion.KRDebug {
         }
 
 		void OnDrawGizmos() {
-			if (OnKRDrawGizmos != null) { OnKRDrawGizmos(); }
+			if (OnKRDrawGizmos != null) {
+				OnKRDrawGizmos();
+			}
 		}
 	}
 }

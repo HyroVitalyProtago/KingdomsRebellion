@@ -8,52 +8,59 @@ using KingdomsRebellion.Core.Math;
 
 namespace KingdomsRebellion.Core.Map {
 	public class QuadTree<T> : IMap<QuadTreeNode<T>,T> where T : IPos, ISize {
-
-		QuadTreeNode<T> _node;
-		IList<T> _objects;
+		readonly QuadTreeNode<T> node;
+		readonly IList<T> objects;
 
 		public QuadTree(int width, int height) {
-			_node = new QuadTreeNode<T>(0, 0, width, height);
-			_objects = new List<T>();
+			node = new QuadTreeNode<T>(0, 0, width, height);
+			objects = new List<T>();
 		}
 
-		public bool Add(T t) {
+		public bool Add(T t, bool floating) {
 			if (!IsInBounds(t.Pos)) {
 				throw new ArgumentException("Position is not in bounds : " + t.Pos);
 			}
-			if (_node.Add(t)) {
-				_objects.Add(t);
+			if (node.Add(t, floating)) {
+				objects.Add(t);
 				return true;
 			}
 			return false;
 		}
 
-		public bool Remove(T t) {
-			if (_node.Remove(t)) {
-				_objects.Remove(t);
+		public bool Remove(T t, bool floating) {
+			if (node.Remove(t, floating)) {
+				objects.Remove(t);
 				return true;
 			}
 			return false;
 		}
 
 		public AbstractNode<QuadTreeNode<T>> FindNode(Vec2 pos) {
-			if (!IsInBounds(pos)) {
-				return null;
-			}
-			return QuadTreeNodeWrapper<T>.Wrap(_node.Find(pos));
+			return !IsInBounds(pos) ? null : QuadTreeNodeWrapper<T>.Wrap(node.Find(pos));
 		}
 
 		public T Find(Vec2 pos) {
-			if (!IsInBounds(pos)) {
-				return default(T);
-			}
-			return _node.Find(pos).Objects.SingleOrDefault(obj => obj.Pos == pos);
+			return !IsInBounds(pos) ? default(T) : node.Find(pos).Objects.SingleOrDefault(obj => obj.Pos == pos);
 		}
 
-		public bool IsInBounds(Vec2 pos) { return _node.IsInBound(pos); }
-		public bool IsEmpty(Vec2 target) { return _node.IsEmpty(target); }
-		public void Walk(Action<QuadTreeNode<T>> f) { _node.Walk(f); }
-		public IEnumerator<T> GetEnumerator() { return _objects.ToList().GetEnumerator(); }
-		IEnumerator IEnumerable.GetEnumerator() { return _objects.ToList().GetEnumerator(); }
+		public bool IsInBounds(Vec2 pos) {
+			return node.IsInBound(pos);
+		}
+
+		public bool IsEmpty(Vec2 target) {
+			return node.IsEmpty(target);
+		}
+
+		public void Walk(Action<QuadTreeNode<T>> f) {
+			node.Walk(f);
+		}
+
+		public IEnumerator<T> GetEnumerator() {
+			return objects.ToList().GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator() {
+			return objects.ToList().GetEnumerator();
+		}
 	}
 }
