@@ -13,6 +13,7 @@ namespace KingdomsRebellion.Core.Player {
 	public class PInput : KRBehaviour {
 
 		event Action<GameAction> OnDemand;
+        event Action<KeyCode> OnBuild;
 
 		PSelection _selection;
 
@@ -25,6 +26,7 @@ namespace KingdomsRebellion.Core.Player {
 			On("OnKeyPress");
 
 			Offer("OnDemand");
+		    Offer("OnBuild");
 		}
 
 		void OnModelSelect(Vec2 v) {
@@ -68,8 +70,9 @@ namespace KingdomsRebellion.Core.Player {
 		            OnDemand(new SpawnAction(k));
 		        }
 		    } else {
-		        if (OnDemand != null) {
-		            OnDemand(new BuildAction(k));
+                if (OnBuild != null) {
+                    //OnDemand(new BuildAction(k));
+                    OnBuild(k);
 		        }
 		    }
 		}
