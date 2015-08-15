@@ -13,27 +13,22 @@ using Debug = UnityEngine.Debug;
 namespace KingdomsRebellion.Core {
 	public static class KRFacade {
 
-		static readonly Stopwatch _stopwatch = new Stopwatch();
-		static readonly IMap<KRTransform> _Map = new QuadTree<KRTransform>(256, 256);
+		static readonly IMap<QuadTreeNode<KRTransform>,KRTransform> _Map = new QuadTree<KRTransform>(256, 256);
 
 		static IList<Vec2> __walkedNode = new List<Vec2>();
 		static IList<Vec2> __walkedFind = new List<Vec2>();
 
 		public static void Awake() {
-//			EventConductor.On(typeof(KRFacade), "OnKRDrawGizmos");
+			EventConductor.On(typeof(KRFacade), "OnKRDrawGizmos");
 		}
 
-		public static IEnumerable<Vec2> FindPath(AbstractNode start, AbstractNode target) {
-			return Pathfinding.FindPath(start, target);
+		public static QuadTreeNode<KRTransform> FindNode(Vec2 p) {
+			return _Map.FindNode(p).WrappedNode();
 		}
 
-		public static IEnumerable<Vec2> FindPath(Vec2 start, Vec2 target) {
-			_stopwatch.Reset();
-			_stopwatch.Start();
-			var path = _Map.FindPath(start, target);
-			_stopwatch.Stop();
-			Debug.Log(String.Format("KRFacade::FindPath | time elapsed: {0}", _stopwatch.Elapsed));
-			return path;
+		public static IEnumerable<QuadTreeNode<KRTransform>> FindPath(Vec2 start, Vec2 target) {
+			return Pathfinding<QuadTreeNode<KRTransform>>.FindPath(_Map.FindNode(start), _Map.FindNode(target))
+				.Select(abstractNode => abstractNode.WrappedNode());
 		}
 
 		public static void UpdateGame() {
@@ -215,7 +210,7 @@ namespace KingdomsRebellion.Core {
 			return _Map.IsEmpty(left) ? left : right;
 		}
 
-		/*
+
 		static void OnKRDrawGizmos() {
 			_Map.Walk(GizmosDrawNode);
 
@@ -238,7 +233,7 @@ namespace KingdomsRebellion.Core {
 			Gizmos.DrawLine(p1, p1 - new Vector3(n.Width - .2f, 0, .1f));
 			Gizmos.DrawLine(p1, p1 - new Vector3(.1f, 0, n.Height - .2f));
 		}
-		*/
+
 
 	}
 }

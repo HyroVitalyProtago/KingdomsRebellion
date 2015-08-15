@@ -6,28 +6,28 @@ using KingdomsRebellion.Core.Math;
 
 namespace KingdomsRebellion.Core.Map {
 
+	public enum ESide {
+		NORTH,
+		EAST,
+		SOUTH,
+		WEST
+	}
+
+	public enum EQuadrant {
+		NORTHWEST,
+		NORTHEAST,
+		SOUTHWEST,
+		SOUTHEAST
+	}
+
+	public enum EState {
+		FREE,
+		MIXED,
+		OBSTRUCTED
+	}
+
 	public class QuadTreeNode<T> : KRObject, IPos where T : IPos, ISize {
-
-		public enum ESide {
-			NORTH,
-			EAST,
-			SOUTH,
-			WEST
-		}
-
-		public enum EQuadrant {
-			NORTHWEST,
-			NORTHEAST,
-			SOUTHWEST,
-			SOUTHEAST
-		}
-
-		public enum EState {
-			FREE,
-			MIXED,
-			OBSTRUCTED
-		}
-
+		
 		int _level;
 		int _width, _height;
 		Vec2 _bottomLeft, _topRight, _center;
@@ -90,6 +90,7 @@ namespace KingdomsRebellion.Core.Map {
 			return true;
 		}
 
+		// not floating
 		bool Add(T obj, Vec2 pos, Vec2 size, bool floating = false) {
 			if (!IsInBound(pos))
 				return false;
@@ -425,27 +426,7 @@ namespace KingdomsRebellion.Core.Map {
 			}
 		}
 
-		public IList<KeyValuePair<QuadTreeNode<T>, Vec2>> Neighbours(Vec2 pos) {
-			var neighbours = new List<QuadTreeNode<T>>();
-
-			foreach (ESide side in Enum.GetValues(typeof(ESide))) {
-				Neighbours(side, neighbours);
-			}
-
-			var neighboursPoint = new List<KeyValuePair<QuadTreeNode<T>, Vec2>>();
-			foreach (var neighbour in neighbours) {
-				var point = PointBetweenQuadTreeNode(this, neighbour);
-				if (pos.Equals(point)) {
-					neighboursPoint.Add(new KeyValuePair<QuadTreeNode<T>, Vec2>(neighbour, PointBetweenQuadTreeNode(neighbour, this)));
-				} else {
-					neighboursPoint.Add(new KeyValuePair<QuadTreeNode<T>, Vec2>(this, point));
-				}
-			}
-			
-			return neighboursPoint;
-		}
-
-		ESide SideOfNeighbour(QuadTreeNode<T> neighbour) {
+		public ESide SideOfNeighbour(QuadTreeNode<T> neighbour) {
 			IList<QuadTreeNode<T>> neighbours = new List<QuadTreeNode<T>>();
 
 			foreach (ESide side in Enum.GetValues(typeof(ESide))) {
@@ -459,6 +440,14 @@ namespace KingdomsRebellion.Core.Map {
 			throw new SystemException("Search side of an invalid neighbour");
 		}
 
+		public IList<QuadTreeNode<T>> Neighbours() {
+			IList<QuadTreeNode<T>> neighbours = new List<QuadTreeNode<T>>();
+			Neighbours(ESide.NORTH, neighbours);
+			Neighbours(ESide.SOUTH, neighbours);
+			Neighbours(ESide.EAST, neighbours);
+			Neighbours(ESide.WEST, neighbours);
+			return neighbours;
+		}
 
 		public bool IsFree() {
 			return _state == EState.FREE;
@@ -488,34 +477,6 @@ namespace KingdomsRebellion.Core.Map {
 					_subnodes[i].Walk(f);
 				}
 			}
-		}
-
-
-		static Vec2 PointBetweenQuadTreeNode(QuadTreeNode<T> src, QuadTreeNode<T> dst) {
-			int x = -1, y = -1;
-
-			switch (src.SideOfNeighbour(dst)) {
-			case ESide.SOUTH:
-				y = src.BottomLeft.Y;
-				break;
-			case ESide.NORTH:
-				y = src.TopRight.Y - 1;
-				break;
-			case ESide.EAST:
-				x = src.TopRight.X - 1;
-				break;
-			case ESide.WEST:
-				x = src.BottomLeft.X;
-				break;
-			}
-
-			if (x == -1) {
-				x = (src.Width > dst.Width) ? dst.Pos.X : src.Pos.X;
-			} else {
-				y = (src.Height > dst.Height) ? dst.Pos.Y : src.Pos.Y;
-			}
-
-			return new Vec2(x, y);
 		}
 	}
 }

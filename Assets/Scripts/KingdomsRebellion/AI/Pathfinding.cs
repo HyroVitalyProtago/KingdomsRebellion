@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using KingdomsRebellion.Core.Math;
+using KingdomsRebellion.Core.Interfaces;
 
 namespace KingdomsRebellion.AI {
-	public static class Pathfinding {
-		readonly static Heap<AbstractNode> OpenSet = new Heap<AbstractNode>(64);
-		readonly static IList<AbstractNode> Nodes = new List<AbstractNode>();
-		readonly static IList<Vec2> Empty = new List<Vec2>();
+	public static class Pathfinding<T> where T : IPos {
+		readonly static Heap<AbstractNode<T>> OpenSet = new Heap<AbstractNode<T>>(64);
+		readonly static IList<AbstractNode<T>> Nodes = new List<AbstractNode<T>>();
 
-		public static IEnumerable<Vec2> FindPath(AbstractNode startNode, AbstractNode targetNode) {
+		public static IEnumerable<AbstractNode<T>> FindPath(AbstractNode<T> startNode, AbstractNode<T> targetNode) {
 			OpenSet.Clear();
 			OpenSet.Push(startNode);
 			Nodes.Add(startNode);
@@ -16,7 +15,7 @@ namespace KingdomsRebellion.AI {
 			startNode.PathCost = 0;
 			
 			while (!OpenSet.IsEmpty()) {
-				AbstractNode currentNode = OpenSet.Pop();
+				AbstractNode<T> currentNode = OpenSet.Pop();
 
 				if (currentNode == targetNode) {
 					return RetracePath(startNode, currentNode);
@@ -24,7 +23,7 @@ namespace KingdomsRebellion.AI {
 					
 				currentNode.Close();
 
-				foreach (AbstractNode neighbour in currentNode.Neighbours()) {
+				foreach (AbstractNode<T> neighbour in currentNode.Neighbours()) {
 					if (!neighbour.IsFree() || neighbour.IsClosed()) {
 						if (neighbour == targetNode) { // abort if path can't join target
 							return RetracePath(startNode, currentNode);
@@ -48,25 +47,24 @@ namespace KingdomsRebellion.AI {
 			}
 
 			Reset();
-			return Empty;
+			return OpenSet;
 		}
 
-		static IEnumerable<Vec2> RetracePath(AbstractNode startNode, AbstractNode endNode) {
-			IList<Vec2> path = new List<Vec2>();
-			AbstractNode currentNode = endNode;
+		static IEnumerable<AbstractNode<T>> RetracePath(AbstractNode<T> startNode, AbstractNode<T> endNode) {
+			IList<AbstractNode<T>> path = new List<AbstractNode<T>>();
+			AbstractNode<T> currentNode = endNode;
 
 			while (currentNode != startNode) {
-				path.Add(currentNode.Pos);
+				path.Add(currentNode);
 				currentNode = currentNode.Parent;
 			}
-			path.Add(currentNode.Pos);
 
 			Reset();
 			return path.Reverse();
 		}
 
 		static void Reset() {
-			foreach (AbstractNode n in Nodes) {
+			foreach (AbstractNode<T> n in Nodes) {
 				n.Reset();
 			}
 			Nodes.Clear();
