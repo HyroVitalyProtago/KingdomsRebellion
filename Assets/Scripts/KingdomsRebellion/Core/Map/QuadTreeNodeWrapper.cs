@@ -2,21 +2,22 @@
 using System.Linq;
 using KingdomsRebellion.AI;
 using KingdomsRebellion.Core.Interfaces;
+using KingdomsRebellion.Core.Math;
 
 namespace KingdomsRebellion.Core.Map {
 	public class QuadTreeNodeWrapper<T> : AbstractNode where T : IPos,ISize {
 		readonly QuadTreeNode<T> _node;
 
-		QuadTreeNodeWrapper(QuadTreeNode<T> node) : base(node.Pos) {
+		QuadTreeNodeWrapper(QuadTreeNode<T> node, Vec2 pos) : base(pos) {
 			_node = node;
-			_node.SetProperty("NodeWrapper", this);
+			_node.SetProperty(GetID(pos), this);
 		}
 
-		public static QuadTreeNodeWrapper<T> Wrap(QuadTreeNode<T> node) {
+		public static QuadTreeNodeWrapper<T> Wrap(QuadTreeNode<T> node, Vec2 pos) {
 			try {
-				return node.GetProperty<QuadTreeNodeWrapper<T>>("NodeWrapper");
+				return node.GetProperty<QuadTreeNodeWrapper<T>>(GetID(pos));
 			} catch (KeyNotFoundException) {
-				return new QuadTreeNodeWrapper<T>(node);
+				return new QuadTreeNodeWrapper<T>(node, pos);
 			}
 		}
 
@@ -24,12 +25,16 @@ namespace KingdomsRebellion.Core.Map {
 			return _node.IsFree();
 		}
 
-		public override IEnumerable<AbstractNode> Neighbours() {
-			return _node.Neighbours().Select(quadTreeNode => Wrap(quadTreeNode) as AbstractNode);
+		protected override IEnumerable<AbstractNode> RealNeighbours() {
+			return _node.Neighbours(Pos).Select(p => Wrap(p.Key, p.Value) as AbstractNode);
 		}
 
 		public override string ToString() {
-			return string.Format("[QuadTreeNodeWrapper: Pos={0}]", Pos);
+			return GetID(Pos);
+		}
+
+		static string GetID(Vec2 p) {
+			return string.Format("[QuadTreeNodeWrapper: Pos={0}]", p);
 		}
 	}
 }

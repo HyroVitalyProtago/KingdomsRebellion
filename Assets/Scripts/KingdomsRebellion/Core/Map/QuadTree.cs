@@ -39,7 +39,9 @@ namespace KingdomsRebellion.Core.Map {
 		}
 
 		public IEnumerable<Vec2> FindPath(Vec2 start, Vec2 target) {
-			return SimplifyPath(KRFacade.FindPath(FindNode(start), FindNode(target)));
+			var targetNode = FindNode(target);
+			targetNode.Link();
+			return SimplifyPath(KRFacade.FindPath(FindNode(start), targetNode));
 		}
 
 		static IEnumerable<Vec2> SimplifyPath(IEnumerable<Vec2> waypoints) {
@@ -71,7 +73,7 @@ namespace KingdomsRebellion.Core.Map {
 		}
 
 		public AbstractNode FindNode(Vec2 pos) {
-			return !IsInBounds(pos) ? null : QuadTreeNodeWrapper<T>.Wrap(node.Find(pos));
+			return !IsInBounds(pos) ? null : QuadTreeNodeWrapper<T>.Wrap(node.Find(pos), pos);
 		}
 
 		public T Find(Vec2 pos) {

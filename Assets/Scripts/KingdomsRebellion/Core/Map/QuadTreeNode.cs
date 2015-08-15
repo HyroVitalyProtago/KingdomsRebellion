@@ -425,7 +425,27 @@ namespace KingdomsRebellion.Core.Map {
 			}
 		}
 
-		public ESide SideOfNeighbour(QuadTreeNode<T> neighbour) {
+		public IList<KeyValuePair<QuadTreeNode<T>, Vec2>> Neighbours(Vec2 pos) {
+			var neighbours = new List<QuadTreeNode<T>>();
+
+			foreach (ESide side in Enum.GetValues(typeof(ESide))) {
+				Neighbours(side, neighbours);
+			}
+
+			var neighboursPoint = new List<KeyValuePair<QuadTreeNode<T>, Vec2>>();
+			foreach (var neighbour in neighbours) {
+				var point = PointBetweenQuadTreeNode(this, neighbour);
+				if (pos.Equals(point)) {
+					neighboursPoint.Add(new KeyValuePair<QuadTreeNode<T>, Vec2>(neighbour, PointBetweenQuadTreeNode(neighbour, this)));
+				} else {
+					neighboursPoint.Add(new KeyValuePair<QuadTreeNode<T>, Vec2>(this, point));
+				}
+			}
+			
+			return neighboursPoint;
+		}
+
+		ESide SideOfNeighbour(QuadTreeNode<T> neighbour) {
 			IList<QuadTreeNode<T>> neighbours = new List<QuadTreeNode<T>>();
 
 			foreach (ESide side in Enum.GetValues(typeof(ESide))) {
@@ -439,14 +459,6 @@ namespace KingdomsRebellion.Core.Map {
 			throw new SystemException("Search side of an invalid neighbour");
 		}
 
-		public IList<QuadTreeNode<T>> Neighbours() {
-			IList<QuadTreeNode<T>> neighbours = new List<QuadTreeNode<T>>();
-			Neighbours(ESide.NORTH, neighbours);
-			Neighbours(ESide.SOUTH, neighbours);
-			Neighbours(ESide.EAST, neighbours);
-			Neighbours(ESide.WEST, neighbours);
-			return neighbours;
-		}
 
 		public bool IsFree() {
 			return _state == EState.FREE;

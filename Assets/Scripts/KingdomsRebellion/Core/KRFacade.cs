@@ -13,6 +13,7 @@ using Debug = UnityEngine.Debug;
 namespace KingdomsRebellion.Core {
 	public static class KRFacade {
 
+		static readonly Stopwatch _stopwatch = new Stopwatch();
 		static readonly IMap<KRTransform> _Map = new QuadTree<KRTransform>(256, 256);
 
 		static IList<Vec2> __walkedNode = new List<Vec2>();
@@ -27,7 +28,12 @@ namespace KingdomsRebellion.Core {
 		}
 
 		public static IEnumerable<Vec2> FindPath(Vec2 start, Vec2 target) {
-			return _Map.FindPath(start, target);
+			_stopwatch.Reset();
+			_stopwatch.Start();
+			var path = _Map.FindPath(start, target);
+			_stopwatch.Stop();
+			Debug.Log(String.Format("KRFacade::FindPath | time elapsed: {0}", _stopwatch.Elapsed));
+			return path;
 		}
 
 		public static void UpdateGame() {
