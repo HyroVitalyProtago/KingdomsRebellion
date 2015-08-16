@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using KingdomsRebellion.Network.Link;
 using KingdomsRebellion.Core.Math;
 using KingdomsRebellion.Core.Components;
@@ -13,12 +15,13 @@ namespace KingdomsRebellion.Core.Player {
 	public class PInput : KRBehaviour {
 
 		event Action<GameAction> OnDemand;
-        event Action<KeyCode> OnBuild;
 
 		PSelection _selection;
-
+        bool buildMode;
+        List<KRBuild> _workers;
+        KeyCode _key;
 		void Awake() {
-			_selection = GetComponent<PSelection>();
+            _selection = GetComponent<PSelection>();
 
 			On("OnModelSelect");
 			On("OnModelDrag");
@@ -26,13 +29,24 @@ namespace KingdomsRebellion.Core.Player {
 			On("OnKeyPress");
 
 			Offer("OnDemand");
-		    Offer("OnBuild");
 		}
 
+	    void Start() {
+            buildMode = false;
+	    }
+
 		void OnModelSelect(Vec2 v) {
-			if (OnDemand != null) {
-				OnDemand(new SelectAction(v));
-			}
+            if (OnDemand != null) {
+                if (buildMode) {
+                    if (_workers.First().CanBuild(v)) {
+                        OnDemand(new BuildAction(_key, v));
+                    }
+                    _workers.First().DisableBuildMode();
+                    buildMode = false;
+                } else {
+		            OnDemand(new SelectAction(v));
+		        }
+		    }
 		}
 
 		void OnModelDrag(Vec2 v1, Vec2 v2, Vec2 v3) {
@@ -70,9 +84,11 @@ namespace KingdomsRebellion.Core.Player {
 		            OnDemand(new SpawnAction(k));
 		        }
 		    } else {
-                if (OnBuild != null) {
-                    //OnDemand(new BuildAction(k));
-                    OnBuild(k);
+		        _workers = _selection.GetWorkers();
+                if (_workers.Count > 0) {
+                    _workers.First().OnBuild(k);
+		            buildMode = true;
+		            _key = k;
 		        }
 		    }
 		}

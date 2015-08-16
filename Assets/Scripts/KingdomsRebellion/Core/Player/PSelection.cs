@@ -211,5 +211,16 @@ namespace KingdomsRebellion.Core.Player {
 		public bool IsBuilding() {
 			return _selectedObjects[NetworkAPI.PlayerId].All(u => u.GetComponent<KRSpawn>() != null);
 		}
+
+	    public List<KRBuild> GetWorkers() {
+            List<KRBuild> workers = new List<KRBuild>();
+	        foreach (var unit in _selectedObjects[NetworkAPI.PlayerId]) {
+	            KRBuild krBuild = unit.GetComponent<KRBuild>();
+	            if (krBuild != null) {
+	                workers.Add(krBuild);
+	            }
+	        }
+            return workers;
+	    }  
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using KingdomsRebellion.Core.Components;
+using KingdomsRebellion.Core.Math;
 using UnityEngine;
 
 namespace KingdomsRebellion.Network.Link {
@@ -11,13 +12,15 @@ namespace KingdomsRebellion.Network.Link {
     public class BuildAction : GameAction {
 
         protected KeyCode _keyCode;
+        protected Vec2 _pos;
 
         public static BuildAction FromBytes(byte[] data) {
             return new BuildAction().GetFromBytes(data) as BuildAction;
         }
 
-        public BuildAction(KeyCode keyCode) {
+        public BuildAction(KeyCode keyCode, Vec2 pos) {
             _keyCode = keyCode;
+            _pos = pos;
         }
 
         protected BuildAction() { }
@@ -26,10 +29,10 @@ namespace KingdomsRebellion.Network.Link {
             return delegate(GameObject go) {
                        switch (_keyCode) {
                            case KeyCode.C:
-                               go.GetComponent<KRBuild>().Build("Base");
+                               go.GetComponent<KRBuild>().Build("Base",_pos);
                                break;
                            case KeyCode.V:
-                               go.GetComponent<KRBuild>().Build("Barrack");
+                               go.GetComponent<KRBuild>().Build("Barrack",_pos);
                                break;
                        }
                    };
@@ -41,12 +44,14 @@ namespace KingdomsRebellion.Network.Link {
 
         protected override void Serialize(BinaryWriter writer) {
             base.Serialize(writer);
-            writer.Write((Int32) _keyCode);
+            writer.Write((Int32)_keyCode);
+            _pos.Serialize(writer);
         }
 
         protected override void Deserialize(BinaryReader reader) {
             base.Deserialize(reader);
-            _keyCode = (KeyCode) reader.ReadInt32();
+            _keyCode = (KeyCode)reader.ReadInt32();
+            _pos = Vec2.Deserialize(reader);
         }
     }
 }

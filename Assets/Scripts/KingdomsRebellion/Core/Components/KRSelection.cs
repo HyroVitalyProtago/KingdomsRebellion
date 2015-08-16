@@ -11,7 +11,7 @@ namespace KingdomsRebellion.Core.Components {
 		HealthBar _healthBar;
 
 		void Awake() {
-			_healthBar = GetComponent<HealthBar>();
+			_healthBar = GetComponentInChildren<HealthBar>();
 		}
 
 		void Start() {
