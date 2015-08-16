@@ -32,7 +32,7 @@ namespace KingdomsRebellion.Core.FSM {
             }
 
 			if (_attack.Target.PlayerID == _krtransform.PlayerID) {
-				_fsm.GetComponent<KRMovement>().Move(_attack.Target.Pos);
+                _krmovement.Move(_attack.Target.Pos);
                 return typeof(MovementState);
             }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using KingdomsRebellion.Core.Components;
+using KingdomsRebellion.Core.FSM;
 using KingdomsRebellion.Core.Math;
 using UnityEngine;
 
@@ -29,10 +30,13 @@ namespace KingdomsRebellion.Network.Link {
             return delegate(GameObject go) {
                        switch (_keyCode) {
                            case KeyCode.C:
-                               go.GetComponent<KRBuild>().Build("Base",_pos);
+                               go.GetComponent<FiniteStateMachine>().Build("Base",_pos);
                                break;
                            case KeyCode.V:
-                               go.GetComponent<KRBuild>().Build("Barrack",_pos);
+                               go.GetComponent<FiniteStateMachine>().Build("Barrack", _pos);
+                               break;
+                           case KeyCode.R:
+                               go.GetComponent<FiniteStateMachine>().Repare(_pos);
                                break;
                        }
                    };

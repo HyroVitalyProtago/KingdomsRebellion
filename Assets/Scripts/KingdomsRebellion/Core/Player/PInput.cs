@@ -18,6 +18,7 @@ namespace KingdomsRebellion.Core.Player {
 
 		PSelection _selection;
         bool buildMode;
+        bool _repareMode;
         List<KRBuild> _workers;
         KeyCode _key;
 		void Awake() {
@@ -43,9 +44,12 @@ namespace KingdomsRebellion.Core.Player {
                     }
                     _workers.First().DisableBuildMode();
                     buildMode = false;
+                } else if (_repareMode) {
+                    OnDemand(new BuildAction(_key, v));
+                    _repareMode = false;
                 } else {
-		            OnDemand(new SelectAction(v));
-		        }
+                    OnDemand(new SelectAction(v));
+                }
 		    }
 		}
 
@@ -86,9 +90,12 @@ namespace KingdomsRebellion.Core.Player {
 		    } else {
 		        _workers = _selection.GetWorkers();
                 if (_workers.Count > 0) {
-                    _workers.First().OnBuild(k);
-		            buildMode = true;
-		            _key = k;
+                    if (_workers.First().OnBuild(k)) {
+                        buildMode = true;
+                    } else {
+                        _repareMode = true;
+                    }
+                    _key = k;
 		        }
 		    }
 		}

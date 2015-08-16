@@ -69,5 +69,15 @@ namespace KingdomsRebellion.Core.FSM {
 			GetComponent<KRAttack>().Attack(modelPoint);
             PushState(new AttackState(this), true);
         }
+
+        public void Build(string nameObj, Vec2 pos) {
+            GetComponent<KRBuild>().Build(nameObj, pos);
+            PushState(new BuildState(this), true);
+        }
+
+        public void Repare(Vec2 pos) {
+            GetComponent<KRBuild>().Repare( pos);
+            PushState(new BuildState(this), true);
+        }
     }
 }

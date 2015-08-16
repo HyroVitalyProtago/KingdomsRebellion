@@ -13,7 +13,8 @@ namespace KingdomsRebellion.Core.Components {
 
         Transform _dynamics;
         KRTransform _krtransform;
-        GameObject _building;
+        GameObject _view;
+        public KRTransform Building { get; private set; }
         public Vec2 RallyPoint { get; set; }
         Dictionary<String, Object> _spawnableObjects;
         Dictionary<String, Material> _materials;
@@ -32,7 +33,7 @@ namespace KingdomsRebellion.Core.Components {
 
         void Start() {
             GameObject go = GameObject.Find("KRGameObjects");
-            _building = null;
+            _view = null;
             if (go == null) {
                 throw new SystemException("KRGameObjects not found in scene");
             }
@@ -43,8 +44,8 @@ namespace KingdomsRebellion.Core.Components {
             RallyPoint = _krtransform.Pos + 2*toCenter;
         }
 
-        public void AddSpawnable(String name) {
-            _spawnableObjects.Add(name, Resources.Load("Prefabs/Buildings/" + name));
+        public void AddSpawnable(String nameObj) {
+            _spawnableObjects.Add(nameObj, Resources.Load("Prefabs/Buildings/" + nameObj));
         }
 
         public void Build(String nameObj, Vec2 pos) {
@@ -55,48 +56,57 @@ namespace KingdomsRebellion.Core.Components {
                         GameObject;
 
                 kgo.transform.SetParent(_dynamics);
+                Building = kgo.GetComponent<KRTransform>();
+                Building.PlayerID = _krtransform.PlayerID;
 
-                kgo.GetComponent<KRTransform>().PlayerID = _krtransform.PlayerID;
                 if (_krtransform.PlayerID == 0) {
-                    kgo.GetComponentInChildren<Renderer>().sharedMaterial = _materials["SweetBlue"];
+                    Building.GetComponentInChildren<Renderer>().sharedMaterial = _materials["SweetBlue"];
                 } else {
-                    kgo.GetComponentInChildren<Renderer>().sharedMaterial = _materials["SweetRed"];
+                    Building.GetComponentInChildren<Renderer>().sharedMaterial = _materials["SweetRed"];
                 }
             }
         }
 
-        public void OnBuild(KeyCode k) {
-            if (_building != null) Destroy(_building);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="k">KeyCode press</param>
+        /// <returns>True if player want to Build new Object. If player want to repare, return false.</returns>
+        public bool OnBuild(KeyCode k) {
+            if (_view != null) Destroy(_view);
             switch (k) {
                 case KeyCode.C:
-                    _building = Instantiate(Resources.Load("Prefabs/Buildings/View/Base"),
+                    _view = Instantiate(Resources.Load("Prefabs/Buildings/View/Base"),
                         InputModelAdapter.WorldPosition(Input.mousePosition), Quaternion.identity) as GameObject;
                     break;
                 case KeyCode.V:
-                    _building = Instantiate(Resources.Load("Prefabs/Buildings/View/Barrack"),
+                    _view = Instantiate(Resources.Load("Prefabs/Buildings/View/Barrack"),
                         InputModelAdapter.WorldPosition(Input.mousePosition), Quaternion.identity) as GameObject;
                     break;
+                case KeyCode.R:
+                    return false;
             }
-            if (_building != null) {
+            if (_view != null) {
                 if (_krtransform.PlayerID == 0) {
-                    _building.GetComponentInChildren<Renderer>().sharedMaterial = _materials["TransparentBlue"];
+                    _view.GetComponentInChildren<Renderer>().sharedMaterial = _materials["TransparentBlue"];
                 } else {
-                    _building.GetComponentInChildren<Renderer>().sharedMaterial = _materials["TransparentRed"];
+                    _view.GetComponentInChildren<Renderer>().sharedMaterial = _materials["TransparentRed"];
                 }
             }
+            return true;
         }
 
         void Update() {
-            if (_building != null) {
+            if (_view != null) {
                 Vector3 mousePos = InputModelAdapter.WorldPosition(Input.mousePosition);
-                if (_building.transform.position != mousePos) {
-                    _building.transform.position = mousePos.Adjusted();
+                if (_view.transform.position != mousePos) {
+                    _view.transform.position = mousePos.Adjusted();
                 }
             }
         }
 
         public bool CanBuild(Vec2 pos) {
-            Vec2 size = Vec2.FromVector3(_building.transform.GetChild(0).localScale);
+            Vec2 size = Vec2.FromVector3(_view.transform.GetChild(0).localScale);
             for (int i = 0; i < size.X; ++i) {
                 for (int j = 0; j < size.Y; ++j) {
                     if (!KRFacade.IsEmpty(pos + new Vec2(i, j))) {
@@ -108,7 +118,11 @@ namespace KingdomsRebellion.Core.Components {
         }
 
         public void DisableBuildMode() {
-            Destroy(_building);
+            Destroy(_view);
+        }
+
+        public void Repare(Vec2 pos) {
+            Building = KRFacade.Find(pos).GetComponent<KRTransform>();
         }
     }
 }
