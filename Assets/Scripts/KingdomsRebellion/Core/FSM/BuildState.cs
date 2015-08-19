@@ -24,13 +24,13 @@ namespace KingdomsRebellion.Core.FSM {
         }
 
         public override Type Execute() {
-            Debug.Log(Vec2.Dist(_buildingTransform.Pos, _krtransform.Pos));
             if (Vec2.Dist(_buildingTransform.Pos, _krtransform.Pos) > 1) {
                 _krMovement.Move(_buildingTransform.Pos);
                 return typeof (MovementState);
             }
             if (!_krHealth.Ready) {
-                _krHealth.OnCreation(1);
+                // TODO replace by a component that all buildings have.
+                _krHealth.Heal(1, _krBuild.Building.GetComponent<KRSpawn>() != null);
                 return GetType();
             }
             return null;

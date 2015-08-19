@@ -34,9 +34,13 @@ namespace KingdomsRebellion.Core {
 		public static void UpdateGame() {
 			foreach (KRTransform unit in _Map) {
 				FiniteStateMachine fsm = unit.GetComponent<FiniteStateMachine>();
+			    KRSpawn krSpawn = unit.GetComponent<KRSpawn>();
 				if (fsm != null) {
 					fsm.UpdateGame();
 				}
+			    if (krSpawn != null) {
+			        krSpawn.UpdateGame();
+			    }
 			}
 		}
 

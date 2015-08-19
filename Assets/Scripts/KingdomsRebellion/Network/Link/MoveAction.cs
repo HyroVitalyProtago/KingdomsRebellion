@@ -29,7 +29,10 @@ namespace KingdomsRebellion.Network.Link {
 
 		public override Action<GameObject> GetAction() {
 			return delegate(GameObject go) {
-				go.GetComponent<FiniteStateMachine>().Move(_modelPoint);
+                FiniteStateMachine fsm = go.GetComponent<FiniteStateMachine>();
+			    if (fsm != null) {
+			        fsm.Move(_modelPoint);
+			    }
 			};
 		}
 

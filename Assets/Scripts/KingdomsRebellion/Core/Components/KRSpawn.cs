@@ -11,12 +11,14 @@ namespace KingdomsRebellion.Core.Components {
     public class KRSpawn : KRBehaviour {
 
 		Transform _dynamics;
-		KRTransform _krtransform;
+        KRTransform _krtransform;
+        int _speed;
+        int _currentFrame;
 
         Vec2 _spawnPoint;
 		public Vec2 RallyPoint { get; set; }
         Dictionary<String, Object> _spawnableObjects;
-
+        GameObject objToSpawn;
 		Material _sweetBlue, _sweetRed;
 
 		void Awake() {
@@ -38,6 +40,8 @@ namespace KingdomsRebellion.Core.Components {
 
 			RallyPoint = _krtransform.Pos + 5 * toCenter;
 			_spawnPoint = _krtransform.Pos + 2 * toCenter;
+            _speed = 8;
+            _currentFrame = 8;
         }
 
         public void AddSpawnable(String name) {
@@ -60,9 +64,31 @@ namespace KingdomsRebellion.Core.Components {
 					kgo.transform.Find("Body").GetComponent<Renderer>().sharedMaterial = _sweetRed;
 					kgo.transform.Find("Spotlight").GetComponent<Light>().color = new Color(.85f,.85f,.3f);
 				}
-
-				kgo.GetComponent<FiniteStateMachine>().Move(RallyPoint);
+                kgo.GetComponent<KRHealth>().OnSpawn();
+                objToSpawn = kgo;
+                kgo.SetActive(false);
             }
         }
+
+	    public void UpdateGame() {
+	        if (objToSpawn != null) {
+	            if (_currentFrame == 0) {
+	                KRHealth health = objToSpawn.GetComponent<KRHealth>();
+	                if (!health.Ready) {
+	                    // TODO maybe it's possible to replace GetComponent by true
+	                    health.Heal(4, objToSpawn.GetComponent<KRMovement>() != null);
+	                } else {
+	                    objToSpawn.SetActive(true);
+	                    objToSpawn.GetComponent<FiniteStateMachine>().Move(RallyPoint);
+	                    objToSpawn = null;
+	                }
+	                _currentFrame = _speed;
+	            } else {
+	                --_currentFrame;
+	            }
+	        } else {
+	            _currentFrame = 8;
+	        }
+	    }
     }
 }

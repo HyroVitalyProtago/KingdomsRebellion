@@ -19,10 +19,10 @@ namespace KingdomsRebellion.Core.Components {
 
         void Awake() {
 			LifeMax = __lifeMax;
-            Life = 1;
+            Life = 100;
 			Defense = __defense;
 			Weakness = __weakness;
-            Ready = false;
+            Ready = true;
         }
         
         public void OnDamageDone(AttackTypeEnum type, int damage) {
@@ -47,19 +47,21 @@ namespace KingdomsRebellion.Core.Components {
             KRFacade.Remove(GetComponent<KRTransform>(), GetComponent<KRMovement>() != null);
         }
 
-        void Heal(int num) {
-            if (Life + num < LifeMax) {
-                Life += num;
+        public void Heal(int speed, bool isGoodType) {
+            if (!isGoodType) return;
+            if (Life + speed < LifeMax) {
+                Life += speed;
             } else {
                 Life = LifeMax;
             }
-        }
-
-        public void OnCreation(int speed) {
-            Heal(speed);
             if (Life == LifeMax && !Ready) {
                 Ready = true;
             }
+        }
+
+        public void OnSpawn() {
+            Ready = false;
+            Life = 1;
         }
     }
 }

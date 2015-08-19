@@ -58,6 +58,7 @@ namespace KingdomsRebellion.Core.Components {
                 kgo.transform.SetParent(_dynamics);
                 Building = kgo.GetComponent<KRTransform>();
                 Building.PlayerID = _krtransform.PlayerID;
+                kgo.GetComponent<KRHealth>().OnSpawn();
 
                 if (_krtransform.PlayerID == 0) {
                     Building.GetComponentInChildren<Renderer>().sharedMaterial = _materials["SweetBlue"];

@@ -72,23 +72,23 @@ namespace KingdomsRebellion.Core.Player {
 				if (IsInRect(_selectableObjects[i])) {
 					PreSelected(_selectableObjects[i]);
 				} else if (_playerPreSelected.Remove(_selectableObjects[i]) || _ennemyPreSelected.Remove(_selectableObjects[i])) {
-					_selectableObjects[i].GetComponent<HealthBar>().Hide();
+                    _selectableObjects[i].GetComponentInChildren<HealthBar>().Hide();
 				}
 			}
 			if (_playerPreSelected.Count > 0) {
 				foreach (var go in _playerPreSelected) {
-					go.GetComponent<HealthBar>().Show();
+					go.GetComponentInChildren<HealthBar>().Show();
 				}
 				foreach (var go in _ennemyPreSelected) {
-					go.GetComponent<HealthBar>().Hide();
+                    go.GetComponentInChildren<HealthBar>().Hide();
 				}
 				_ennemyPreSelected.Clear();
 			} else if (_ennemyPreSelected.Count > 0) {
 				foreach (var go in _ennemyPreSelected) {
-					go.GetComponent<HealthBar>().Show();
+                    go.GetComponentInChildren<HealthBar>().Show();
 				}
 				foreach (var go in _playerPreSelected) {
-					go.GetComponent<HealthBar>().Hide();
+                    go.GetComponentInChildren<HealthBar>().Hide();
 				}
 				_playerPreSelected.Clear();
 			}
@@ -130,7 +130,7 @@ namespace KingdomsRebellion.Core.Player {
 			}
 
 			foreach (var unit in _selectedObjects[playerID]) {
-				unit.GetComponent<HealthBar>().Show();
+				unit.GetComponentInChildren<HealthBar>().Show();
 			}
 
 			ApplySelection(playerID);
