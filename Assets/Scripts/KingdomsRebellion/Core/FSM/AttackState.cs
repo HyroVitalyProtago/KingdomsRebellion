@@ -12,12 +12,18 @@ namespace KingdomsRebellion.Core.FSM {
         readonly KRAttack _attack;
 		readonly KRTransform _krtransform;
         readonly KRMovement _krmovement;
-        
+        Vec2 _targetPos;
+
         public AttackState(FiniteStateMachine fsm) : base(fsm) {
             _attack = fsm.GetComponent<KRAttack>();
 			_krtransform = fsm.GetComponent<KRTransform>();
 			_krmovement = fsm.GetComponent<KRMovement>();
         }
+
+        public override void Enter() {
+            
+        }
+
 
         public override Type Execute() {
             if (_attack.Target == null) {
@@ -35,18 +41,31 @@ namespace KingdomsRebellion.Core.FSM {
                 _krmovement.Move(_attack.Target.Pos);
                 return typeof(MovementState);
             }
-
-			if (Vec2.Dist(_attack.Target.Pos, _krtransform.Pos) ==
+            int i = 0;
+            while (i < _attack.Target.Size.X - 1) {
+                if (_attack.Target.Pos.X + i >= _krtransform.Pos.X) break;
+                ++i;
+            }
+            int j = 0;
+            while (j < _attack.Target.Size.Y - 1) {
+                if (_attack.Target.Pos.Y + j >= _krtransform.Pos.Y) break;
+                ++j;
+            }
+            if (Vec2.Dist(_attack.Target.Pos+ new Vec2(i,j), _krtransform.Pos) ==
                 _attack.Range) {
                 _attack.UpdateGame();
             } else {
-				if (_krmovement != null) {
-				    if (_attack.Range == 1) {
-                        _krmovement.Follow(_attack.Target);
+                if (_krmovement != null) {
+                    if (_attack.Range == 1) {
+                        if (_attack.Target.GetComponent<KRMovement>() != null) {
+                            _krmovement.Follow(_attack.Target);
+                        } else {
+                            _krmovement.Move(_attack.Target.Pos+ new Vec2(i,j));
+                        }
                         return typeof(MovementState);
-				    } else {
-				        return typeof(RangeState);
-				    }
+                    } else {
+                        return typeof(RangeState);
+                    }
                 }
                 return null;
             }

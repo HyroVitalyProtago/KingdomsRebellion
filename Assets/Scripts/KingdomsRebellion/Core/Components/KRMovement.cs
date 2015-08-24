@@ -168,6 +168,7 @@ namespace KingdomsRebellion.Core.Components {
 
 			__way.Clear();
 			__way.Add(_krtransform.Pos);
+            Followee = null;
 //			__waynodes.Clear();
 		}
 

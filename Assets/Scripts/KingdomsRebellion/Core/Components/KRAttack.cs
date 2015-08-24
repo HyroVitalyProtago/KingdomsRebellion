@@ -65,7 +65,7 @@ namespace KingdomsRebellion.Core.Components {
 
         public void UpdateGame() {
 			Vec2 targetPos = Target.Pos;
-            if (Vec2.Dist(targetPos, GetComponent<KRTransform>().Pos) == Range) {
+            //if (Vec2.Dist(targetPos, GetComponent<KRTransform>().Pos) == Range) {
 				if (_currentFrame == 0) {
 					_spot.enabled = true;
                     Target.GetComponent<KRHealth>().OnDamageDone(AttackType, Strength);
@@ -74,11 +74,11 @@ namespace KingdomsRebellion.Core.Components {
 					_spot.enabled = false;
 					--_currentFrame;
                 }
-            } else {
-				_krMovement.Move(targetPos);
-				_currentFrame = AttackSpeed;
-				_spot.enabled = false;
-            }
+           //} else {
+           //     _krMovement.Move(targetPos);
+           //     _currentFrame = AttackSpeed;
+           //     _spot.enabled = false;
+            //}
         }
 
         void OnTargetDeath(GameObject go) {

@@ -33,6 +33,8 @@ namespace KingdomsRebellion.Core {
 
 		public static void UpdateGame() {
 			foreach (KRTransform unit in _Map) {
+                // TODO ERROR FIXME ... : NEVER REMOVE OBJECT HERE...
+                if (unit == null) continue;
 				FiniteStateMachine fsm = unit.GetComponent<FiniteStateMachine>();
 			    KRSpawn krSpawn = unit.GetComponent<KRSpawn>();
 				if (fsm != null) {

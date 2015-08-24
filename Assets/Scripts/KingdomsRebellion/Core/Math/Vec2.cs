@@ -62,6 +62,21 @@ namespace KingdomsRebellion.Core.Math {
 		    return Mathf.Max(Mathf.Abs(X - v.X), Mathf.Abs(Y - v.Y));
 		}
 
+        public Vec2 Normalized(Vec2 v) {
+            Vec2 res = new Vec2(0,0);
+            if (v.X > 0) {
+                res += Vec2.Right;
+            } else if (v.X < 0) {
+                res -= Vec2.Right;
+            }
+            if (v.Y > 0) {
+                res += Vec2.Up;
+            } else if (v.Y < 0) {
+                res -= Vec2.Up;
+            }
+            return res;
+        }
+
 		public override string ToString() {
 			return "(" + X + ", " + Y + ")";
 		}
